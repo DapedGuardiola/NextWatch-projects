@@ -1,0 +1,17 @@
+# Windows System Files
+desktop.ini
+Thumbs.db
+ehthumbs.db
+
+# Dataset & Folders (Opsional, jika dataset terlalu besar)
+# *.csv
+
+# Node.js / NestJS (Jika proyekmu pakai ini)
+node_modules/
+dist/
+.env
+
+# Laravel (Jika proyekmu pakai ini)
+/vendor/
+/storage/*.key
+.env
