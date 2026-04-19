@@ -1,13 +1,13 @@
 "# NextWatch-projects" 
 ---
-### Cara implementasi sistem rekomendasi keputusan di collab ###
+#Cara implementasi sistem rekomendasi keputusan di collab #
 
-## Download raw data
+### Download raw data
 ```
 assets/imdb_top_1000.csv
 ```
 
-## Buka file ipynb 
+### Buka file ipynb 
 path 
 ```
 sistem_rekomendasi_film_modeling.ipynb
