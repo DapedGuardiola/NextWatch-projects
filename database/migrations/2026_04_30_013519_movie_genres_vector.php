@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create("movie_genre_vector",function(Blueprint $table){
-            $table->increments("id");
+            $table->increments("id")->unique();
             $table->unsignedBigInteger("tmdb_movie_id");
             $table->json("vector");
+            $table->foreign('tmdb_movie_id')->references('tmdb_movie_id')->on('movies');
         });
     }
 
