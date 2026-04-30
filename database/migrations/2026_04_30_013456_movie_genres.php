@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create("movie_genres", function (Blueprint $table) {
-            $table->bigIncrements("id");
+            $table->bigIncrements("id")->unique();
             $table->unsignedBigInteger("tmdb_movie_id");
             $table->unsignedBigInteger("map_genre_id");
+            $table->foreign('tmdb_movie_id')->references('tmdb_movie_id')->on('movies');
+            $table->foreign('map_genre_id')->references('map_id')->on('genres');
         }); 
     }
 

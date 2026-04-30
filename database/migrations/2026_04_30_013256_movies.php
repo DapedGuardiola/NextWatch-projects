@@ -13,7 +13,7 @@ return new class extends Migration
         
         Schema::create("movies", function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->unsignedBigInteger("tmdb_movie_id")->unique;
+            $table->unsignedBigInteger("tmdb_movie_id")->unique();
             $table->string("title");
             $table->text("overview")->nullable();
             $table->string("poster_path")->nullable();

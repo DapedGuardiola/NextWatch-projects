@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create("actors",function(Blueprint $table){
             $table->increments("id");
-            $table->unsignedBigInteger("tmdb_actor_id");
+            $table->unsignedBigInteger("tmdb_actor_id")->unique();
             $table->string("name");
             $table->string("image_path")->nullable();
         });

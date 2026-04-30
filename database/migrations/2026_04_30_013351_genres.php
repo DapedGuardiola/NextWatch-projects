@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create("genres",function(Blueprint$table){
             $table->bigIncrements("id");
-            $table->unsignedBigInteger("map_id")->unique;
+            $table->unsignedBigInteger("map_id")->unique();
             $table->string("name");
         });
     }

@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create("movie_actors", function (Blueprint $table) {
-            $table->bigIncrements("id");
+            $table->bigIncrements("id")->unique();
             $table->unsignedBigInteger("tmdb_movie_id");
             $table->unsignedBigInteger("tmdb_actor_id");
+            $table->foreign('tmdb_movie_id')->references('tmdb_movie_id')->on('movies');
+            $table->foreign('tmdb_actor_id')->references('tmdb_actor_id')->on('actors');
         }); 
     }
 
