@@ -25,10 +25,10 @@
             
             <!-- Sidebar Kiri -->
             <div class="w-1/4 pr-8 flex flex-col gap-6 mt-20 font-semibold">
-                <a href="#" class="bg-white text-black py-2 px-4 rounded-xl text-center">User Profile</a>
-                <a href="#" class="text-gray-400 hover:text-white text-center">Account Settings</a>
-                <a href="#" class="text-gray-400 hover:text-white text-center">Favorite Movies</a>
-                <a href="#" class="text-gray-400 hover:text-white text-center">Watchlist</a>
+               <a href="{{ route('profile.index') }}" class="bg-white text-black py-2 px-4 rounded-xl text-center">User Profile</a>
+<a href="{{ route('profile.settings') }}" class="text-gray-400 hover:text-white text-center transition">Account Settings</a>
+<a href="#" class="text-gray-400 hover:text-white text-center transition">Favorite Movies</a>
+<a href="#" class="text-gray-400 hover:text-white text-center transition">Watchlist</a>
                 
                 <form method="POST" action="/logout" class="mt-12">
                     @csrf
