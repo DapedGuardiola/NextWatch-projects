@@ -13,6 +13,30 @@ class ProfileController extends Controller
         return view('profile.index'); 
     }
 
+    public function updateProfile(Request $request)
+    {
+        // Validasi inputan user
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
+            'dob' => ['nullable', 'date'],
+            'bio' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $user = auth()->user();
+        
+        // Simpan data ke database
+        $user->update([
+            'name' => $request->name,
+            'gender' => $request->gender,
+            'dob' => $request->dob,
+            'bio' => $request->bio,
+        ]);
+
+        return back()->with('success', 'Profile updated successfully!');
+    }
+
+    // Fungsi upload foto
     public function updateAvatar(Request $request)
     {
         $request->validate([
