@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Settings - NextWatch</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+<x-app-layout>
+    <x-slot name="title">
+        {{ __('Account Settings - NextWatch') }}
+    </x-slot>
+
     <style>
         .input-transparan {
             background: transparent !important;
@@ -46,8 +43,6 @@
             -moz-appearance: textfield;
         }
     </style>
-</head>
-<body class="bg-gray-900 font-sans antialiased text-gray-200">
 
     @php
         $avatarUrl = auth()->user()->avatar 
@@ -55,7 +50,7 @@
             : "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) . "&background=333&color=fff";
     @endphp
 
-    <div class="relative min-h-screen w-full overflow-hidden">
+    <div class="relative min-h-screen w-full overflow-hidden text-gray-200">
         <div class="absolute inset-0 bg-cover bg-center z-0" 
              style="background-image: url('{{ $avatarUrl }}'); filter: blur(60px); transform: scale(1.2);">
         </div>
@@ -76,13 +71,7 @@
             </div>
 
             <div class="w-3/4">
-                <div class="flex justify-center gap-4 mb-8">
-                    <button class="bg-yellow-600/30 text-yellow-500 px-4 py-1 rounded-full text-sm">Home</button>
-                    <button class="bg-gray-800/50 px-4 py-1 rounded-full text-sm hover:bg-gray-700 transition">Discover</button>
-                    <button class="bg-gray-800/50 px-4 py-1 rounded-full text-sm hover:bg-gray-700 transition">Top Charted</button>
-                </div>
-
-                <div class="bg-black/20 backdrop-blur-md rounded-[2rem] p-12 mt-12 mx-auto w-11/12 shadow-2xl relative z-20">
+                <div class="bg-black/20 backdrop-blur-md rounded-[2rem] p-12 mt-20 mx-auto w-11/12 shadow-2xl relative z-20">
                     <form action="{{ route('profile.settings.update') }}" method="POST" class="flex flex-col gap-8" autocomplete="off">
                         @csrf
                         @method('PUT')
@@ -120,7 +109,6 @@
                         </div>
 
                         <div class="flex flex-col items-center mt-8 gap-6">
-                            <!-- Class border dan border-yellow-500 sudah dihapus dari sini -->
                             <button type="submit" class="text-yellow-500 font-semibold py-2 px-8 rounded-full hover:bg-yellow-500/10 transition text-sm cursor-pointer">
                                 Save Changes
                             </button>
@@ -134,5 +122,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+</x-app-layout>
