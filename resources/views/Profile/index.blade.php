@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - NextWatch</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-900 font-sans antialiased">
 
     @php
-        $avatarUrl = auth()->user()->avatar 
-            ? asset('storage/' . auth()->user()->avatar) 
-            : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=333&color=fff';
+    $avatarUrl = auth()->user()->avatar
+    ? asset('storage/' . auth()->user()->avatar)
+    : 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=333&color=fff';
     @endphp
 
     <div class="relative min-h-screen w-full overflow-hidden text-gray-200">
         <!-- DYNAMIC BACKGROUND -->
-        <div class="absolute inset-0 bg-cover bg-center z-0" 
-             style="background-image: url('{{ $avatarUrl }}'); filter: blur(60px); transform: scale(1.2);">
+        <div class="absolute inset-0 bg-cover bg-center z-0"
+            style="background-image: url('{{ $avatarUrl }}'); filter: blur(60px); transform: scale(1.2);">
         </div>
         <div class="absolute inset-0 bg-black/60 z-0"></div>
 
         <div class="relative z-10 flex h-full max-w-7xl mx-auto p-6">
-            
+
             <!-- Sidebar Kiri -->
             <div class="w-1/4 pr-8 flex flex-col gap-6 mt-20 font-semibold">
-               <a href="{{ route('profile.index') }}" class="bg-white text-black py-2 px-4 rounded-xl text-center">User Profile</a>
-<a href="{{ route('profile.settings') }}" class="text-gray-400 hover:text-white text-center transition">Account Settings</a>
-<a href="#" class="text-gray-400 hover:text-white text-center transition">Favorite Movies</a>
-<a href="#" class="text-gray-400 hover:text-white text-center transition">Watchlist</a>
-                
-                <form method="POST" action="/logout" class="mt-12">
+                <a href="{{ route('profile.index') }}" class="bg-white text-black py-2 px-4 rounded-xl text-center">User Profile</a>
+                <a href="{{ route('profile.settings') }}" class="text-gray-400 hover:text-white text-center transition">Account Settings</a>
+                <a href="#" class="text-gray-400 hover:text-white text-center transition">Favorite Movies</a>
+                <a href="#" class="text-gray-400 hover:text-white text-center transition">Watchlist</a>
+
+                <form method="POST" action="{{ route('logout') }}" class="mt-12">
                     @csrf
                     <button type="submit" class="text-red-500 w-full text-center hover:text-red-400">Sign Out</button>
                 </form>
@@ -48,14 +50,14 @@
                     <!-- Kiri: Foto -->
                     <div class="w-1/3 flex flex-col items-center">
                         <img src="{{ $avatarUrl }}" alt="Profile" class="w-48 h-48 rounded-3xl object-cover mb-4 shadow-xl">
-                        
+
                         <form id="avatar-form" action="{{ route('profile.avatar') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="avatar" id="avatar-input" class="hidden" accept="image/*">
                         </form>
-                        
-                        <button onclick="document.getElementById('avatar-input').click()" 
-                                class="bg-white text-black font-semibold py-2 px-6 rounded-xl w-full hover:bg-gray-200 transition">
+
+                        <button onclick="document.getElementById('avatar-input').click()"
+                            class="bg-white text-black font-semibold py-2 px-6 rounded-xl w-full hover:bg-gray-200 transition">
                             Edit Profile
                         </button>
                     </div>
@@ -65,11 +67,11 @@
                         <form action="{{ route('profile.update') }}" method="POST" class="flex flex-col gap-6">
                             @csrf
                             @method('PUT')
-                            
+
                             <div>
                                 <label class="text-sm text-gray-400">Name</label>
-                                <input type="text" name="name" value="{{ auth()->user()->name }}" 
-                                       class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">
+                                <input type="text" name="name" value="{{ auth()->user()->name }}"
+                                    class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">
                             </div>
 
                             <div class="flex gap-4">
@@ -84,16 +86,16 @@
                                 </div>
                                 <div class="w-1/2">
                                     <label class="text-sm text-gray-400">Date of Birth</label>
-                                    <input type="date" name="dob" value="{{ auth()->user()->dob }}" 
-                                           class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition color-scheme-dark"
-                                           style="color-scheme: dark;">
+                                    <input type="date" name="dob" value="{{ auth()->user()->dob }}"
+                                        class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition color-scheme-dark"
+                                        style="color-scheme: dark;">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="text-sm text-gray-400">Bio</label>
-                                <textarea name="bio" rows="3" 
-                                          class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-gray-300 border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">{{ auth()->user()->bio }}</textarea>
+                                <textarea name="bio" rows="3"
+                                    class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-gray-300 border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">{{ auth()->user()->bio }}</textarea>
                             </div>
 
                             <!-- Tombol Save yang wajib ada -->
@@ -111,8 +113,9 @@
 
     <script>
         document.getElementById('avatar-input').addEventListener('change', function() {
-            if(this.files && this.files[0]) document.getElementById('avatar-form').submit();
+            if (this.files && this.files[0]) document.getElementById('avatar-form').submit();
         });
     </script>
 </body>
+
 </html>

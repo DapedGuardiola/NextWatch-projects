@@ -1,35 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::middleware('auth')->group(function () {
-    // Rute User Profile
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profileUI', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
-    
-    // 👇 Rute Baru Account Settings 👇
+
     Route::get('/settings', [ProfileController::class, 'settings'])->name('profile.settings');
     Route::put('/settings/update', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
+
+    Route::get('/discover', [DashboardController::class, 'discover'])->name('dashboard.discover');
+    Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
 });
 
-// === RUTE JALAN PINTAS UNTUK TESTING ===
-Route::get('/test-login', function () {
-    $user = User::firstOrCreate(
-        ['email' => 'tester@nextwatch.com'],
-        [
-            'name' => 'Admin NextWatch',
-            'password' => bcrypt('password123')
-        ]
-    );
-
-    Auth::login($user);
-    return redirect('/profile');
-});
+require __DIR__ . '/auth.php';
