@@ -15,4 +15,8 @@ class DashboardController extends Controller
         return view('dashboard', compact('movies'));
     }
 
+    public function topCharted(){
+        $movies = $this->dashboardService->getMovie();
+        return view('topcharted', compact('movies'));
+    }
 }
