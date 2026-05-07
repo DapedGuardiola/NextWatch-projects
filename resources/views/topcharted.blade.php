@@ -9,21 +9,29 @@
             </h1>
         </div>
 
-        <div class="flex gap-4 px-10 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
-        @foreach($movies as $index => $movie)
-            <x-movie.topmovies-modal>
-                <x-slot name="poster">
-                    {{ $movie['poster_path'] }}
-                </x-slot>
-                <x-slot name="title">
-                    {{ $movie['title'] }}
-                </x-slot>
-                <x-slot name="rank">
-                    {{ $index + 1 }}
-                </x-slot>
-            </x-movie.topmovies-modal>
-        @endforeach
-        </div>
+        
+        @foreach($moviesByGenre as $genre => $movies)
+            <div class="mx-10">
+                <h2>
+                    <p class="text-xl font-semibold">{{ $genre }}</p>
+                </h2>
+            </div>
+            <div class="flex gap-4 py-4 px-10 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
+                @foreach($movies as $index => $movie)
+                    <x-movie.topmovies-modal>
+                        <x-slot name="poster">
+                            {{ $movie['poster_path'] }}
+                        </x-slot>
+                        <x-slot name="title">
+                            {{ $movie['title'] }}
+                        </x-slot>
+                        <x-slot name="rank">
+                            {{ $index + 1 }}
+                        </x-slot>
+                    </x-movie.topmovies-modal>
+                @endforeach
+            </div>
+            @endforeach
     </div>
 
 </x-app-layout>
