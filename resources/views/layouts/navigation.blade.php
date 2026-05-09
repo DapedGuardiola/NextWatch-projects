@@ -18,9 +18,13 @@
                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Home') }}
                 </x-nav-link>
-                <x-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">
+                {{-- Discover → trigger modal --}}
+                <button @click="$dispatch('open-discover')"
+                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium leading-5 transition
+                    text-gray-600 bg-gray-200/50 hover:bg-gray-400/50 active:bg-gray-400/50
+                    border-transparent focus:outline-none">
                     {{ __('Discover') }}
-                </x-nav-link>
+                </button>
                 <x-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">
                     {{ __('Top Charted') }}
                 </x-nav-link>
