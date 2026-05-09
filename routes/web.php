@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [ProfileController::class, 'settings'])->name('profile.settings');
     Route::put('/settings/update', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
 
-    Route::get('/discover', [DashboardController::class, 'discover'])->name('dashboard.discover');
+    Route::get('/discover', [DiscoverController::class, 'index'])->name('dashboard.discover');
+    Route::get('/discover/results', [DiscoverController::class, 'results'])->name('discover.results');
     Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
 });
 

@@ -35,6 +35,14 @@
             {{ $slot }}
         </main>
     </div>
+    {{-- Kirim data genres & languages ke modal --}}
+    @php
+        $discoverService = app(\App\Services\DiscoverService::class);
+        $genres    = $genres ?? $discoverService->getGenres();
+        $languages = $languages ?? $discoverService->getLanguages();
+    @endphp
+
+    <x-discover-modal :genres="$genres" :languages="$languages" />
 </body>
 
 </html>
