@@ -9,10 +9,10 @@
 'duration' => null,
 ])
 
-<a href="{{ route('movie.detail',$tmdb_movie_id) }}" class="shrink-0 w-44 cursor-pointer relative block group"data-card>
+<a href="{{ route('movie.detail',$tmdb_movie_id) }}" class="shrink-0 sm:w-56 cursor-pointer relative block group"data-card>
 
     {{-- Tampilan default: poster + title --}}
-    <div class="rounded-2xl overflow-hidden aspect-[2/3] shadow-[6px_6px_0px_#5a5a5a]
+    <div class="rounded-2xl overflow-hidden aspect-[4/6] shadow-[6px_6px_0px_#5a5a5a]
                 transition-all duration-300 delay-0
                 group-hover:opacity-0 group-hover:delay-500">
         @isset($poster)
@@ -31,12 +31,12 @@
     @endisset
 
     {{-- Panel detail: muncul setelah 0.5 detik hover --}}
-    <div class="absolute top-0 left-0 z-10 w-[560px] h-[260px]
+    <div class="absolute top-0 left-0 z-10 w-56 h-[260px]
                 bg-[#1c1c1e] rounded-2xl overflow-hidden flex
                 border border-white/10
                 opacity-0 invisible pointer-events-none
                 transition-all duration-300 delay-0
-                group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:delay-500" data-panel>
+                group-hover:opacity-100 group-hover:visible group-hover: w-[560px] group-hover:pointer-events-auto group-hover:delay-500" data-panel>
 
         {{-- Poster kecil di kiri --}}
         @isset($poster)

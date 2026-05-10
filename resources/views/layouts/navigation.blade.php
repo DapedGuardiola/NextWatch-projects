@@ -2,12 +2,12 @@
     $navClass = request()->routeIs('dashboard.topCharted') ? 'relative' : 'absolute top-0';
 @endphp
 
-<nav x-data="{ open: false }" class="{{ $navClass }} left-0 right-0 z-50 bg-transparent">
+<nav x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 bg-transparent">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 relative items-center">
 
             <!-- Logo (kiri) -->
-            <div class="shrink-0 flex items-center">
+            <div class="shrink-0 w-10 flex items-center">
                 <a href="{{ route('dashboard') }}">
                     <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                 </a>
@@ -31,11 +31,11 @@
             </div>
 
             <!-- Settings Dropdown (kanan) -->
-            <div class="hidden sm:flex sm:items-center">
+            <div class="hidden w-10 sm:flex sm:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <img class="w-10 h-10 rounded-full" src="{{asset('images/image1.png')}}" alt="Image">
+                        <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <img class="shrink-0 w-10 h-10 rounded-full" src="{{asset('images/image1.png')}}" alt="Image">
                         </button>
                     </x-slot>
                     <x-slot name="content">
