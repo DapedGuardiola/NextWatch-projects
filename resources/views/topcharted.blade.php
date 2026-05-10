@@ -8,7 +8,10 @@
                 <p class="text-2xl font-bold">Top On Its Genre</p>
             </h1>
         </div>
-
+        <div class="mx-10">
+            <p class="text-gray-500">Discover the most popular movies across various genres, ranked by views and audience favorites.</p>
+            <x-movie.popular-carousel :movies="$popularMovies" />
+        </div>        
         
         @foreach($moviesByGenre as $genre => $movies)
             <div class="mx-10">
