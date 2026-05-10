@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[Fillable([
     'tmdb_movie_id', 'title', 'overview', 'poster_path',
@@ -19,4 +20,10 @@ class Movie extends Model
     {
         return $this->hasMany(MovieGenre::class, 'tmdb_movie_id', 'tmdb_movie_id');
     }
+    
+    // protected function posterUrl(){
+    //     return Attribute::make(
+    //         get: fn() => 'https://image.tmdb.org/t/p/w500/' . $this->poster_path
+    //     );
+    // }
 }

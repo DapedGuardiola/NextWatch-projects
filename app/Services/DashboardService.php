@@ -2,21 +2,44 @@
 
 namespace App\Services;
 
+use App\Models\Movie;
+use App\Models\MovieGenre;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 class DashboardService
 {
     public function getMovie()
     {
-        $movies = collect([
-            ['title' => 'Extraction',   'poster_path' => 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500'],
-            ['title' => 'The Dark Knight', 'poster_path' => 'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=500'],
-            ['title' => 'Interstellar', 'poster_path' => 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500'],
-            ['title' => 'John Wick',    'poster_path' => 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500'],
-            ['title' => 'Avengers',     'poster_path' => 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=500'],
-            ['title' => 'Inception',    'poster_path' => 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=500'],
-            ['title' => 'Mad Max',      'poster_path' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500'],
-            ['title' => 'Dune',         'poster_path' => 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=500'],
-        ]);
-        return $movies;
+        $movies = Movie::select([
+            'tmdb_movie_id',
+            'title',
+            DB::raw('YEAR(release_date)as year'),
+            'rating',
+            'overview',
+            'runtime',
+            'poster_path',
+        ])->with('genres.genre:map_id,name')
+            ->orderBy('rating', 'Desc')
+            ->limit(10)
+            ->get();
+
+        log::info('Data Movie berhasil diambil', ['movies' => $movies]);
+
+        // $movies = collect([
+        //     ['title' => 'Extraction',   'poster_path' => 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500'],
+        //     ['title' => 'The Dark Knight', 'poster_path' => 'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=500'],
+        //     ['title' => 'Interstellar', 'poster_path' => 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500'],
+        //     ['title' => 'John Wick',    'poster_path' => 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500'],
+        //     ['title' => 'Avengers',     'poster_path' => 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=500'],
+        //     ['title' => 'Inception',    'poster_path' => 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=500'],
+        //     ['title' => 'Mad Max',      'poster_path' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500'],
+        //     ['title' => 'Dune',         'poster_path' => 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=500'],
+        // ]);
+        return $movies->map(function ($movie) {
+            $movie->poster_path = 'https://image.tmdb.org/t/p/w500/' . $movie->poster_path;
+            return $movie;
+        });
     }
 
     public function getMoviesByGenre()
@@ -27,7 +50,7 @@ class DashboardService
                 ['title' => 'The Dark Knight',  'poster_path' => 'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=500'],
                 ['title' => 'John Wick',        'poster_path' => 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500'],
                 ['title' => 'Mad Max',          'poster_path' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500'],
-                ['title' => 'Mission Impossible','poster_path' => 'https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?w=500'],
+                ['title' => 'Mission Impossible', 'poster_path' => 'https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?w=500'],
                 ['title' => 'Top Gun',          'poster_path' => 'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=500'],
                 ['title' => 'Die Hard',         'poster_path' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500'],
                 ['title' => 'Speed',            'poster_path' => 'https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=500'],
@@ -50,11 +73,11 @@ class DashboardService
                 ['title' => 'Titanic',          'poster_path' => 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=500'],
                 ['title' => 'The Notebook',     'poster_path' => 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=500'],
                 ['title' => 'La La Land',       'poster_path' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500'],
-                ['title' => 'Crazy Rich Asians','poster_path' => 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=500'],
+                ['title' => 'Crazy Rich Asians', 'poster_path' => 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=500'],
                 ['title' => 'About Time',       'poster_path' => 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=500'],
-                ['title' => 'Pride & Prejudice','poster_path' => 'https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=500'],
+                ['title' => 'Pride & Prejudice', 'poster_path' => 'https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=500'],
                 ['title' => 'Before Sunrise',   'poster_path' => 'https://images.unsplash.com/photo-1502175353174-a7a70e73b362?w=500'],
-                ['title' => 'A Walk to Remember','poster_path' => 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500'],
+                ['title' => 'A Walk to Remember', 'poster_path' => 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500'],
                 ['title' => 'Me Before You',    'poster_path' => 'https://images.unsplash.com/photo-1516726817505-f5ed825624d8?w=500'],
                 ['title' => 'Hitch',            'poster_path' => 'https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=500'],
             ],
@@ -76,7 +99,7 @@ class DashboardService
                 ['title' => 'Inception',        'poster_path' => 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=500'],
                 ['title' => 'Dune',             'poster_path' => 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=500'],
                 ['title' => 'The Matrix',       'poster_path' => 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500'],
-                ['title' => 'Blade Runner 2049','poster_path' => 'https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=500'],
+                ['title' => 'Blade Runner 2049', 'poster_path' => 'https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=500'],
                 ['title' => 'Arrival',          'poster_path' => 'https://images.unsplash.com/photo-1462332420958-a05d1e002413?w=500'],
                 ['title' => 'Ex Machina',       'poster_path' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500'],
                 ['title' => 'Gravity',          'poster_path' => 'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?w=500'],
@@ -95,6 +118,6 @@ class DashboardService
                 ['title' => 'The Babadook',     'poster_path' => 'https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=500'],
             ],
         ];
-        return $moviesByGenre; 
+        return $moviesByGenre;
     }
 }
