@@ -1,17 +1,33 @@
-@props(['poster' => null, 'title' => null])
+<div class="group shrink-0 w-56 sm:w-64">
 
-<div class="shrink-0 w-44 flex flex-col cursor-pointer group">
-    @isset($poster)
-        <div class="rounded-2xl overflow-hidden aspect-[2/3] shadow-[6px_6px_0px_#5a5a5a] group-hover:shadow-[6px_6px_20px_rgba(0,0,0,0.8)] transition-all duration-300">
-            <img src="{{ $poster }}"
-                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                alt="{{ $title }}">
-        </div>
-    @endisset
+    <div class="relative rounded-2xl overflow-hidden border border-white/10
+        transition duration-500 group-hover:-translate-y-2
+        group-hover:shadow-[0_20px_60px_rgba(34,211,238,0.25)]">
 
-    @isset($title)
-        <p class="mt-2 text-sm font-medium text-center text-black px-1 truncate">
-            {{ trim($title) }}
-        </p>
-    @endisset
+        @isset($poster)
+
+            <img
+                src="{{ $poster }}"
+                class="w-full h-80 object-cover transition duration-500 group-hover:scale-110"
+                alt="{{ $title ?? '' }}"
+            >
+
+        @endisset
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent"></div>
+
+        @isset($title)
+
+            <div class="absolute bottom-0 p-4">
+
+                <h3 class="text-white font-semibold text-lg">
+                    {{ $title }}
+                </h3>
+
+            </div>
+
+        @endisset
+
+    </div>
+
 </div>
