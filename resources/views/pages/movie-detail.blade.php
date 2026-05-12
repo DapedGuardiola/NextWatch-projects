@@ -120,49 +120,96 @@
                             <!-- ACTION BUTTONS - Modern Streaming Style -->
                             <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-6">
 
-                                <!-- Watchlist Button -->
-                                <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
-                                            bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
-                                            text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
-                                            overflow-hidden flex items-center justify-center gap-2">
-                                    <span class="relative z-10 flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        Watchlist
-                                    </span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-white/10 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                </button>
+                            <!-- Watchlist -->
+                            <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                        bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
+                                        text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
+                                        overflow-hidden flex items-center justify-center gap-2">
 
-                                <!-- Favorite Button -->
-                                <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
-                                            bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
-                                            text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
-                                            flex items-center justify-center gap-2">
-                                    <span class="relative z-10 flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                        </svg>
-                                        Favorite
-                                    </span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-white/10 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                </button>
+                                <span class="relative z-10 flex items-center gap-2">
 
-                                <!-- Share Button -->
-                                <button onclick="copyShareLink()" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
-                                            bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/30
-                                            text-gray-100 transition-all duration-300 hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-500/20
-                                            flex items-center justify-center gap-2">
-                                    <span class="relative z-10 flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                        </svg>
-                                        Share
-                                    </span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-white/10 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                </button>
+                                    <svg class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
 
-                            </div>
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 4v16m8-8H4"/>
+
+                                    </svg>
+
+                                    Watchlist
+
+                                </span>
+
+                                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-white/10 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                            </button>
+
+                            <!-- Favorite -->
+                            <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                        bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
+                                        text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
+                                        flex items-center justify-center gap-2">
+
+                                <span class="relative z-10 flex items-center gap-2">
+
+                                    <svg class="w-5 h-5"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24">
+
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+
+                                    </svg>
+
+                                    Favorite
+
+                                </span>
+
+                                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-white/10 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                            </button>
+
+                            <!-- Share -->
+                            <button onclick="copyShareLink()"
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                bg-white/5 hover:bg-white/10
+                                border border-white/10 hover:border-cyan-400/40
+                                text-gray-100 transition-all duration-300
+                                hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-500/20
+                                flex items-center justify-center gap-2">
+
+                                <span class="relative z-10 flex items-center gap-2">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-5 h-5"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.4"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+
+                                        <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"></line>
+                                        <line x1="8.7" y1="13.3" x2="15.3" y2="17.7"></line>
+
+                                    </svg>
+
+                                    Share
+
+                                </span>
+
+                                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-white/10 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                            </button>
+
+                        </div>
 
                         </div>
 
@@ -385,10 +432,81 @@
     </div>
 
     <script>
-        function copyShareLink() {
-            navigator.clipboard.writeText(window.location.href);
-            alert('Link copied!');
+    function copyShareLink() {
+
+        navigator.clipboard.writeText(window.location.href);
+
+        // remove existing toast
+        const existingToast = document.getElementById('share-toast');
+
+        if (existingToast) {
+            existingToast.remove();
         }
-    </script>
+
+        // create toast
+        const toast = document.createElement('div');
+
+        toast.id = 'share-toast';
+
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5 text-cyan-300"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M5 13l4 4L19 7"/>
+
+                    </svg>
+
+                </div>
+
+                <div>
+                    <p class="text-sm font-semibold text-white">
+                        Link copied
+                    </p>
+
+                    <p class="text-xs text-gray-400">
+                        Share link copied to clipboard
+                    </p>
+                </div>
+
+            </div>
+        `;
+
+        toast.className = `
+            fixed top-6 right-6 z-[9999]
+            bg-[#0B1120]/95 backdrop-blur-xl
+            border border-cyan-400/20
+            shadow-[0_0_40px_rgba(34,211,238,0.15)]
+            rounded-2xl
+            px-5 py-4
+            min-w-[280px]
+            animate-[fadeIn_.25s_ease]
+        `;
+
+        document.body.appendChild(toast);
+
+        // auto remove
+        setTimeout(() => {
+
+            toast.style.transition = 'all .3s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+
+        }, 2200);
+    }
+</script>
 
 </x-app-layout>

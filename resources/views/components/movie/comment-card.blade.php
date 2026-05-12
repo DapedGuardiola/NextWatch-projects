@@ -1,30 +1,52 @@
 @props(['comment'])
 
-<div class="bg-[#111827] rounded-xl p-4 border border-white/5">
+<div class="flex gap-4 group">
 
-    <div class="flex gap-4">
+    <!-- AVATAR -->
+    <div class="flex-shrink-0">
 
-        <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center font-bold text-black">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
+                    text-black font-bold flex items-center justify-center
+                    shadow-[0_0_20px_rgba(34,211,238,0.35)]">
+
             {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
+
         </div>
 
-        <div class="flex-1">
+    </div>
 
-            <div class="flex justify-between items-center">
+    <!-- CONTENT -->
+    <div class="flex-1">
 
-                <h3 class="font-semibold">
-                    {{ $comment->user->name ?? 'Unknown User' }}
-                </h3>
+        <div class="flex items-center gap-3">
 
-                <span class="text-gray-500 text-sm">
-                    {{ $comment->created_at ?? 'now' }}
-                </span>
+            <h3 class="font-semibold text-sm text-white">
+                {{ $comment->user->name ?? 'Unknown User' }}
+            </h3>
 
-            </div>
+            <span class="text-xs text-gray-500">
+                {{ $comment->created_at ?? 'now' }}
+            </span>
 
-            <p class="text-gray-300 mt-2 leading-relaxed">
-                {{ $comment->body ?? 'No comment text' }}
-            </p>
+        </div>
+
+        <p class="mt-1 text-gray-300 text-[15px] leading-relaxed">
+            {{ $comment->body ?? 'No comment text' }}
+        </p>
+
+        <div class="flex gap-6 mt-2 text-xs text-gray-500">
+
+            <button class="hover:text-cyan-300 transition">
+                Like
+            </button>
+
+            <button class="hover:text-cyan-300 transition">
+                Reply
+            </button>
+
+            <button class="hover:text-red-400 transition">
+                Report
+            </button>
 
         </div>
 
