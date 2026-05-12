@@ -19,12 +19,12 @@
                     {{ __('Home') }}
                 </x-nav-link>
                 {{-- Discover → trigger modal --}}
-                <button @click="$dispatch('open-discover')"
+                <x-nav-link @click="$dispatch('open-discover')" :active="request()->routeIs('discover.results')"
                     class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium leading-5 transition
-                    text-gray-600 bg-gray-200/50 hover:bg-gray-400/50 active:bg-gray-400/50
+                    hover:bg-gray-400/50 active:bg-gray-400/50
                     border-transparent focus:outline-none">
                     {{ __('Discover') }}
-                </button>
+                </x-nav-link>
                 <x-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">
                     {{ __('Top Charted') }}
                 </x-nav-link>

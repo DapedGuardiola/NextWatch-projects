@@ -24,8 +24,8 @@
     <div class="relative min-h-screen bg-[#212121]">
         <!-- Page Heading -->
         @isset($header)
-        <header class="bg-[#212121] shadow">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <header class="bg-transparent">
+            <div class="max-w-7xl text-white font-bold text-xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 {{ $header }}
             </div>
         </header>

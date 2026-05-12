@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/discover/results', [DiscoverController::class, 'results'])->name('discover.results');
     Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
 
+    Route::get('/actor/detail/{id}',[DashboardController::class,'getActorMovie'])->name('actor.detail');
+
     Route::get('/movie/detail/{id}',function($id){
     $movie = \App\Models\Movie::where('tmdb_movie_id',$id)->first();
     $comments = [];
