@@ -35,4 +35,9 @@ class Movie extends Model
             get: fn() => 'https://image.tmdb.org/t/p/original/'. $this->poster_path
         );
     }
+
+    public function genreVector()
+    {
+        return $this->hasOne(\App\Models\MoviesGenreVector::class, 'tmdb_movie_id', 'tmdb_movie_id');
+    }
 }

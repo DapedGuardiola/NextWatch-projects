@@ -17,10 +17,14 @@ class DiscoverController extends Controller
         return view('dashboard', compact('genres', 'languages'));
     }
 
-    public function results() 
+    public function results(Request $request)
     {
-        $movies = $this->discoverService->getMovies();
+        $genres    = $request->input('genres', []);
+        $languages = $request->input('languages', []);
 
+        $movies = $this->discoverService->filter($genres, $languages);
+    
         return view('discover', compact('movies'));
     }
+
 }
