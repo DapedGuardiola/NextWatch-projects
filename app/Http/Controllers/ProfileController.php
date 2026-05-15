@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -14,7 +15,7 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form (Profile UI).
+     * Menampilkan halaman Profile UI.
      */
     public function index(Request $request): View
     {
@@ -24,7 +25,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Display the user's settings form.
+     * Menampilkan halaman Account Settings.
      */
     public function settings(Request $request): View
     {
@@ -34,10 +35,11 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's Settings (Email, Phone, Password)
+     * Memperbarui pengaturan akun (Email, Phone, Password).
      */
     public function updateSettings(Request $request): RedirectResponse
     {
+        // Validasi format email sesuai kriteria sistem
         $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.Auth::id()],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -49,16 +51,28 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
 
-        // Jika user mengisi form password (ingin ganti password)
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-            
-            // Mengupdate tanggal ganti password sesuai request di blade-mu
-            $user->password_changed_at = now(); 
-        }
-
+        // Reset status verifikasi jika email diubah
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
+        }
+
+        // Logika Ganti Password & Mock Verifikasi Email
+        if ($request->filled('password')) {
+            /**
+             * Simulasi pemicu verifikasi email karena SMTP belum di-setup.
+             * Detail aksi dicatat ke dalam storage/logs/laravel.log
+             */
+            Log::info("MOCK EMAIL: Permintaan ganti password untuk user: {$user->email}. Link verifikasi simulasi telah dipicu.");
+
+            // Enkripsi password menggunakan Bcrypt (Hash::make)
+            $user->password = Hash::make($request->password);
+            
+            // Mencatat waktu perubahan password untuk riwayat keamanan
+            $user->password_changed_at = now(); 
+            
+            $user->save();
+
+            return Redirect::route('profile.settings')->with('status', 'verification-link-sent');
         }
 
         $user->save();
@@ -67,15 +81,18 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's Profile Data (Name, Gender, DOB, Bio)
+     * Memperbarui data profil (Nama, Gender, DOB, Bio).
      */
     public function updateProfile(Request $request): RedirectResponse
     {
+        // Validasi nama wajib lebih dari 3 huruf (min: 4)
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:4', 'max:255'],
             'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
             'dob' => ['nullable', 'date'],
             'bio' => ['nullable', 'string'],
+        ], [
+            'name.min' => 'Nama harus terdiri dari minimal 4 karakter.',
         ]);
 
         $user = $request->user();
@@ -91,7 +108,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's Avatar Image
+     * Memperbarui foto profil pengguna (Avatar).
      */
     public function updateAvatar(Request $request): RedirectResponse
     {
@@ -102,12 +119,12 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($request->hasFile('avatar')) {
-            // Hapus foto lama jika ada
+            // Hapus file avatar lama dari storage jika tersedia
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
 
-            // Simpan foto baru ke storage/app/public/avatars
+            // Simpan file baru ke folder avatars di storage public
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $path;
             $user->save();
@@ -116,8 +133,9 @@ class ProfileController extends Controller
         return Redirect::route('profile.index')->with('status', 'avatar-updated');
     }
 
-    // --- (Fungsi edit dan destroy bawaan tetap ada di bawah sini) ---
-
+    /**
+     * Menampilkan form edit profil bawaan.
+     */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -125,6 +143,9 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Menghapus akun pengguna dari sistem NextWatch.
+     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
