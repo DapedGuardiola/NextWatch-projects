@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\DiscoverService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('components.discover-modal', function ($view) {
+            $discoverService = app(DiscoverService::class);
+            $view->with([
+                'genres'    => $discoverService->getGenres(),
+                'languages' => $discoverService->getLanguages(),
+            ]);
+        });
     }
 }

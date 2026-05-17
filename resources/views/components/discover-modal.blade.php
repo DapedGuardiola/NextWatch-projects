@@ -109,10 +109,20 @@
                         class="px-4 py-2 text-sm text-gray-400 hover:text-white transition">
                         Reset
                     </button>
-                    <a href="{{ route('discover.results') }}"
-                        class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
-                        Search
-                    </a>
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            @click="selectedGenres = []; selectedLanguages = []"
+                            class="px-4 py-2 text-sm text-gray-400 hover:text-white transition">
+                            Reset
+                        </button>
+                        <button
+                            type="button"
+                            @click="submitFilter()"
+                            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                            Search
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -162,6 +172,15 @@ function discoverModal() {
                 if (this.selectedLanguages.length >= 1) return;
                 this.selectedLanguages.push(code);
             }
+        },
+
+        submitFilter() {
+            const params = new URLSearchParams();
+
+            this.selectedGenres.forEach(g => params.append('genres[]', g));
+            this.selectedLanguages.forEach(l => params.append('languages[]', l));
+
+            window.location.href = `/discover/results?${params.toString()}`;
         },
 
         async fetchResults() {

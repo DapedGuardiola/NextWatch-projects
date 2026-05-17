@@ -19,4 +19,16 @@ class FlaskService
         }
         return $response->json('ranked_id');
     }
+    public function getDiscover(array $movies): array
+    {
+        $response = Http::post("{$this->baseUrl}/saw/discover", [
+            'movies' => $movies,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Flask API Error: ' . $response->status());
+        }
+
+        return $response->json('ranked_id');
+    }
 }
