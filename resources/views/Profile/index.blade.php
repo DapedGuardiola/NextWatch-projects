@@ -43,6 +43,9 @@
                             class="bg-white text-black font-semibold py-2 px-6 rounded-xl w-full hover:bg-gray-200 transition">
                             Edit Profile
                         </button>
+                        @error('avatar')
+                            <p class="text-xs text-red-500 mt-2 text-center">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="w-2/3">
@@ -52,8 +55,11 @@
 
                             <div>
                                 <label class="text-sm text-gray-400">Name</label>
-                                <input type="text" name="name" value="{{ auth()->user()->name }}"
+                                <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}"
                                     class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">
+                                @error('name')
+                                    <p class="text-xs text-red-500 mt-1 ml-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="flex gap-4">
@@ -65,12 +71,18 @@
                                         <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
                                         <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
+                                    @error('gender')
+                                        <p class="text-xs text-red-500 mt-1 ml-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 <div class="w-1/2">
                                     <label class="text-sm text-gray-400">Date of Birth</label>
                                     <input type="date" name="dob" value="{{ auth()->user()->dob }}"
                                         class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-white border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition color-scheme-dark"
                                         style="color-scheme: dark;">
+                                    @error('dob')
+                                        <p class="text-xs text-red-500 mt-1 ml-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -78,6 +90,9 @@
                                 <label class="text-sm text-gray-400">Bio</label>
                                 <textarea name="bio" rows="3"
                                     class="w-full bg-gray-800/50 p-3 rounded-xl mt-1 text-gray-300 border border-transparent focus:border-yellow-500 focus:bg-gray-800 focus:ring-0 outline-none transition">{{ auth()->user()->bio }}</textarea>
+                                @error('bio')
+                                    <p class="text-xs text-red-500 mt-1 ml-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="flex justify-end mt-2">
