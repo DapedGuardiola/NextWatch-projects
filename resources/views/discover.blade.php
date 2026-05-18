@@ -15,10 +15,15 @@
         {{-- Grid Movie --}}
         <div class="flex flex-wrap gap-4">
             @forelse($movies as $movie)
-                <x-movie.movie-modal>
-                    <x-slot name="poster">{{ $movie['poster_path'] }}</x-slot>
-                    <x-slot name="title">{{ $movie['title'] }}</x-slot>
-                </x-movie.movie-modal>
+                <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
             @empty
                 <p class="text-gray-400">Tidak ada film ditemukan.</p>
             @endforelse

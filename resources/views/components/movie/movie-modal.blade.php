@@ -9,7 +9,7 @@
 'duration' => null,
 ])
 
-<a href="{{ route('movie.detail',$tmdb_movie_id) }}" class="shrink-0 sm:w-56 cursor-pointer relative block group"data-card>
+<a href="{{ route('movie.detail',$tmdb_movie_id) }}" loading="lazy" class="shrink-0 sm:w-56 cursor-pointer relative block group"data-card>
 
     {{-- Tampilan default: poster + title --}}
     <div class="rounded-2xl overflow-hidden aspect-[4/6] shadow-[6px_6px_0px_#5a5a5a]

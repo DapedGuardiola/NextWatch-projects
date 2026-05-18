@@ -4,9 +4,18 @@ namespace App\Services;
 use App\Helpers\OriginalLanguageHelper;
 use App\Models\Genre;
 use App\Models\Movie;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DiscoverService
 {
+    protected FlaskService $flaskService;
+
+    public function __construct(FlaskService $flaskService)
+    {
+        $this->flaskService = $flaskService;
+    }
+    
     public function getGenres(): array
     {
         return Genre::orderBy('name')->get(['map_id', 'name'])->toArray();
@@ -26,17 +35,68 @@ class DiscoverService
             ->toArray();
     }
 
-    public function getMovies(): object
+    public function filter(array $genres, array $languages): object
     {
-        return collect([
-            ['title' => 'Extraction',      'poster_path' => 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500'],
-            ['title' => 'The Dark Knight', 'poster_path' => 'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=500'],
-            ['title' => 'Interstellar',    'poster_path' => 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500'],
-            ['title' => 'John Wick',       'poster_path' => 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500'],
-            ['title' => 'Avengers',        'poster_path' => 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=500'],
-            ['title' => 'Inception',       'poster_path' => 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=500'],
-            ['title' => 'Mad Max',         'poster_path' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500'],
-            ['title' => 'Dune',            'poster_path' => 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=500'],
+        // 1. Filter di Laravel dulu sebelum kirim ke Flask
+        $query = Movie::select([
+            'tmdb_movie_id',
+            'popularity',
+            'rating',
+            'rating_count',
+            'original_language',
+        ])->with(['genreVector']);
+
+        // Filter bahasa
+        if (!empty($languages)) {
+            $query->whereIn('original_language', $languages);
+        }
+
+        // Filter genre via movie_genres
+        if (!empty($genres)) {
+            $query->whereHas('genres', function ($q) use ($genres) {
+                $q->whereIn('map_genre_id', $genres);
+            });
+        }
+
+        $movies = $query->get()->map(function ($movie) {
+            return [
+                'id'          => $movie->tmdb_movie_id,
+                'popularity'  => $movie->popularity,
+                'rating'      => $movie->rating,
+                'rating_count'=> $movie->rating_count,
+                'vector'      => $movie->genreVector?->vector ?? '[]',
+            ];
+        })->toArray();
+
+        Log::info('Movies setelah filter', [
+            'total' => count($movies),
+            'genres' => $genres,
+            'languages' => $languages,
         ]);
+
+        if (empty($movies)) {
+            return collect();
+        }
+
+        // 2. Kirim ke Flask hanya data yang sudah difilter
+        $rankedIds = $this->flaskService->getDiscover($movies);
+
+        if (empty($rankedIds)) {
+            return collect();
+        }
+
+        // 3. Query movie untuk tampilan
+        return Movie::select([
+            'tmdb_movie_id',
+            'title',
+            DB::raw('YEAR(release_date)as year'),
+            'poster_path',
+            'rating',
+            'overview',
+            'runtime',
+        ])->whereIn('tmdb_movie_id', $rankedIds)
+            ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $rankedIds) . ')')
+            ->get();
     }
+
 }

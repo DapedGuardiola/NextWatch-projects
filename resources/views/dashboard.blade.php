@@ -18,7 +18,7 @@
                 <p class="text-3xl text-white font-bold">Top On Its Genre</p>
             </h1>
         </div>
-        <div class="flex gap-8 px-2 max-w-[90%] mx-auto overflow-hiddenoverflow-x-auto scrollbar-hide">
+        <div class="flex gap-8 px-2 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
             @foreach($movies as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -48,6 +48,19 @@
                 :overview="$movie->overview ?? null"
                 :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
                 :duration="$movie->runtime ?? null" />
+            @endforeach
+        </div>
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">Actors</p>
+            </h1>
+        </div>
+        <div class="flex gap-12 px-2 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+            @foreach($actors as $actor)
+            <x-movie.actor-card
+                :actor_id="$actor->tmdb_actor_id"
+                :image_url="$actor->image_url"
+                :name="$actor->name"/>
             @endforeach
         </div>
 
