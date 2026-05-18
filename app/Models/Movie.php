@@ -36,9 +36,16 @@ class Movie extends Model
         );
     }
 
-    public function genreVector()
+    public function comments()
     {
-        return $this->hasOne(\App\Models\MoviesGenreVector::class, 'tmdb_movie_id', 'tmdb_movie_id');
+        return $this->hasMany(Comment::class, 'movie_id', 'tmdb_movie_id')
+            ->whereNull('reply_id')
+            ->with([
+                'user',
+                'replies.user',
+                'taggedUser'
+            ])
+            ->latest();
     }
     public function normalizedData(){
         return $this->hasOne(NormalizedMovieData::class,'tmdb_movie_id','tmdb_movie_id');

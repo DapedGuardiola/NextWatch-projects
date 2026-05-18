@@ -3,6 +3,9 @@
 use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CommentController;
+use App\Models\Comment;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,29 +34,63 @@ Route::middleware('auth')->group(function () {
     Route::get('/discover/results', [DiscoverController::class, 'results'])->name('discover.results');
     Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
 
-    Route::get('/actor/detail/{id}',[DashboardController::class,'getActorMovie'])->name('actor.detail');
-
-    Route::get('/movie/detail/{id}',function($id){
-    $movie = \App\Models\Movie::where('tmdb_movie_id',$id)->first();
-    $comments = [];
-    $similarMovies = \App\Models\Movie::take(8)->get();
+    Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
+    ->name('comments.store');
+    
+    Route::get('/movie/detail/{id}', function ($id) {
+    $movie = \App\Models\Movie::where('tmdb_movie_id', $id)->firstOrFail();
+    $comments = $movie->comments()
+        ->with('user')
+        ->latest()
+        ->get();
+    $similarMovies = \App\Models\Movie::where('id', '!=', $movie->id)
+        ->take(8)
+        ->get();
     return view('pages.movie-detail', compact(
         'movie',
         'comments',
         'similarMovies'
     ));
     })->name('movie.detail');
-    Route::get('/movie-test', function () {
-    $movie = \App\Models\Movie::first();
-    $comments = [];
-    $similarMovies = \App\Models\Movie::take(8)->get();
+
+    Route::get('/movie/detail/{id}', function ($id) {
+    $movie = \App\Models\Movie::where(
+        'tmdb_movie_id',
+        $id
+    )->firstOrFail();
+    $comments = $movie->comments()->latest()->get();
+    $similarMovies = \App\Models\Movie::where(
+        'tmdb_movie_id',
+        '!=',
+        $movie->tmdb_movie_id
+    )
+    ->take(8)
+    ->get();
     return view('pages.movie-detail', compact(
         'movie',
         'comments',
         'similarMovies'
     ));
-    })->middleware('auth');
+    })->name('movie.detail');
+
+    Route::post('/movie/comment', function (Request $request) {
+    $request->validate([
+        'movie_id' => 'required',
+        'content' => 'required|string|max:1000',
+    ]);
+    Comment::create([
+        'user_id' => auth()->id(),
+        'movie_id' => $request->movie_id,
+        'reply_id' => $request->reply_id,
+        'tagged_user_id' => $request->tagged_user_id,
+        'content' => $request->content,
+    ]);
+    return back();
+    })->middleware('auth')->name('movie.comment');
 
 });
+
+    Route::post('/movies/{movie}/comments', [CommentController::class, 'store'])
+    ->name('comments.store');
 
 require __DIR__ . '/auth.php';
