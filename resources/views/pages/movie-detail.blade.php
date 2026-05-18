@@ -248,31 +248,52 @@
 
                         </div>
 
-                        <!-- COMMENT INPUT (YouTube style minimal) -->
+                        <!-- COMMENT INPUT -->
+                        <form action="{{ route('comments.store', $movie->tmdb_movie_id) }}" method="POST">
+
+                        @csrf
+
                         <div class="flex gap-4 mb-10">
 
-                            <!-- current user avatar placeholder -->
+                            <!-- USER AVATAR -->
                             <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
-                                Y
+
+                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+
                             </div>
 
                             <div class="flex-1">
 
                                 <textarea
+                                    name="body"
                                     rows="2"
                                     placeholder="Add a comment..."
                                     class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"
                                 ></textarea>
 
+                                @error('body')
+                                    <p class="text-red-400 text-sm mt-2">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+
                                 <div class="flex justify-end mt-3">
-                                    <button class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
+
+                                    <button
+                                        type="submit"
+                                        class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
+
                                         Comment
+
                                     </button>
+
                                 </div>
 
                             </div>
 
                         </div>
+
+                    </form>
 
                         <!-- COMMENTS LIST -->
                         <div class="space-y-8 max-h-[520px] overflow-y-auto pr-2">
@@ -307,19 +328,19 @@
                                                     {{ $comment->user->name ?? 'Unknown User' }}
                                                 </h3>
 
-                                                <span class="text-xs text-gray-500">
-                                                    {{ $comment->created_at ?? 'now' }}
+                                                <span class="text-sm text-gray-500">
+                                                    {{ $comment->created_at->diffForHumans() }}
                                                 </span>
 
                                             </div>
 
                                             <!-- COMMENT TEXT -->
-                                            <p class="mt-1 text-gray-300 text-[15px] leading-relaxed">
+                                            <p class="mt-2 text-gray-200 text-[16px] leading-relaxed">
                                                 {{ $comment->body ?? 'No comment text' }}
                                             </p>
 
                                             <!-- ACTIONS (YouTube style subtle) -->
-                                            <div class="flex gap-6 mt-2 text-xs text-gray-500">
+                                            <div class="flex gap-6 mt-3 text-sm text-gray-500">
 
                                                 <button class="hover:text-cyan-300 transition">
                                                     Like

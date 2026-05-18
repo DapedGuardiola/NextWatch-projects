@@ -35,4 +35,16 @@ class Movie extends Model
             get: fn() => 'https://image.tmdb.org/t/p/original/'. $this->poster_path
         );
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'movie_id', 'tmdb_movie_id')
+            ->whereNull('reply_id')
+            ->with([
+                'user',
+                'replies.user',
+                'taggedUser'
+            ])
+            ->latest();
+    }
 }
