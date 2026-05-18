@@ -52,8 +52,14 @@ class Movie extends Model
             ])
             ->latest();
     }
+
     public function normalizedData()
     {
         return $this->hasOne(NormalizedMovieData::class, 'tmdb_movie_id', 'tmdb_movie_id');
+    }
+
+    public function watchlists()
+    {
+        return $this->hasMany(Watchlist::class, 'movie_id', 'tmdb_movie_id');
     }
 }

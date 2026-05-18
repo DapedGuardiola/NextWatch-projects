@@ -121,56 +121,171 @@
                             <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-6">
 
                             <!-- Watchlist -->
-                            <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
-                                        bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
-                                        text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
-                                        overflow-hidden flex items-center justify-center gap-2">
+                            @if($isInWatchlist)
 
-                                <span class="relative z-10 flex items-center gap-2">
+                            <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
 
-                                    <svg class="w-5 h-5"
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    type="submit"
+                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                    bg-red-500/20 hover:bg-red-500/30
+                                    border border-red-400/30
+                                    text-red-300 transition-all duration-300
+                                    flex items-center justify-center gap-2">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-5 h-5"
                                         fill="none"
+                                        viewBox="0 0 24 24"
                                         stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                        stroke-width="2">
 
                                         <path stroke-linecap="round"
                                             stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M12 4v16m8-8H4"/>
+                                            d="M6 18L18 6M6 6l12 12"/>
 
                                     </svg>
 
-                                    Watchlist
+                                    Remove Watchlist
 
-                                </span>
+                                </button>
 
-                                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-white/10 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            </form>
 
-                            </button>
+                            @else
+
+                            <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
+
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                    bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
+                                    text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
+                                    overflow-hidden flex items-center justify-center gap-2">
+
+                                    <span class="relative z-10 flex items-center gap-2">
+
+                                        <svg class="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 4v16m8-8H4"/>
+
+                                        </svg>
+
+                                        Add Watchlist
+
+                                    </span>
+
+                                </button>
+
+                            </form>
+
+                            @endif
 
                             <!-- Favorite -->
-                            <button class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
-                                        bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
-                                        text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
-                                        flex items-center justify-center gap-2">
+                    @if($isFavorite)
 
-                                <span class="relative z-10 flex items-center gap-2">
+                    <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
 
-                                    <svg class="w-5 h-5"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24">
+                        @csrf
+                        @method('DELETE')
 
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        <button
+                            type="submit"
+                            class="group relative px-6 md:px-8 py-3 md:py-4 rounded-xl
+                            font-semibold text-base
+                            bg-white/10 hover:bg-white/15
+                            border border-cyan-400/20 hover:border-cyan-300/40
+                            backdrop-blur-xl
+                            text-cyan-200
+                            transition-all duration-300
+                            hover:shadow-[0_0_30px_rgba(34,211,238,0.12)]
+                            flex items-center justify-center gap-3 overflow-hidden">
 
-                                    </svg>
+                            <!-- glow -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-300/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
-                                    Favorite
+                            <span class="relative z-10 flex items-center gap-3">
 
-                                </span>
+                                <!-- filled heart -->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5 fill-cyan-300"
+                                    viewBox="0 0 24 24">
 
-                                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-white/10 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                                    2 5.42 4.42 3 7.5 3
+                                    c1.74 0 3.41.81 4.5 2.09
+                                    C13.09 3.81 14.76 3 16.5 3
+                                    19.58 3 22 5.42 22 8.5
+                                    c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
 
-                            </button>
+                                </svg>
+
+                                Saved
+
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                    @else
+
+                    <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
+
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="group relative px-6 md:px-8 py-3 md:py-4 rounded-xl
+                            font-semibold text-base
+                            bg-white/5 hover:bg-white/10
+                            border border-white/10 hover:border-cyan-400/30
+                            backdrop-blur-xl
+                            text-gray-100
+                            transition-all duration-300
+                            hover:text-cyan-200
+                            hover:shadow-[0_0_30px_rgba(34,211,238,0.10)]
+                            flex items-center justify-center gap-3 overflow-hidden">
+
+                            <!-- glow -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-300/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition duration-500"></div>
+
+                            <span class="relative z-10 flex items-center gap-3">
+
+                                <!-- outline heart -->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2">
+
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+
+                                </svg>
+
+                                Favorite
+
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                    @endif
 
                             <!-- Share -->
                             <button onclick="copyShareLink()"
@@ -248,53 +363,6 @@
 
                         </div>
 
-                        <!-- COMMENT INPUT -->
-                        <form action="{{ route('comments.store', $movie->tmdb_movie_id) }}" method="POST">
-
-                        @csrf
-
-                        <div class="flex gap-4 mb-10">
-
-                            <!-- USER AVATAR -->
-                            <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
-
-                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-
-                            </div>
-
-                            <div class="flex-1">
-
-                                <textarea
-                                    name="body"
-                                    rows="2"
-                                    placeholder="Add a comment..."
-                                    class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"
-                                ></textarea>
-
-                                @error('body')
-                                    <p class="text-red-400 text-sm mt-2">
-                                        {{ $message }}
-                                    </p>
-                                @enderror
-
-                                <div class="flex justify-end mt-3">
-
-                                    <button
-                                        type="submit"
-                                        class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
-
-                                        Comment
-
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
                         <!-- COMMENTS LIST -->
                         <div class="space-y-8 max-h-[520px] overflow-y-auto pr-2">
 
@@ -336,7 +404,7 @@
 
                                             <!-- COMMENT TEXT -->
                                             <p class="mt-2 text-gray-200 text-[16px] leading-relaxed">
-                                                {{ $comment->body ?? 'No comment text' }}
+                                                {{ $comment->content ?? 'No comment text' }}
                                             </p>
 
                                             <!-- ACTIONS (YouTube style subtle) -->
@@ -385,6 +453,45 @@
                                 </div>
 
                             @endif
+                            <!-- COMMENT INPUT -->
+                        <form action="{{ route('comments.store', $movie->tmdb_movie_id) }}" method="POST">
+
+                        @csrf
+
+                        <div class="flex gap-4 mb-10">
+
+                            <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
+
+                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+
+                            </div>
+
+                            <div class="flex-1">
+
+                                <textarea
+                                    name="content"
+                                    rows="2"
+                                    placeholder="Add a comment..."
+                                    class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"
+                                ></textarea>
+
+                                <div class="flex justify-end mt-3">
+
+                                    <button
+                                        type="submit"
+                                        class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
+
+                                        Comment
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </form>
 
                         </div>
 
