@@ -40,4 +40,7 @@ class Movie extends Model
     {
         return $this->hasOne(\App\Models\MoviesGenreVector::class, 'tmdb_movie_id', 'tmdb_movie_id');
     }
+    public function normalizedData(){
+        return $this->hasOne(NormalizedMovieData::class,'tmdb_movie_id','tmdb_movie_id');
+    }
 }

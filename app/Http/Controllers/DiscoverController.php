@@ -22,7 +22,7 @@ class DiscoverController extends Controller
         $genres    = $request->input('genres', []);
         $languages = $request->input('languages', []);
 
-        $movies = $this->discoverService->filter($genres, $languages);
+        $movies = $this->discoverService->filterTest($genres, $languages);
     
         return view('discover', compact('movies'));
     }
