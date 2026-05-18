@@ -32,10 +32,15 @@ class Movie extends Model
     protected function posterUrl(): Attribute
     {
         return Attribute::make(
-            get: fn() => 'https://image.tmdb.org/t/p/original/'. $this->poster_path
+            get: fn() => 'https://image.tmdb.org/t/p/original/' . $this->poster_path
         );
     }
 
+    public function genreVector()
+    {
+        return $this->hasOne(\App\Models\MoviesGenreVector::class, 'tmdb_movie_id', 'tmdb_movie_id');
+    }
+    
     public function comments()
     {
         return $this->hasMany(Comment::class, 'movie_id', 'tmdb_movie_id')
@@ -47,7 +52,8 @@ class Movie extends Model
             ])
             ->latest();
     }
-    public function normalizedData(){
-        return $this->hasOne(NormalizedMovieData::class,'tmdb_movie_id','tmdb_movie_id');
+    public function normalizedData()
+    {
+        return $this->hasOne(NormalizedMovieData::class, 'tmdb_movie_id', 'tmdb_movie_id');
     }
 }
