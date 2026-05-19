@@ -1,8 +1,7 @@
-<div class="group shrink-0 w-56 sm:w-64">
+<div class="group shrink-0 sm:w-56">
 
-    <div class="relative rounded-2xl overflow-hidden border border-white/10
-        transition duration-500 group-hover:-translate-y-2
-        group-hover:shadow-[0_20px_60px_rgba(34,211,238,0.25)]">
+    <div class="relative rounded-2xl aspect-[4/6] overflow-hidden border border-white/10
+        transition duration-500 group-hover:-translate-y-2">
 
         @isset($rank)
 

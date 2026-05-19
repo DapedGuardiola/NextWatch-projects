@@ -3,20 +3,19 @@
         {{ __('Top Charted Movies') }}
     </x-slot>
     <div>
-        <div class="mx-10 my-5">
+        <div class="mx-10 mt-[75px] mb-5">
             <h1>
-                <p class="text-2xl font-bold">Top On Its Genre</p>
+                <p class="text-3xl text-white font-bold">All Time Best Movies</p>
             </h1>
         </div>
-        <div class="mx-10">
-            <p class="text-gray-500">Discover the most popular movies across various genres, ranked by views and audience favorites.</p>
+        <div class="mx-10 mb-5">
             <x-movie.popular-carousel :movies="$popularMovies" />
         </div>        
         
         @foreach($moviesByGenre as $genre => $movies)
-            <div class="mx-10">
+            <div class="text-white mx-10">
                 <h2>
-                    <p class="text-xl font-semibold">{{ $genre }}</p>
+                    <p class="text-3xl text-white font-bold">{{ $genre }}</p>
                 </h2>
             </div>
             <div class="flex gap-4 py-4 px-10 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
