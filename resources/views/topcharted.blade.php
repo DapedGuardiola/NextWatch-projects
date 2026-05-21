@@ -20,17 +20,16 @@
             </div>
             <div class="flex gap-4 py-4 px-10 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
                 @foreach($movies as $index => $movie)
-                    <x-movie.topmovies-modal>
-                        <x-slot name="poster">
-                            {{ $movie['poster_path'] }}
-                        </x-slot>
-                        <x-slot name="title">
-                            {{ $movie['title'] }}
-                        </x-slot>
-                        <x-slot name="rank">
-                            {{ $index + 1 }}
-                        </x-slot>
-                    </x-movie.topmovies-modal>
+                    <x-movie.topmovies-modal
+                        :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"
+                        :title="$movie['title']"
+                        :tmdb_movie_id="$movie['id']"
+                        :year="$movie['year'] ?? null"
+                        :rating="$movie['rating'] ?? null"
+                        :overview="$movie['overview'] ?? null"
+                        :genres="[]"
+                        :duration="$movie['runtime'] ?? null" 
+                        :rank="$index + 1" />
                 @endforeach
             </div>
             @endforeach
