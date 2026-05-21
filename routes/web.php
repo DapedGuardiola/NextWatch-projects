@@ -6,6 +6,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TopChartedController;
+use App\Services\LogActivityService;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +37,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/discover', [DiscoverController::class, 'index'])->name('dashboard.discover');
     Route::get('/discover/results', [DiscoverController::class, 'results'])->name('discover.results');
-    Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
+
+    Route::get('/top_charted', [TopChartedController::class, 'index'])->name('dashboard.topCharted');
 
     //Movie Detail
     Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
@@ -71,10 +75,13 @@ Route::middleware('auth')->group(function () {
     })->name('actor.detail');
 
     Route::get('/movie/detail/{id}', function ($id) {
+    $user_id = auth()->id();
     $movie = \App\Models\Movie::where(
         'tmdb_movie_id',
-        $id 
+        $id
     )->with('genres.genre:map_id,name')->firstOrFail();
+    $logActivityService = new LogActivityService();
+    $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
 
     $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
 
@@ -120,7 +127,12 @@ Route::middleware('auth')->group(function () {
         'genreNames'
     ));
 
-})->name('movie.detail');
+    })->name('movie.detail');
+
+    //Search
+
+    Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+    Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
 
     Route::post('/movie/comment', function (Request $request) {
     $request->validate([

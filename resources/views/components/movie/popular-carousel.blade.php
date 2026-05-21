@@ -11,32 +11,31 @@
                     <span class="text-yellow-400 font-semibold">{{ $i + 1 }}.</span>
                     <span>{{ $movie['title'] }}</span>
                     <span>💜</span>
-                    <span class="text-gray-400 text-xs">{{ number_format($movie['views']) }}</span>
+                    <span class="text-gray-400 text-xs">{{ number_format($movie['popularity']) }}</span>
                 </div>
             @endforeach
         </div>
     </div>
 
     {{-- Stage Carousel --}}
-    <div class="absolute top-0 bottom-0 right-0 flex items-center justify-left" style="left: 250px;">
-        <button onclick="prevSlide()" class="absolute left-2 z-10 bg-white/15 hover:bg-white/25 text-white border-0 w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer transition">&#8249;</button>
-
+    <button id="prevButton" onclick="prevSlide()" class="absolute left-2 z-10 bg-white/15 hover:bg-white/25 text-white border-0 w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer transition">&#8249;</button>
+    
+    <div id="carouselContainer" class="absolute top-0 bottom-0 right-0 flex items-center justify-left" style="width: 60%;">
         <div class="flex items-center scrollbar-hide transition-transform duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]" id="carouselTrack">
             @foreach($movies as $i => $movie)
                 <div onclick="goToSlide({{ $i }})"
                      data-index="{{ $i }}"
                      class="poster-item shrink-0 rounded-[14px] cursor-pointer transition-all duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]
                             {{ $i === 0 ? 'w-56 h-80 opacity-100 mx-2.5 outline outline-[2.5px]' : (abs($i - 0) === 1 ? 'w-36 h-56 opacity-60 mx-1' : 'w-24 h-40 opacity-35 -mx-2') }}">
-                    <img src="{{ $movie['poster_path'] }}" class="w-full h-full rounded-[14px] object-cover" alt="{{ $movie['title'] }}">
+                    <img src="https://image.tmdb.org/t/p/original/{{ $movie['poster_path'] }}" class="w-full h-full rounded-[14px] object-cover" alt="{{ $movie['title'] }}">
                     <div class="p-2 text-center">
                         <p class="text-white text-xs font-semibold truncate">{{ $movie['title'] }}</p>
                     </div>
                 </div>
             @endforeach
         </div>
-
-        <button onclick="nextSlide()" class="absolute right-2 z-10 bg-white/15 hover:bg-white/25 text-white border-0 w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer transition">&#8250;</button>
     </div>
+    <button id="nextButton" onclick="nextSlide()" class="absolute right-2 z-10 bg-white/15 hover:bg-white/25 text-white border-0 w-8 h-8 rounded-full flex items-center justify-center text-lg cursor-pointer transition">&#8250;</button>
 </div>
 
 <script>
@@ -45,6 +44,8 @@
     const carouselTrack = document.getElementById('carouselTrack');
     const infoPanel = document.getElementById('infoPanel');
     const rankList = document.getElementById('rankList');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
 
     // Ukuran tiap tier
     const SIZE = {
@@ -101,12 +102,14 @@
             rankList.style.opacity = '0';
             rankList.style.transform = 'translateY(8px)';
             rankList.style.pointerEvents = 'none';
+            prevButton.style.marginLeft = '0%';
         } else {
             infoPanel.style.top = '50%';
             infoPanel.style.transform = 'translateY(-50%)';
             rankList.style.opacity = '1';
             rankList.style.transform = 'translateY(0)';
             rankList.style.pointerEvents = '';
+            prevButton.style.marginLeft = '100%';
         }
     }
 

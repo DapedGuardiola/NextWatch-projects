@@ -8,11 +8,14 @@
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-20% via-[#212121]/75 via-70% to-[#212121] to-100%"></div>
 
         <!-- Konten di atas gambar -->
-        <div class="absolute bottom-[25%] left-10">
+        <div class="absolute bottom-[15%] left-10">
             <h1 class="text-white text-7xl font-bold">{{ $popularMovie->title }}</h1>
         </div>
     </div>
     <div class="-mt-[200px] max-w [95%] left-0 right-0 relative z-10 ">
+        <div class="mt-[135px]">
+            <x-movie.search-bar />
+        </div>
         <div class="mx-10 my-10">
             <h1>
                 <p class="text-3xl text-white font-bold">Top On Its Genre</p>

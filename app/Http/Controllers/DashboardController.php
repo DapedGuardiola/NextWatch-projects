@@ -19,13 +19,7 @@ class DashboardController extends Controller
         $actors = $this->actorService->getActor();
         return view('dashboard', compact(['movies','popularMovie','actors']));
     }
-
-    public function topCharted(){
-        $popularMovies = $this->dashboardService->getPopularMovies();
-        $moviesByGenre = $this->dashboardService->getMoviesByGenre();
-        return view('topcharted', compact('popularMovies', 'moviesByGenre'));
-    }
-
+    
     public function getActorMovie($id){
         $actorsData = $this->actorService->getActorMovies($id);
         return view('pages.actor-detail',compact('actorsData'));

@@ -14,7 +14,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
 
-            $table->integer('movie_id');
+            $table->unsignedBigInteger('movie_id');
+
+            $table->boolean('is_persona')->nullable()->default(null);
 
             $table->timestamps();
 
@@ -23,6 +25,8 @@ return new class extends Migration
                 'movie_id'
             ]);
 
+            $table->foreign('movie_id')->references('tmdb_movie_id')->on('movies');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
