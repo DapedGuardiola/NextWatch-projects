@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\SearchController;
+use App\Services\LogActivityService;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -72,12 +73,13 @@ Route::middleware('auth')->group(function () {
     })->name('actor.detail');
 
     Route::get('/movie/detail/{id}', function ($id) {
-
+    $user_id = auth()->id();
     $movie = \App\Models\Movie::where(
         'tmdb_movie_id',
         $id
     )->firstOrFail();
-
+    $logActivityService = new LogActivityService();
+    $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
     $comments = $movie->comments()
         ->with('user')
         ->latest()
