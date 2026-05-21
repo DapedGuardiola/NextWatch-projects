@@ -140,13 +140,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
     ->name('comments.store');
 
-    Route::get('/actor/{id}', function ($id) {
-    $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
-    if (!$actor) {
-        abort(404);
-    }
-    return view('pages.actor-detail', compact('actor'));
-    })->name('actor.detail');
+    // Route::get('/actor/{id}', function ($id) {
+    // $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
+    // if (!$actor) {
+    //     abort(404);
+    // }
+    // return view('pages.actor-detail', compact('actor'));
+    // })->name('actor.detail');
 });
 
 require __DIR__ . '/auth.php';
