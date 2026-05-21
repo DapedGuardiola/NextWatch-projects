@@ -68,6 +68,7 @@ class TopChartedService
                         'runtime' => $movie->runtime,
                         'poster_path' => $movie->poster_path,
                         'popularity' => $movie->popularity,
+                        'genres'     => $movie->genres->pluck('genre.map_id')->filter()->values()->toArray(),
                     ];
                 })->toArray();
             }
