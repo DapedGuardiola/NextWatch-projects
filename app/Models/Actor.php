@@ -21,4 +21,16 @@ class Actor extends Model
             get: fn() => 'https://image.tmdb.org/t/p/w300/'. $this->image_path
         );
     }
+
+    public function movies()
+    {
+        return $this->belongsToMany(
+            Movie::class,
+            'movie_actors',
+            'tmdb_actor_id',
+            'tmdb_movie_id',
+            'tmdb_actor_id',
+            'tmdb_movie_id'
+        );
+    }
 }

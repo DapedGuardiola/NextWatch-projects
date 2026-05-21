@@ -71,11 +71,12 @@ Route::middleware('auth')->group(function () {
     })->name('actor.detail');
 
     Route::get('/movie/detail/{id}', function ($id) {
-
     $movie = \App\Models\Movie::where(
         'tmdb_movie_id',
-        $id
-    )->firstOrFail();
+        $id 
+    )->with('genres.genre:map_id,name')->firstOrFail();
+
+    $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
 
     $comments = $movie->comments()
         ->with('user')
@@ -115,7 +116,8 @@ Route::middleware('auth')->group(function () {
         'comments',
         'similarMovies',
         'isInWatchlist',
-        'isFavorite'
+        'isFavorite',
+        'genreNames'
     ));
 
 })->name('movie.detail');
