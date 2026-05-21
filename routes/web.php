@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TopChartedController;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +36,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/discover', [DiscoverController::class, 'index'])->name('dashboard.discover');
     Route::get('/discover/results', [DiscoverController::class, 'results'])->name('discover.results');
-    Route::get('/top_charted', [DashboardController::class, 'topCharted'])->name('dashboard.topCharted');
+
+    Route::get('/top_charted', [TopChartedController::class, 'index'])->name('dashboard.topCharted');
 
     //Movie Detail
     Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])

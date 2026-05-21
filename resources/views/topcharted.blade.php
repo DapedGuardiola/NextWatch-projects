@@ -22,7 +22,7 @@
                 @foreach($movies as $index => $movie)
                     <x-movie.topmovies-modal>
                         <x-slot name="poster">
-                            {{ $movie['poster_path'] }}
+                            {{ "https://image.tmdb.org/t/p/original/" .  $movie['poster_path'] }}
                         </x-slot>
                         <x-slot name="title">
                             {{ $movie['title'] }}
