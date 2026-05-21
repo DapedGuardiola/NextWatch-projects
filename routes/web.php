@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\SearchController;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -118,7 +119,12 @@ Route::middleware('auth')->group(function () {
         'isFavorite'
     ));
 
-})->name('movie.detail');
+    })->name('movie.detail');
+
+    //Search
+
+    Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+    Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
 
     Route::post('/movie/comment', function (Request $request) {
     $request->validate([
@@ -138,13 +144,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
     ->name('comments.store');
 
-    Route::get('/actor/{id}', function ($id) {
-    $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
-    if (!$actor) {
-        abort(404);
-    }
-    return view('pages.actor-detail', compact('actor'));
-    })->name('actor.detail');
+    // Route::get('/actor/{id}', function ($id) {
+    // $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
+    // if (!$actor) {
+    //     abort(404);
+    // }
+    // return view('pages.actor-detail', compact('actor'));
+    // })->name('actor.detail');
 });
 
 require __DIR__ . '/auth.php';
