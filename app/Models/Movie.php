@@ -62,4 +62,16 @@ class Movie extends Model
     {
         return $this->hasMany(Watchlist::class, 'movie_id', 'tmdb_movie_id');
     }
+
+    public function actors()
+    {
+        return $this->belongsToMany(
+            Actor::class,
+            'movie_actors',
+            'tmdb_movie_id',
+            'tmdb_actor_id',
+            'tmdb_movie_id',
+            'tmdb_actor_id'
+        );
+    }
 }

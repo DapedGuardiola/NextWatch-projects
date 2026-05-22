@@ -79,9 +79,12 @@ Route::middleware('auth')->group(function () {
     $movie = \App\Models\Movie::where(
         'tmdb_movie_id',
         $id
-    )->firstOrFail();
+    )->with('genres.genre:map_id,name')->firstOrFail();
     $logActivityService = new LogActivityService();
     $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
+
+    $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
+
     $comments = $movie->comments()
         ->with('user')
         ->latest()
@@ -120,7 +123,8 @@ Route::middleware('auth')->group(function () {
         'comments',
         'similarMovies',
         'isInWatchlist',
-        'isFavorite'
+        'isFavorite',
+        'genreNames'
     ));
 
     })->name('movie.detail');
