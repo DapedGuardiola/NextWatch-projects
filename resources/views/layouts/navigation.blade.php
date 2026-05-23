@@ -2,14 +2,12 @@
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 relative items-center">
 
-            <!-- Logo (kiri) -->
             <div class="shrink-0 w-10 flex items-center">
                 <a href="{{ route('dashboard') }}">
                     <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                 </a>
             </div>
 
-            <!-- Navigation Links (TENGAH) -->
             <div class="hidden sm:flex sm:absolute sm:left-1/2 sm:-translate-x-1/2 gap-2">
                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Home') }}
@@ -26,12 +24,17 @@
                 </x-nav-link>
             </div>
 
-            <!-- Settings Dropdown (kanan) -->
             <div class="hidden w-10 sm:flex sm:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
+                        @php
+                            // Logika untuk mengecek apakah user punya avatar atau belum
+                            $avatarUrl = Auth::user()->avatar 
+                                ? asset('storage/' . Auth::user()->avatar) 
+                                : "https://ui-avatars.com/api/?name=" . urlencode(Auth::user()->name) . "&background=333&color=fff";
+                        @endphp
                         <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <img class="shrink-0 w-10 h-10 rounded-full" src="{{asset('images/image1.png')}}" alt="Image">
+                            <img class="shrink-0 w-10 h-10 rounded-full object-cover" src="{{ $avatarUrl }}" alt="{{ Auth::user()->name }}">
                         </button>
                     </x-slot>
                     <x-slot name="content">
@@ -47,7 +50,6 @@
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger (mobile) -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -60,7 +62,6 @@
         </div>
     </div>
 
-    <!-- Responsive Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Home') }}</x-responsive-nav-link>
