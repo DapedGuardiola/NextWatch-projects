@@ -15,7 +15,7 @@ class TopChartedController extends Controller
     }
 
     public function index(){
-        $popularMovies = $this->topChartedService->getTopPopularMoviesAllTime(10);
+        $popularMovies = $this->topChartedService->getAllTimeBest(10);
         $moviesByGenre = $this->topChartedService->getBestMoviesByGenre(10);
         return view('topcharted', compact('popularMovies', 'moviesByGenre'));
     }
