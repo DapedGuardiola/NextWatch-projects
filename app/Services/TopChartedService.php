@@ -19,7 +19,7 @@ class TopChartedService
     {
         // 1. Ambil semua kandidat + data normalisasi
         $candidates = Movie::select(['tmdb_movie_id'])
-            ->orderByRaw('popularity DESC')
+            ->orderByRaw('popularity DESC, rating DESC')
             ->limit(100)    
             ->get();
 
@@ -61,7 +61,6 @@ class TopChartedService
                 'rating',
             ])
             ->whereIn('tmdb_movie_id', $topIds)
-            ->orderByRaw('FIELD(popularity, ' . implode(',', $topIds) . ')')
             ->get();
 
         Log::info('EDAS all time best retrieved', ['count' => $movies->count()]);
@@ -138,7 +137,6 @@ class TopChartedService
                     'popularity',
                 ])
                 ->whereIn('tmdb_movie_id', $topIds)
-                ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $topIds) . ')')
                 ->get();
 
             $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
