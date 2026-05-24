@@ -44,4 +44,30 @@ class FlaskService
 
         return $response->json('ranked_id');
     }
+
+    public function getAllTimeBest(array $movies): array
+    {
+        $response = Http::post("{$this->baseUrl}/edas/alltime", [
+            'movies' => $movies,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Flask EDAS Alltime Error: ' . $response->status());
+        }
+
+        return $response->json('ranked_id');
+    }
+
+    public function getBestMoviesByGenre(array $movies): array
+    {
+        $response = Http::post("{$this->baseUrl}/edas/bestbygenre", [
+            'movies' => $movies,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Flask EDAS Error: ' . $response->status());
+        }
+
+        return $response->json('ranked_id');
+    }
 }
