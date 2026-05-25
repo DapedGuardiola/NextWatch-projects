@@ -81,6 +81,7 @@ Route::middleware('auth')->group(function () {
         $id
     )->with('genres.genre:map_id,name')->firstOrFail();
     $logActivityService = new LogActivityService();
+    $detailService = new DetailService();
     $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
 
     $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
@@ -90,13 +91,7 @@ Route::middleware('auth')->group(function () {
         ->latest()
         ->get();
 
-    $similarMovies = \App\Models\Movie::where(
-        'tmdb_movie_id',
-        '!=',
-        $movie->tmdb_movie_id
-    )
-    ->take(8)
-    ->get();
+    $similarMovies = $detailService->filterSimilar($id);
 
     $isInWatchlist = \App\Models\Watchlist::where(
         'user_id',
