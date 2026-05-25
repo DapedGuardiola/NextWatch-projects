@@ -71,7 +71,7 @@ class FlaskService
         return $response->json('ranked_id');
     }
 
-    public function getSimilar(array $target_movie, array $movies): array
+    public function getSimilar(array $target_movie, array $movies)
     {
         $response = Http::post("{$this->baseUrl}/cbf/similar", [
             'target_movie' => $target_movie,
@@ -82,6 +82,7 @@ class FlaskService
             throw new \Exception('Flask API Error: ' . $response->status());
         }
 
-        return $response->json('ranked_id');
+        // dd($response->json('similar_ids'));  
+        return $response->json('similar_ids');
     }
 }

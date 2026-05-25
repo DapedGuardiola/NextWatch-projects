@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Services\FlaskService;
 class DetailService
 {
-    protected $flaskService;
+    protected FlaskService $flaskService;
     public function __construct(FlaskService $flaskService)
     {
         $this->flaskService = $flaskService;
@@ -19,10 +19,10 @@ class DetailService
     {
         // 1. Filter di Laravel dulu sebelum kirim ke Flask
         $target = Movie::select([
-        'tmdb_movie_id',
+            'tmdb_movie_id',
         ])
         ->with([
-            'genres:map_genre_id',
+            'genres:tmdb_movie_id,map_genre_id',
             'genreVector:tmdb_movie_id,vector',
             'normalizedData:tmdb_movie_id,n_rating,n_popularity,n_rating_count'
         ])
@@ -47,12 +47,13 @@ class DetailService
         });
     }
 
-        $target_movie = $target->map(function ($movie) {
-            return [
-                'id'           => $movie->tmdb_movie_id,
-                'vector'       => $movie->genreVector?->vector ?? '[]',          // ✓ Akses via relationship
-            ];
-        })->toArray();
+        $target_movie = [
+            'id' => $target->tmdb_movie_id,
+            'movie_genre_vector' => json_decode(
+                $target->genreVector?->vector ?? '[]',
+                true
+            )
+        ];
 
         $movies = $query->get()->map(function ($movie) {
             return [
@@ -60,7 +61,10 @@ class DetailService
                 'popularity'   => $movie->normalizedData?->n_popularity ?? 0,    // ✓ Akses via relationship
                 'rating'       => $movie->normalizedData?->n_rating ?? 0,        // ✓ Akses via relationship
                 'rating_count' => $movie->normalizedData?->n_rating_count ?? 0,  // ✓ Akses via relationship
-                'vector'       => $movie->genreVector?->vector ?? '[]',          // ✓ Akses via relationship
+                'vector' => json_decode(
+            $movie->genreVector?->vector ?? '[]',
+            true
+        )
             ];
         })->toArray();
 
@@ -75,9 +79,17 @@ class DetailService
         }
 
         // 2. Kirim ke Flask hanya data yang sudah difilter
-        $rankedIds = $this->flaskService->getSimilar($target_movie, $movies);
+        $similar_Ids = $this->flaskService->getSimilar(
+        $target_movie,
+        $movies
+    );
+        // dd($similar_Ids);
 
-        if (empty($rankedIds)) {
+        // Log::info('Movies setelah filter', [
+        //     'data' => $similar_Ids
+        // ]);
+
+        if (empty($similar_Ids)) {
             return collect();
         }
 
@@ -90,8 +102,8 @@ class DetailService
             'rating',
             'overview',
             'runtime',
-        ])->whereIn('tmdb_movie_id', $rankedIds)
-            ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $rankedIds) . ')')
+        ])->whereIn('tmdb_movie_id', $similar_Ids)
+            ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $similar_Ids) . ')')
             ->get();
     }
 }
