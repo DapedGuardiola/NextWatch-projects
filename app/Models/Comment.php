@@ -11,7 +11,7 @@ class Comment extends Model
         'movie_id',
         'reply_id',
         'tagged_user_id',
-        'body',
+        'content',
     ];
 
     /*
@@ -39,7 +39,7 @@ class Comment extends Model
     {
         return $this->hasMany(Comment::class, 'reply_id')
             ->with('user')
-            ->latest();
+            ->oldest();
     }
 
     public function taggedUser()

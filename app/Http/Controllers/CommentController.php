@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Services\CommentService;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    public function store(Request $request, $movie)
+    public function __construct(protected CommentService $commentService) {}
+
+    public function store(Request $request)
     {
-        $request->validate([
-            'content' => 'required|string|max:1000'
+        $validated = $request->validate([
+            'movie_id'       => 'required',
+            'content'           => 'required|string|max:1000',
+            'reply_id'       => 'nullable|exists:comments,id',
+            'tagged_user_id' => 'nullable|exists:users,id',
         ]);
 
-        Comment::create([
-            'user_id' => auth()->id(),
-            'movie_id' => $movie,
-            'content' => $request->content,
-            'reply_id' => null,
-            'tagged_user_id' => null,
-        ]);
+        $this->commentService->store($validated);
 
-        return back()->with('success', 'Comment added');
+        return back();
     }
 }

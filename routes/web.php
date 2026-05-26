@@ -84,23 +84,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
     Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
 
-    Route::post('/movie/comment', function (Request $request) {
-    $request->validate([
-        'movie_id' => 'required',
-        'content' => 'required|string|max:1000',
-    ]);
-    Comment::create([
-        'user_id' => auth()->id(),
-        'movie_id' => $request->movie_id,
-        'reply_id' => $request->reply_id,
-        'tagged_user_id' => $request->tagged_user_id,
-        'content' => $request->content,
-    ]);
-    return back();
-    })->middleware('auth')->name('movie.comment');
-
-    Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
-    ->name('comments.store');
+    Route::post('/movie/comment', [CommentController::class, 'store'])
+        ->middleware('auth')
+        ->name('movie.comment');
 
     // Route::get('/actor/{id}', function ($id) {
     // $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
