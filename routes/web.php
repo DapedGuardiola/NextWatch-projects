@@ -109,6 +109,11 @@ Route::middleware('auth')->group(function () {
     // }
     // return view('pages.actor-detail', compact('actor'));
     // })->name('actor.detail');
+    
+    Route::get('/profile/persona', [ProfileController::class, 'persona'])->name('profile.persona');
+    Route::post('/profile/persona/update', [ProfileController::class, 'updatePersona'])->name('profile.persona.update');
+    Route::post('/profile/persona/genres', [ProfileController::class, 'updateGenres'])->name('profile.persona.genres');
+    Route::delete('/profile/persona/genres/{genre}', [ProfileController::class, 'destroyGenre'])->name('profile.persona.genres.destroy');
 });
 
 require __DIR__ . '/auth.php';
