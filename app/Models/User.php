@@ -40,4 +40,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    // RELASI BARU UNTUK GENRE PERSONA
+    public function genres()
+    {
+        return $this->hasMany(UserGenre::class);
+    }
 }

@@ -12,13 +12,15 @@
                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Home') }}
                 </x-nav-link>
-                {{-- Discover → trigger modal --}}
-                <x-nav-link @click="$dispatch('open-discover')" :active="request()->routeIs('discover.results')"
+                
+                {{-- Discover — Menggunakan tautan halaman langsung tanpa mengubah class sedikit pun --}}
+                <x-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover', 'discover.results')"
                     class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium leading-5 transition
                     hover:bg-gray-400/50 active:bg-gray-400/50
                     border-transparent focus:outline-none">
                     {{ __('Discover') }}
                 </x-nav-link>
+                
                 <x-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">
                     {{ __('Top Charted') }}
                 </x-nav-link>
@@ -65,7 +67,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Home') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">{{ __('Discover') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">{{ __('Discover') }}</span class="text-indigo-400"></x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">{{ __('Top Charted') }}</x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-gray-200">
