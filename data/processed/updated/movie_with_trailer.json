@@ -49057,6 +49057,22 @@
   },
   {
     "original_language": "en",
+    "title": "Wuthering Heights",
+    "overview": "Foundling Heathcliff is raised by the wealthy Earnshaws in Yorkshire but in later life launches a vendetta against the family.",
+    "popularity": 4.409263,
+    "release_date": "2009-01-18",
+    "runtime": 142.0,
+    "tagline": null,
+    "rating": 6.9,
+    "rating_count": 37,
+    "poster_path": null,
+    "tmdb_movie_id": 36597,
+    "collection_id": null,
+    "trailer_key": null,
+    "trailer_size": null
+  },
+  {
+    "original_language": "en",
     "title": "10th & Wolf",
     "overview": "A former street tough returns to his Philadelphia home after a stint in the military. Back on his home turf, he once again finds himself tangling with the mob boss who was instrumental in his going off to be a soldier.",
     "popularity": 3.942464,
@@ -52158,6 +52174,22 @@
     "collection_id": null,
     "trailer_key": "O3MsVkfYwJg",
     "trailer_size": 360
+  },
+  {
+    "original_language": "en",
+    "title": "Emma",
+    "overview": "Emma Woodhouse seems to be perfectly content, a loving father whom she cares for, friends, and a home. But Emma has a terrible habit - matchmaking. She cannot resist finding suitors for her friends, most of all Harriet Smith. Emma is desperate for Harriet to find happiness, but every suitor she finds for her friend ends up attracted to Emma herself. But is Emma so focused on Harriet's happiness that she is not considering her own happiness in love?",
+    "popularity": 2.135689,
+    "release_date": "2009-10-11",
+    "runtime": 240.0,
+    "tagline": null,
+    "rating": 7.6,
+    "rating_count": 38,
+    "poster_path": null,
+    "tmdb_movie_id": 183894,
+    "collection_id": null,
+    "trailer_key": null,
+    "trailer_size": null
   },
   {
     "original_language": "en",

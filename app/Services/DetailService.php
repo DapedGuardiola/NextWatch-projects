@@ -14,13 +14,7 @@ class DetailService
     {
         $this->flaskService = $flaskService;
     }
-    public function getSelectedMovie(int $id){
-        $movie = Movie::where(
-        'tmdb_movie_id',
-        $id
-        )->with('genres.genre:map_id,name')->firstOrFail();
-        return $movie;
-    }
+
     public function filterSimilar(int $movieId): object
     {
         // 1. Filter di Laravel dulu sebelum kirim ke Flask
