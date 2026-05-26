@@ -4,7 +4,7 @@
     {{-- Info Panel Kiri --}}
     <div class="absolute left-8 z-10 flex flex-col transition-all duration-500" id="infoPanel"
          style="top: 50%; transform: translateY(-50%);">
-        <h2 class="text-white text-2xl font-bold mb-3">Most Popular</h2>
+        <h2 class="text-white text-2xl font-bold mb-3">All Time Best Movies</h2>
         <div id="rankList">
             @foreach($movies as $i => $movie)
                 <div class="flex items-center gap-2 text-white text-sm mb-1.5">

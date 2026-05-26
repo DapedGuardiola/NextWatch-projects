@@ -8,73 +8,153 @@ use Illuminate\Support\Facades\Log;
 
 class TopChartedService
 {
-    public function getTopPopularMoviesAllTime($limit = 10)
+    protected $flaskService;
+
+    public function __construct(FlaskService $flaskService)
     {
-        $movies = Movie::select([
-            'tmdb_movie_id',
-            'title',
-            'poster_path',
-            'popularity',
-        ])
-            ->orderByRaw('popularity DESC')
-            ->limit($limit)
+        $this->flaskService = $flaskService;
+    }
+
+    public function getAllTimeBest()
+    {
+        // 1. Ambil semua kandidat + data normalisasi
+        $candidates = Movie::select(['tmdb_movie_id'])
+            ->orderByRaw('popularity DESC, rating DESC')
+            ->limit(100)    
             ->get();
 
-        Log::info('Top popular movies all time retrieved', ['count' => $movies->count()]);
+        if ($candidates->isEmpty()) {
+            return collect();
+        }
+
+        // 2. Payload ke Flask
+        $moviesPayload = $candidates->map(function ($movie) {
+            return [
+                'id'           => $movie->tmdb_movie_id,
+                'popularity'   => $movie->popularity   ?? 0,
+                'rating'       => $movie->rating        ?? 0,
+                'rating_count' => $movie->rating_count  ?? 0,
+            ];
+        })->toArray();
+
+        // 3. Kirim ke Flask EDAS alltime
+        try {
+            $rankedIds = $this->flaskService->getAllTimeBest($moviesPayload);
+        } catch (\Exception $e) {
+            Log::error('Flask EDAS alltime error', ['error' => $e->getMessage()]);
+            return collect();
+        }
+
+        if (empty($rankedIds)) {
+            return collect();
+        }
+
+        // 4. Ambil top N sesuai urutan ranked
+        $topIds = array_slice($rankedIds, 0, 10);
+
+        // 5. Query detail movies
+        $movies = Movie::select([
+                'tmdb_movie_id',
+                'title',
+                'poster_path',
+                'popularity',
+                'rating',
+            ])
+            ->whereIn('tmdb_movie_id', $topIds)
+            ->get();
+
+        Log::info('EDAS all time best retrieved', ['count' => $movies->count()]);
 
         return $movies->map(function ($movie) {
             return [
-                'id' => $movie->tmdb_movie_id,
-                'title' => $movie->title,
+                'id'          => $movie->tmdb_movie_id,
+                'title'       => $movie->title,
                 'poster_path' => $movie->poster_path,
-                'popularity' => $movie->popularity,
+                'popularity'  => $movie->popularity,
+                'rating'      => $movie->rating,
             ];
         });
     }
 
-    public function getBestMoviesByGenre($moviesPerGenre = 10)
+    public function getBestMoviesByGenre()
     {
         $genres = DB::table('genres')->get();
-        
         $moviesByGenre = [];
 
         foreach ($genres as $genre) {
-            $movies = Movie::select([
-                'movies.tmdb_movie_id',
-                'movies.title',
-                DB::raw('YEAR(movies.release_date) as year'),
-                'movies.rating',
-                'movies.rating_count',
-                'movies.overview',
-                'movies.runtime',
-                'movies.poster_path',
-                'movies.popularity',
-            ])
+            // 1. Ambil kandidat + data normalisasi
+            $candidates = Movie::select([
+                    'movies.tmdb_movie_id',
+                ])
+                ->with([
+                    'genreVector:tmdb_movie_id,vector',
+                ])
                 ->join('movie_genres', 'movies.tmdb_movie_id', '=', 'movie_genres.tmdb_movie_id')
                 ->where('movie_genres.map_genre_id', '=', $genre->map_id)
-                ->orderByRaw('movies.popularity DESC')
-                ->limit($moviesPerGenre)
+                ->orderByRaw('rating DESC')
+                ->limit(30)
                 ->get();
 
-            if ($movies->count() > 0) {
-                $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
-                    return [
-                        'id' => $movie->tmdb_movie_id,
-                        'title' => $movie->title,
-                        'year' => $movie->year,
-                        'rating' => $movie->rating,
-                        'rating_count' => $movie->rating_count,
-                        'overview' => $movie->overview,
-                        'runtime' => $movie->runtime,
-                        'poster_path' => $movie->poster_path,
-                        'popularity' => $movie->popularity,
-                        'genres'     => $movie->genres->pluck('genre.map_id')->filter()->values()->toArray(),
-                    ];
-                })->toArray();
+            if ($candidates->isEmpty()) {
+                continue;
             }
+
+            // 2. Payload ke Flask
+            $moviesPayload = $candidates->map(function ($movie) {
+                return [
+                    'id'           => $movie->tmdb_movie_id,
+                    'popularity'   => $movie->popularity   ?? 0,
+                    'rating'       => $movie->rating        ?? 0,
+                    'rating_count' => $movie->rating_count  ?? 0,
+                ];
+            })->toArray();
+
+            // 3. Kirim ke Flask EDAS
+            try {
+                $rankedIds = $this->flaskService->getBestMoviesByGenre($moviesPayload);
+            } catch (\Exception $e) {
+                Log::error('Flask EDAS error: ' . $genre->name, ['error' => $e->getMessage()]);
+                continue;
+            }
+
+            if (empty($rankedIds)) {
+                continue;
+            }
+
+            // 4. Ambil top N sesuai urutan ranked
+            $topIds = array_slice($rankedIds, 0, 10);
+
+            // 5. Query detail movies
+            $movies = Movie::select([
+                    'tmdb_movie_id',
+                    'title',
+                    DB::raw('YEAR(release_date) as year'),
+                    'rating',
+                    'rating_count',
+                    'overview',
+                    'runtime',
+                    'poster_path',
+                    'popularity',
+                ])
+                ->whereIn('tmdb_movie_id', $topIds)
+                ->get();
+
+            $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
+                return [
+                    'id'           => $movie->tmdb_movie_id,
+                    'title'        => $movie->title,
+                    'year'         => $movie->year,
+                    'rating'       => $movie->rating,
+                    'rating_count' => $movie->rating_count,
+                    'overview'     => $movie->overview,
+                    'runtime'      => $movie->runtime,
+                    'poster_path'  => $movie->poster_path,
+                    'popularity'   => $movie->popularity,
+                ];
+            })->toArray();
         }
 
-        Log::info('Best movies by genre retrieved', ['genres_count' => count($moviesByGenre)]);
+        Log::info('EDAS best movies by genre', ['genres_count' => count($moviesByGenre)]);
 
         return $moviesByGenre;
     }

@@ -5,7 +5,7 @@
     <div>
         <div class="mx-10 mt-[75px] mb-5">
             <h1>
-                <p class="text-3xl text-white font-bold">All Time Best Movies</p>
+                <p class="text-3xl text-white font-bold">You Must Know These Movies!!</p>
             </h1>
         </div>
         <div class="mx-10 mb-5">

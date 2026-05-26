@@ -28,4 +28,16 @@ class WatchlistController extends Controller
 
         return back();
     }
+
+    // FUNGSI BARU UNTUK MENAMPILKAN HALAMAN WATCHLIST
+    public function index()
+    {
+        // Mengambil data watchlist milik user beserta filmnya dari database
+        $watchlists = Watchlist::with('movie')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return view('pages.watchlist', compact('watchlists'));
+    }
 }

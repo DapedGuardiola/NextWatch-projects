@@ -9,6 +9,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TopChartedController;
 use App\Services\LogActivityService;
+use App\Services\DetailService;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -81,6 +82,7 @@ Route::middleware('auth')->group(function () {
         $id
     )->with('genres.genre:map_id,name')->firstOrFail();
     $logActivityService = new LogActivityService();
+    $detailService = app(DetailService::class);
     $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
 
     $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
@@ -90,13 +92,7 @@ Route::middleware('auth')->group(function () {
         ->latest()
         ->get();
 
-    $similarMovies = \App\Models\Movie::where(
-        'tmdb_movie_id',
-        '!=',
-        $movie->tmdb_movie_id
-    )
-    ->take(8)
-    ->get();
+    $similarMovies = $detailService->filterSimilar($id);
 
     $isInWatchlist = \App\Models\Watchlist::where(
         'user_id',
