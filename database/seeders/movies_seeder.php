@@ -13,7 +13,7 @@ class movies_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("data/processed/updated/movie_with_trailer.json");
+        $path = base_path("data/processed/updated/fixed_movies.json");
         $json = file_get_contents($path);
         $movies = json_decode($json,true);
         $batchSize = 500;

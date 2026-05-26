@@ -12,7 +12,7 @@ class movie_genres_vector_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("data/processed/fixed_movie_vector.json");
+        $path = base_path("data/processed/updated/movieVector.json");
         $json = file_get_contents($path);
         $vectors =json_decode($json, true);
 
