@@ -19,9 +19,10 @@ class DetailController extends Controller
     }
     public function index(int $id) {
     $similarMovies = $this->detailService->filterSimilar($id);
-    $logActivityService = new LogActivityService();
-    $logActivityService->click(['user_id'=>$this->user_id,'movie_id'=>$id]);
     $movie = $this->detailService->getSelectedMovie($id);
+    if($movie){
+        $this->logActivityService->click(['user_id'=>$this->user_id,'movie_id'=>$id]);
+    }
     $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
     $comments = $movie->comments()
         ->with('user')
