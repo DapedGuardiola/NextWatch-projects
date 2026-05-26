@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             movie_actors_seeder::class,
             movie_genres_vector_seeder::class,
             UsersSeeder::class,
+            normalizeMovieSeeder::class,
+            userGenreSeeder::class,
         ]);
     }
 }

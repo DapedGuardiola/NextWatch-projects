@@ -24,4 +24,7 @@ class DashboardController extends Controller
         $actorsData = $this->actorService->getActorMovies($id);
         return view('pages.actor-detail',compact('actorsData'));
     }
+    public function getDashboardContent(){
+        $content = $this->dashboardService->getMainContent(); 
+    }
 }

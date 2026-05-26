@@ -15,10 +15,15 @@ class normalizeMovieSeeder extends Seeder
         $path = base_path('data/processed/normalized_movie.json');
         $json = file_get_contents($path);
         $movies = json_decode($json, true);
+
+        $existingMovies = DB::table('movies')->pluck('tmdb_movie_id')->toArray();
         $batch_size = 500;
         $data = [];
 
         foreach($movies as $m){
+            if (!in_array($m["movie_id"], $existingMovies)) {
+                continue;
+            }
             $data [] = [
                 'tmdb_movie_id' => $m["movie_id"],
                 'n_rating'=> $m["n_rating"],

@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
     $logActivityService = new LogActivityService();
     $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
 
-    $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
+    $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
 
     $comments = $movie->comments()
         ->with('user')

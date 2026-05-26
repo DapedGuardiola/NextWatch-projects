@@ -13,7 +13,7 @@ class movies_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("/data/processed/movies.json");
+        $path = base_path("data/processed/updated/movie_with_trailer.json");
         $json = file_get_contents($path);
         $movies = json_decode($json,true);
         $batchSize = 500;
@@ -32,6 +32,9 @@ class movies_seeder extends Seeder
                 'rating' => $movie["rating"],
                 'rating_count' => $movie["rating_count"],
                 'original_language' => $movie["original_language"],
+                'collection_id' => $movie["collection_id"],
+                'trailer_key' => $movie["trailer_key"],
+                'trailer_size' => $movie["trailer_size"],
                 ];
             if(count($data) === $batchSize){
                 DB::table("movies")->insert($data);
