@@ -12,10 +12,6 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
-// IMPORT MODEL UNTUK PERSONA GENRE
-use App\Models\Genre;
-use App\Models\UserGenre;
-
 class ProfileController extends Controller
 {
     /**
@@ -43,6 +39,7 @@ class ProfileController extends Controller
      */
     public function updateSettings(Request $request): RedirectResponse
     {
+        // Validasi format email sesuai kriteria sistem
         $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.Auth::id()],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -54,15 +51,27 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
 
+        // Reset status verifikasi jika email diubah
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
+        // Logika Ganti Password & Mock Verifikasi Email
         if ($request->filled('password')) {
+            /**
+             * Simulasi pemicu verifikasi email karena SMTP belum di-setup.
+             * Detail aksi dicatat ke dalam storage/logs/laravel.log
+             */
             Log::info("MOCK EMAIL: Permintaan ganti password untuk user: {$user->email}. Link verifikasi simulasi telah dipicu.");
+
+            // Enkripsi password menggunakan Bcrypt (Hash::make)
             $user->password = Hash::make($request->password);
+            
+            // Mencatat waktu perubahan password untuk riwayat keamanan
             $user->password_changed_at = now(); 
+            
             $user->save();
+
             return Redirect::route('profile.settings')->with('status', 'verification-link-sent');
         }
 
@@ -76,6 +85,7 @@ class ProfileController extends Controller
      */
     public function updateProfile(Request $request): RedirectResponse
     {
+        // Validasi nama wajib lebih dari 3 huruf (min: 4)
         $request->validate([
             'name' => ['required', 'string', 'min:4', 'max:255'],
             'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
@@ -109,9 +119,12 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($request->hasFile('avatar')) {
+            // Hapus file avatar lama dari storage jika tersedia
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
+
+            // Simpan file baru ke folder avatars di storage public
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $path;
             $user->save();
@@ -120,6 +133,9 @@ class ProfileController extends Controller
         return Redirect::route('profile.index')->with('status', 'avatar-updated');
     }
 
+    /**
+     * Menampilkan form edit profil bawaan.
+     */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -127,6 +143,9 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Menghapus akun pengguna dari sistem NextWatch.
+     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -134,91 +153,14 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
         Auth::logout();
+
         $user->delete();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
-    }
-
-    // ==============================================
-    // LOGIKA FITUR PERSONA (TUGAS 1)
-    // ==============================================
-
-    /**
-     * Menampilkan halaman Edit Persona.
-     */
-    public function persona(Request $request): View
-    {
-        // Mengambil film-film yang dipilih user sebagai persona awal
-        $personaMovies = \App\Models\Favorite::with('movie')
-            ->where('user_id', Auth::id())
-            ->where('is_persona', true)
-            ->get();
-
-        // Mengambil semua daftar master genre untuk ditampilkan di pilihan modal
-        $allGenres = Genre::all();
-        
-        // Mengambil daftar id genre yang saat ini sedang aktif dipilih oleh pengguna
-        $myGenres = UserGenre::where('user_id', Auth::id())
-            ->pluck('genre_id')
-            ->toArray();
-
-        return view('profile.persona', [
-            'user' => $request->user(),
-            'personaMovies' => $personaMovies,
-            'allGenres' => $allGenres,
-            'myGenres' => $myGenres
-        ]);
-    }
-
-    /**
-     * Menyimpan atau memperbarui data genre dari Modal Pilihan.
-     */
-    public function updateGenres(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'genres' => 'nullable|array|max:4',
-        ]);
-
-        // Hapus semua pilihan genre lama milik user ini
-        UserGenre::where('user_id', Auth::id())->delete();
-
-        // Masukkan data genre baru hasil pilihan modal jika ada
-        if ($request->has('genres')) {
-            foreach ($request->genres as $genreId) {
-                UserGenre::create([
-                    'user_id' => Auth::id(),
-                    'genre_id' => $genreId,
-                ]);
-            }
-        }
-
-        return Redirect::route('profile.persona')->with('status', 'genres-updated');
-    }
-
-    /**
-     * Menghapus salah satu genre secara langsung tanpa modal lewat tombol (X).
-     */
-    public function destroyGenre($genreId): RedirectResponse
-    {
-        UserGenre::where('user_id', Auth::id())
-            ->where('genre_id', $genreId)
-            ->delete();
-
-        return Redirect::route('profile.persona')->with('status', 'genre-deleted');
-    }
-
-    /**
-     * Menyimpan status final aktivasi persona pengguna ke tabel users.
-     */
-    public function updatePersona(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-        $user->is_personalized = true;
-        $user->save();
-
-        return Redirect::route('profile.persona')->with('status', 'persona-updated');
     }
 }

@@ -9,8 +9,6 @@
             <a href="{{ route('profile.index') }}" class="text-gray-300 hover:text-white transition">User Profile</a>
             <a href="{{ route('profile.settings') }}" class="text-gray-300 hover:text-white transition">Account Settings</a>
             
-            <a href="{{ route('profile.persona') }}" class="text-gray-300 hover:text-white transition">Edit Persona</a>
-            
             <a href="{{ route('favorites.index') }}" class="bg-white text-black py-2 px-4 rounded-xl shadow-lg font-semibold">Favorite Movies</a>
             
             <a href="{{ route('watchlist.index') }}" class="text-gray-300 hover:text-white transition">Watchlist</a>

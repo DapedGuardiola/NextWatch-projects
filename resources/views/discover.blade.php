@@ -5,14 +5,7 @@
 
         {{-- Header --}}
         <div class="mb-10">
-            <div class="flex justify-between items-center">
-                <h1 class="text-4xl font-bold text-white leading-tight">Discover <span class="text-indigo-400">Films</span></h1>
-                
-                {{-- Tombol Pemantik Modal --}}
-                <button x-data @click="$dispatch('open-discover')" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-sm font-medium transition shadow-md">
-                    Open Filter
-                </button>
-            </div>
+            <h1 class="text-4xl font-bold text-white leading-tight">Discover <span class="text-indigo-400">Films</span></h1>
             <p class="text-gray-400 text-sm mt-2">Find your next favorite movie</p>
 
             {{-- Divider --}}
@@ -37,7 +30,4 @@
         </div>
 
     </div>
-
-    {{-- MEMANGGIL KOMPONEN MODAL DISCOVER DI LUAR WRAPPER UTAMA --}}
-    <x-discover-modal :genres="$genres" :languages="$languages" />
 </x-app-layout>
