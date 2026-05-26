@@ -1,16 +1,16 @@
 <x-app-layout>
     <style>
-    #youtube-player iframe {
-        width: 100% !important;
-        height: 500px !important;
-        border-radius: 16px;
-    }
-
-    @media (max-width: 768px) {
         #youtube-player iframe {
-            height: 250px !important;
+            width: 100% !important;
+            height: 500px !important;
+            border-radius: 16px;
         }
-    }
+
+        @media (max-width: 768px) {
+            #youtube-player iframe {
+                height: 250px !important;
+            }
+        }
     </style>
     <div class="bg-[#020817] text-white overflow-hidden">
 
@@ -37,10 +37,10 @@
             <div class="relative z-10 max-w-[90%] mx-auto px-6 py-14">
 
                 <!-- DEFAULT LAYOUT: poster + content side by side -->
-                <div id="default-layout" class="grid grid-cols-2 lg:grid-cols-[380px_1fr] gap-12 items-center transition-all duration-700">
+                <div id="default-layout" class="grid grid-cols-2 lg:grid-cols-[380px_1fr] gap-10 items-center transition-all duration-700">
 
                     <!-- POSTER -->
-                    <div id="poster-col" class="group relative max-w-[500px] transition-all duration-700">
+                    <div id="poster-col" class="group relative w-[325px] transition-all duration-700">
                         <div class="absolute inset-0 bg-cyan-400/20 blur-3xl rounded-[32px] scale-90"></div>
                         <img
                             src="https://image.tmdb.org/t/p/w500/{{ $movie->poster_path }}"
@@ -53,20 +53,29 @@
                     </div>
 
                     <!-- CONTENT -->
-                    <div id="content-col" class="flex flex-col justify-between transition-all duration-700">
+                    <div id="trailer-layout" class="opacity-100 scale-100 transform transition-all duration-700 ease-out flex-col gap-10">
 
+                        <!-- TRAILER -->
+                        @if($movie->trailer_key)
+                        <div id="youtube-player" class="w-full rounded-2xl overflow-hidden"></div>
+                        @else
+                        {{-- Tidak ada trailer --}}
+                        <div class="flex items-center justify-center h-[300px] rounded-2xl
+                    border border-white/10 bg-white/5">
+                            <p class="text-gray-400">Trailer tidak tersedia</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                <div id="content-col" class="flex flex-col justify-between transition-all duration-700">
+                    <div class="mt-10">
+                        <!-- TITLE -->
+                        <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight">
+                            {{ $movie->title }}
+                        </h1>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
-
-                            <!-- TITLE -->
-                            <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight">
-                                {{ $movie->title }}
-                            </h1>
-
-                            <!-- TAGLINE -->
-                            <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">
-                                {{ $movie->tagline }}
-                            </p>
-
                             <!-- TOP META -->
                             <div class="flex flex-wrap items-center gap-3 mt-8 text-sm">
 
@@ -122,22 +131,28 @@
 
                                     <span class="text-gray-500 min-w-[90px]">
                                         Starring
-                                    </span>
 
-                                    <span class="text-white font-medium">
-
-                                        {{ $movie->actors->take(3)->pluck('name')->implode(', ') }}
-
-                                    </span>
-
+                                    <div class="grid grid-cols-3 mt-2 ml-4 gap-4 overflow-hidden">
+                                        @foreach($movie->actors as $actor)
+                                        <x-movie.small.small-actor-card
+                                            :actor_id="$actor->tmdb_actor_id"
+                                            :image_url="$actor->image_url"
+                                            :name="$actor->name" />
+                                        @endforeach
+                                    </div>
                                 </div>
 
                             </div>
 
+                        </div>
+                        <div>
                             <!-- OVERVIEW -->
                             <div class="mt-10 max-w-3xl">
-
-                                <p class="text-gray-300 text-lg leading-relaxed">
+                                <!-- TAGLINE -->
+                                <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">
+                                    {{ $movie->tagline }}
+                                </p>
+                                <p class="text-gray-300 text-lg leading-relaxed mt-2">
                                     {{ $movie->overview }}
                                 </p>
 
@@ -146,354 +161,203 @@
                             <!-- GENRES -->
                             <div class="mt-10">
 
-                                <h2 class="text-2xl font-semibold mb-5">
-                                    Genres
-                                </h2>
-
                                 <div class="flex flex-wrap gap-4">
 
                                     @foreach($genreNames as $genre)
 
-                                        <div class="px-4 py-2 rounded-full 
+                                    <div class="px-4 py-2 rounded-full 
                                             bg-cyan-500/10 border border-cyan-400/20
                                             backdrop-blur-xl
                                             hover:bg-cyan-500/20
                                             text-cyan-200 text-sm
                                             transition duration-300">
 
-                                            {{ is_object($genre) ? $genre->name : $genre }}
+                                        {{ is_object($genre) ? $genre->name : $genre }}
 
-                                        </div>
+                                    </div>
 
                                     @endforeach
 
                                 </div>
 
                             </div>
-
                         </div>
+                    </div>
 
-                        <!-- ACTION BUTTONS -->
-                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-6">
 
-                            <!-- WATCHLIST -->
-                            @if($isInWatchlist)
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex flex-col mx-auto sm:flex-row gap-3 md:gap-4 pt-6">
 
-                            <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
+                        <!-- WATCHLIST -->
+                        @if($isInWatchlist)
 
-                                @csrf
-                                @method('DELETE')
+                        <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
 
-                                <button
-                                    type="submit"
-                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
                                     bg-red-500/20 hover:bg-red-500/30
                                     border border-red-400/30
                                     text-red-300 transition-all duration-300
                                     flex items-center justify-center gap-2">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2">
 
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M6 18L18 6M6 6l12 12"/>
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M6 18L18 6M6 6l12 12" />
 
-                                    </svg>
+                                </svg>
 
-                                    Remove Watchlist
+                                Remove Watchlist
 
-                                </button>
+                            </button>
 
-                            </form>
+                        </form>
 
-                            @else
+                        @else
 
-                            <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
+                        <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
 
-                                @csrf
+                            @csrf
 
-                                <button
-                                    type="submit"
-                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                            <button
+                                type="submit"
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
                                     bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
                                     text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
                                     overflow-hidden flex items-center justify-center gap-2">
 
-                                    <span class="relative z-10 flex items-center gap-2">
+                                <span class="relative z-10 flex items-center gap-2">
 
-                                        <svg class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
 
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M12 4v16m8-8H4"/>
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
 
-                                        </svg>
+                                    </svg>
 
-                                        Add Watchlist
+                                    Add Watchlist
 
-                                    </span>
+                                </span>
 
-                                </button>
+                            </button>
 
-                            </form>
+                        </form>
 
-                            @endif
+                        @endif
 
-                            <!-- FAVORITE -->
-                            @if($isFavorite)
+                        <!-- FAVORITE -->
+                        @if($isFavorite)
 
-                            <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
+                        <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
 
-                                @csrf
-                                @method('DELETE')
+                            @csrf
+                            @method('DELETE')
 
-                                <button
-                                    type="submit"
-                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                            <button
+                                type="submit"
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
                                     bg-red-500/20 hover:bg-red-500/30
                                     border border-red-400/30
                                     text-red-300 transition-all duration-300
                                     flex items-center justify-center gap-2">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24">
 
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 
-                                    </svg>
+                                </svg>
 
-                                    Remove Favorite
+                                Remove Favorite
 
-                                </button>
+                            </button>
 
-                            </form>
+                        </form>
 
-                            @else
+                        @else
 
-                            <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
+                        <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
 
-                                @csrf
+                            @csrf
 
-                                <button
-                                    type="submit"
-                                    class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                            <button
+                                type="submit"
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
                                     bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
                                     text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
                                     flex items-center justify-center gap-2">
 
-                                    <span class="relative z-10 flex items-center gap-2">
+                                <span class="relative z-10 flex items-center gap-2">
 
-                                        <svg class="w-5 h-5"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24">
 
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 
-                                        </svg>
+                                    </svg>
 
-                                        Favorite
+                                    Favorite
 
-                                    </span>
+                                </span>
 
-                                </button>
+                            </button>
 
-                            </form>
+                        </form>
 
-                            @endif
+                        @endif
 
-                            <!-- SHARE -->
-                            <button onclick="copyShareLink()"
-                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                        <!-- SHARE -->
+                        <button onclick="copyShareLink()"
+                            class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
                                 bg-white/5 hover:bg-white/10
                                 border border-white/10 hover:border-cyan-400/40
                                 text-gray-100 transition-all duration-300
                                 hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-500/20
                                 flex items-center justify-center gap-2">
 
-                                <span class="relative z-10 flex items-center gap-2">
+                            <span class="relative z-10 flex items-center gap-2">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.4"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.4"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
 
-                                        <circle cx="18" cy="5" r="3"></circle>
-                                        <circle cx="6" cy="12" r="3"></circle>
-                                        <circle cx="18" cy="19" r="3"></circle>
+                                    <circle cx="18" cy="5" r="3"></circle>
+                                    <circle cx="6" cy="12" r="3"></circle>
+                                    <circle cx="18" cy="19" r="3"></circle>
 
-                                        <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"></line>
-                                        <line x1="8.7" y1="13.3" x2="15.3" y2="17.7"></line>
+                                    <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"></line>
+                                    <line x1="8.7" y1="13.3" x2="15.3" y2="17.7"></line>
 
-                                    </svg>
+                                </svg>
 
-                                    Share
+                                Share
 
-                                </span>
+                            </span>
 
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- TRAILER LAYOUT: trailer atas, content bawah -->
-                <div id="trailer-layout" class="hidden opacity-0 scale-95 transform transition-all duration-700 ease-out flex-col gap-10">
-
-                    <!-- TRAILER -->
-                    @if($movie->trailer_key)
-                    <div id="youtube-player" class="w-full rounded-2xl overflow-hidden"></div>
-                    @else
-                    {{-- Tidak ada trailer --}}
-                    <div class="flex items-center justify-center h-[300px] rounded-2xl
-                    border border-white/10 bg-white/5">
-                        <p class="text-gray-400">Trailer tidak tersedia</p>
-                    </div>
-                    @endif
-
-                    <!-- CONTENT BAWAH TRAILER -->
-                    <div id="trailer-content" class="flex flex-col gap-6">
-
-                        <div>
-                            <h1 class="mt-10 text-5xl lg:text-7xl font-black leading-none tracking-tight">
-                                {{ $movie->title }}
-                            </h1>
-                            <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">
-                                {{ $movie->tagline }}
-                            </p>
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-3 mt-8 text-sm">
-
-                            <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500/10 border border-yellow-400/20 text-yellow-300">
-                                <span class="font-black tracking-wide">TMDb</span>
-                                <span class="text-white font-semibold">{{ $movie->rating }}</span>
-                            </div>
-
-                            <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200">
-                                {{ \Carbon\Carbon::parse($movie->release_date)->format('Y') }}
-                            </div>
-
-                            <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200">
-                                {{ $movie->runtime }} min
-                            </div>
-
-                            <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 uppercase text-gray-200">
-                                {{ $movie->original_language }}
-                            </div>
-
-                        </div>
-
-                        <div class="mt-8 space-y-4 max-w-3xl">
-                            <div class="flex gap-3">
-                                <span class="text-gray-500 min-w-[90px]">Director</span>
-                                <span class="text-white font-medium">{{ $movie->director ?? 'Unknown Director' }}</span>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="text-gray-500 min-w-[90px]">Starring</span>
-                                <span class="text-white font-medium">{{ $movie->actors->take(3)->pluck('name')->implode(', ') }}</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-10 max-w-3xl">
-                            <p class="text-gray-300 text-lg leading-relaxed">
-                                {{ $movie->overview }}
-                            </p>
-                        </div>
-
-                        <div class="mt-10">
-                            <h2 class="text-2xl font-semibold mb-5">Genres</h2>
-                            <div class="flex flex-wrap gap-4">
-                                @foreach($genreNames as $genre)
-                                    <div class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 backdrop-blur-xl hover:bg-cyan-500/20 text-cyan-200 text-sm transition duration-300">
-                                        {{ is_object($genre) ? $genre->name : $genre }}
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 pt-6">
-
-                            @if($isInWatchlist)
-                                <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition-all duration-300 flex items-center justify-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                        Remove Watchlist
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 overflow-hidden flex items-center justify-center gap-2">
-                                        <span class="relative z-10 flex items-center gap-2">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            Add Watchlist
-                                        </span>
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if($isFavorite)
-                                <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition-all duration-300 flex items-center justify-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                        </svg>
-                                        Remove Favorite
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 flex items-center justify-center gap-2">
-                                        <span class="relative z-10 flex items-center gap-2">
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                            </svg>
-                                            Favorite
-                                        </span>
-                                    </button>
-                                </form>
-                            @endif
-
-                            <button onclick="copyShareLink()" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40 text-gray-100 transition-all duration-300 hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-500/20 flex items-center justify-center gap-2">
-                                <span class="relative z-10 flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="18" cy="5" r="3"></circle>
-                                        <circle cx="6" cy="12" r="3"></circle>
-                                        <circle cx="18" cy="19" r="3"></circle>
-                                        <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"></line>
-                                        <line x1="8.7" y1="13.3" x2="15.3" y2="17.7"></line>
-                                    </svg>
-                                    Share
-                                </span>
-                            </button>
-
-                        </div>
+                        </button>
 
                     </div>
 
@@ -713,7 +577,6 @@
     @if($movie->trailer_key)
     {{-- YouTube IFrame API --}}
     <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
         let player;
         const trailerKey = "{{ $movie->trailer_key }}";
@@ -724,7 +587,7 @@
                 height: '500',
                 videoId: trailerKey,
                 playerVars: {
-                    autoplay: 1,
+                    autoplay: 0,
                     rel: 0,
                     modestbranding: 1,
                     controls: 1,
@@ -743,23 +606,22 @@
                 container.style.width = '100%'
                 container.style.height = '100%'
             }
-
             setTimeout(revealTrailerSection, 2000)
         }
 
-        function revealTrailerSection() {
-            const defaultLayout = document.getElementById('default-layout')
-            const trailerLayout = document.getElementById('trailer-layout')
+        // function revealTrailerSection() {
+        //     const defaultLayout = document.getElementById('default-layout')
+        //     const trailerLayout = document.getElementById('trailer-layout')
 
-            if (!defaultLayout || !trailerLayout) {
-                return
-            }
+        //     if (!defaultLayout || !trailerLayout) {
+        //         return
+        //     }
 
-            defaultLayout.classList.add('hidden')
-            trailerLayout.classList.remove('hidden')
-            trailerLayout.classList.remove('opacity-0', 'scale-95')
-            trailerLayout.classList.add('opacity-100', 'scale-100')
-        }
+        //     defaultLayout.classList.add('hidden')
+        //     trailerLayout.classList.remove('hidden')
+        //     trailerLayout.classList.remove('opacity-0', 'scale-95')
+        //     trailerLayout.classList.add('opacity-100', 'scale-100')
+        // }
 
         function onPlayerError(event) {
             // Error 101/150 = tidak bisa embed

@@ -6,5 +6,5 @@
     <div class="rounded-full aspect-[3/3] overflow-hidden">
     <img src="{{ $image_url }}" alt="{{ $name }}" loading="lazy" class="shrink-0 w-full h-full object-cover object-center">
     </div>
-    <p class="mt-2 text-white font-bold truncate">{{ $name }}</p>
+    <p class="mt-2 text-white text-center w-full font-bold truncate">{{ $name }}</p>
 </a>

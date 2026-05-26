@@ -5,23 +5,23 @@ namespace App\Http\Controllers;
 use App\Services\DetailService;
 use App\Services\LogActivityService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DetailController extends Controller
 {
     protected $detailService;
     protected $logActivityService;
-    protected $user_id;
     public function __construct(DetailService $detailService, LogActivityService $logActivityService)
     {
        $this->detailService = $detailService;
        $this->logActivityService = $logActivityService;
-       $this->user_id = auth()->id();
     }
     public function index(int $id) {
     $similarMovies = $this->detailService->filterSimilar($id);
     $movie = $this->detailService->getSelectedMovie($id);
+    $userId = Auth::id();
     if($movie){
-        $this->logActivityService->click(['user_id'=>$this->user_id,'movie_id'=>$id]);
+        $this->logActivityService->click(['user_id'=>$userId,'movie_id'=>$id]);
     }
     $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
     $comments = $movie->comments()
@@ -29,8 +29,7 @@ class DetailController extends Controller
         ->latest()
         ->get();
     $isInWatchlist = \App\Models\Watchlist::where(
-        'user_id',
-        auth()->id()
+        'user_id', $userId
     )
     ->where(
         'movie_id',
@@ -39,8 +38,7 @@ class DetailController extends Controller
     ->exists();
 
     $isFavorite = \App\Models\Favorite::where(
-        'user_id',
-        auth()->id()
+        'user_id', $userId
     )
     ->where(
         'movie_id',
