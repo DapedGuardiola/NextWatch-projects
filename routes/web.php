@@ -4,9 +4,11 @@ use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\detailController as ControllersDetailController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\DetailController;
 use App\Http\Controllers\TopChartedController;
 use App\Services\LogActivityService;
 use App\Services\DetailService;
@@ -75,25 +77,7 @@ Route::middleware('auth')->group(function () {
     return view('pages.actor-detail', compact('actorsData'));
     })->name('actor.detail');
 
-    Route::get('/movie/detail/{id}', function ($id) {
-        $user_id = auth()->id();
-        $movie = \App\Models\Movie::where('tmdb_movie_id', $id)->with('genres.genre:map_id,name')->firstOrFail();
-        
-        $logActivityService = new LogActivityService();
-        $detailService = app(DetailService::class);
-        $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
-
-        $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
-        $comments = $movie->comments()->with('user')->latest()->get();
-        $similarMovies = $detailService->filterSimilar($id);
-
-        $isInWatchlist = \App\Models\Watchlist::where('user_id', auth()->id())->where('movie_id', $movie->tmdb_movie_id)->exists();
-        $isFavorite = \App\Models\Favorite::where('user_id', auth()->id())->where('movie_id', $movie->tmdb_movie_id)->exists();
-
-        return view('pages.movie-detail', compact(
-            'movie', 'comments', 'similarMovies', 'isInWatchlist', 'isFavorite', 'genreNames'
-        ));
-    })->name('movie.detail');
+    Route::get('/movie/detail/{id}', [DetailController::class,'index'])->name('movie.detail');
 
     //Search
 

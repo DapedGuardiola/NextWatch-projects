@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-path_source = Path('data/processed/movies.json')
-path_output = Path('data/processed/normalized_movie.json')
+path_source = Path('data/processed/updated/fixed_movies.json')
+path_output = Path('data/processed/updated/fixed_normalize_movie.json')
 with open(path_source, 'r',encoding='utf-8') as f:
     movies = json.load(f)
 
