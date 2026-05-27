@@ -387,13 +387,8 @@
                             <div class="flex justify-between items-start mb-8">
  
                                 <div>
-                                    <h2 class="text-3xl font-bold tracking-tight">
-                                        Discussion
-                                    </h2>
- 
-                                    <p class="text-gray-400 text-sm mt-1">
-                                        Join the conversation with other viewers
-                                    </p>
+                                    <h2 class="text-3xl font-bold tracking-tight">Discussion</h2>
+                                    <p class="text-gray-400 text-sm mt-1">Join the conversation with other viewers</p>
                                 </div>
  
                                 <div class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300">
@@ -405,7 +400,6 @@
                             <!-- COMMENT INPUT -->
                             @auth
                             <form action="{{ route('movie.comment') }}" method="POST">
- 
                                 @csrf
                                 <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
  
@@ -416,7 +410,6 @@
                                     </div>
  
                                     <div class="flex-1">
- 
                                         <textarea
                                             name="content"
                                             rows="2"
@@ -424,24 +417,20 @@
                                             class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"></textarea>
  
                                         <div class="flex justify-end mt-3">
- 
-                                            <button
-                                                type="submit"
+                                            <button type="submit"
                                                 class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
                                                 Comment
                                             </button>
- 
                                         </div>
- 
                                     </div>
  
                                 </div>
- 
                             </form>
                             @else
                             <div class="mb-10 flex items-center gap-3 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                 </svg>
                                 <span>
                                     <a href="{{ route('login') }}" class="text-cyan-400 hover:underline">Login</a> to join the discussion.
@@ -462,27 +451,22 @@
                                         <div class="flex gap-4 group">
  
                                             <div class="flex-shrink-0">
- 
                                                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
                                                             text-black font-bold flex items-center justify-center
                                                             shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                                                     {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
                                                 </div>
- 
                                             </div>
  
                                             <div class="flex-1">
  
                                                 <div class="flex items-center gap-3">
- 
                                                     <h3 class="font-semibold text-sm text-white">
                                                         {{ $comment->user->name ?? 'Unknown User' }}
                                                     </h3>
- 
                                                     <span class="text-sm text-gray-500">
                                                         {{ $comment->created_at->diffForHumans() }}
                                                     </span>
- 
                                                 </div>
  
                                                 <p class="mt-2 text-gray-200 text-[16px] leading-relaxed">
@@ -490,11 +474,7 @@
                                                 </p>
  
                                                 <div class="flex gap-6 mt-3 text-sm text-gray-500">
- 
-                                                    <button class="hover:text-cyan-300 transition">
-                                                        Like
-                                                    </button>
- 
+                                                    <button class="hover:text-cyan-300 transition">Like</button>
                                                     @auth
                                                     <button
                                                         data-reply-toggle="{{ $comment->id }}"
@@ -502,25 +482,20 @@
                                                         Reply
                                                     </button>
                                                     @endauth
- 
-                                                    <button class="hover:text-red-400 transition">
-                                                        Report
-                                                    </button>
- 
+                                                    <button class="hover:text-red-400 transition">Report</button>
                                                 </div>
  
                                             </div>
  
                                         </div>
  
-                                        {{-- FORM REPLY (hidden by default, toggle via JS) --}}
+                                        {{-- FORM REPLY KE KOMENTAR UTAMA --}}
                                         @auth
                                         <div id="reply-form-{{ $comment->id }}" class="hidden ml-14 mt-3">
-                                            <form action="{{ route('movie.comment') }}" method="POST" class="flex gap-3">
+                                            <form action="{{ route('movie.comment') }}" method="POST" class="flex gap-2">
                                                 @csrf
                                                 <input type="hidden" name="movie_id"  value="{{ $movie->tmdb_movie_id }}">
                                                 <input type="hidden" name="reply_id"  value="{{ $comment->id }}">
-                                                <input type="hidden" name="tagged_user_id" value="{{ $comment->user_id }}">
                                                 <div class="flex-1 flex gap-2">
                                                     <textarea
                                                         name="content"
@@ -539,79 +514,14 @@
                                         </div>
                                         @endauth
  
-                                        {{-- BALASAN --}}
+                                        {{-- NESTED REPLY TREE --}}
                                         @if($comment->replies->isNotEmpty())
-                                        <div class="ml-14 mt-4 space-y-4 border-l-2 border-white/5 pl-4">
+                                        <div class="ml-14 mt-4 space-y-3 border-l border-white/5 pl-2">
                                             @foreach($comment->replies as $reply)
-                                            <div>
-                                                <div class="flex gap-4">
- 
-                                                    <div class="flex-shrink-0">
-                                                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
-                                                                    text-black font-bold flex items-center justify-center text-xs
-                                                                    shadow-[0_0_20px_rgba(34,211,238,0.35)]">
-                                                            {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
-                                                        </div>
-                                                    </div>
- 
-                                                    <div class="flex-1">
-                                                        <div class="flex items-center gap-3 flex-wrap">
-                                                            <h3 class="font-semibold text-sm text-white">
-                                                                {{ ($reply->user->name ?? 'Unknown User') }}
-                                                            </h3>
-                                                            @if($reply->taggedUser)
-                                                                <span class="text-cyan-400 text-xs font-medium">
-                                                                    Reply to &#64;{{ $reply->taggedUser->name }}
-                                                                </span>
-                                                            @endif
-                                                            <span class="text-xs text-gray-500">
-                                                                {{ $reply->created_at->diffForHumans() }}
-                                                            </span>
-                                                        </div>
-                                                        <p class="mt-1 text-gray-300 text-[15px] leading-relaxed">
-                                                            {{ $reply->content }}
-                                                        </p>
-                                                        <div class="flex gap-6 mt-2 text-xs text-gray-500">
-                                                            <button class="hover:text-cyan-300 transition">Like</button>
-                                                            @auth
-                                                            <button
-                                                                data-reply-toggle="{{ $reply->id }}"
-                                                                class="hover:text-cyan-300 transition">
-                                                                Reply
-                                                            </button>
-                                                            @endauth
-                                                            <button class="hover:text-red-400 transition">Report</button>
-                                                        </div>
-                                                    </div>
- 
-                                                </div>
-
-                                                {{-- FORM REPLY TO REPLY (nested) --}}
-                                                @auth
-                                                <div id="reply-form-{{ $reply->id }}" class="hidden ml-14 mt-3">
-                                                    <form action="{{ route('movie.comment') }}" method="POST" class="flex gap-3">
-                                                        @csrf
-                                                        <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
-                                                        <input type="hidden" name="reply_id" value="{{ $comment->id }}">
-                                                        <input type="hidden" name="tagged_user_id" value="{{ $reply->user_id }}">
-                                                        <div class="flex-1 flex gap-2">
-                                                            <textarea
-                                                                name="content"
-                                                                rows="1"
-                                                                placeholder="Reply to {{ $reply->user->name ?? '' }}…"
-                                                                class="flex-1 resize-none bg-transparent border-b border-white/10
-                                                                       focus:border-cyan-400 outline-none text-gray-200
-                                                                       placeholder-gray-500 pb-2 text-sm transition"></textarea>
-                                                            <button type="submit"
-                                                                    class="self-end px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                                                                           text-black text-sm font-semibold transition">
-                                                                Reply
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                @endauth
-                                            </div>
+                                                <x-movie.comment-reply
+                                                    :reply="$reply"
+                                                    :movie="$movie"
+                                                    :depth="0" />
                                             @endforeach
                                         </div>
                                         @endif
@@ -782,6 +692,7 @@
     </script>
     @endif
 
+    {{-- TOGGLE REPLY FORM --}}
     <script>
         document.querySelectorAll('[data-reply-toggle]').forEach(btn => {
             btn.addEventListener('click', () => {

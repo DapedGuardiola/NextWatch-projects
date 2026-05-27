@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use App\Models\Comment;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class CommentService
 {
-    public function getCommentsByMovie(int|string $movieId)
+    public function getCommentsByMovie(int|string $movieId): Collection
     {
-        return Comment::with(['user', 'replies.user', 'taggedUser'])
+        return Comment::with(['user', 'replies'])
             ->where('movie_id', $movieId)
             ->whereNull('reply_id')
             ->oldest()
@@ -19,11 +20,10 @@ class CommentService
     public function store(array $data): Comment
     {
         return Comment::create([
-            'user_id'        => Auth::id(),
-            'movie_id'       => $data['movie_id'],
-            'reply_id'       => $data['reply_id']        ?? null,
-            'tagged_user_id' => $data['tagged_user_id']  ?? null,
-            'content'           => $data['content'],
+            'user_id'  => Auth::id(),
+            'movie_id' => $data['movie_id'],
+            'reply_id' => $data['reply_id'] ?? null,
+            'content'  => $data['content'],
         ]);
     }
 }
