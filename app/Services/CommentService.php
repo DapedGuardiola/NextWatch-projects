@@ -26,4 +26,25 @@ class CommentService
             'content'  => $data['content'],
         ]);
     }
+
+     public function update(Comment $comment, string $content): Comment
+    {
+        $comment->update(['content' => $content]);
+        return $comment;
+    }
+
+    public function destroy(Comment $comment): void
+    {
+        // Hapus semua replies
+        $this->deleteReplies($comment);
+        $comment->delete();
+    }
+
+    private function deleteReplies(Comment $comment): void
+    {
+        foreach ($comment->replies as $reply) {
+            $this->deleteReplies($reply);
+            $reply->delete();
+        }
+    }
 }

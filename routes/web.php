@@ -87,6 +87,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/movie/comment', [CommentController::class, 'store'])
         ->middleware('auth')
         ->name('movie.comment');
+        
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('movie.comment.update')->middleware('auth');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('movie.comment.destroy')->middleware('auth');
 
     // Route::get('/actor/{id}', function ($id) {
     // $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();

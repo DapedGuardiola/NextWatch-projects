@@ -447,32 +447,127 @@
  
                                     {{-- KOMENTAR UTAMA --}}
                                     <div>
- 
-                                        <div class="flex gap-4 group">
- 
-                                            <div class="flex-shrink-0">
+
+                                        <div class="flex gap-4">
+
+                                            {{-- AVATAR + GARIS VERTIKAL --}}
+                                            <div class="flex flex-col items-center flex-shrink-0">
                                                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
                                                             text-black font-bold flex items-center justify-center
                                                             shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                                                     {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
                                                 </div>
+                                                @if($comment->replies->isNotEmpty())
+                                                <div class="w-px flex-1 mt-2 bg-white/10"></div>
+                                                @endif
                                             </div>
- 
-                                            <div class="flex-1">
- 
-                                                <div class="flex items-center gap-3">
-                                                    <h3 class="font-semibold text-sm text-white">
-                                                        {{ $comment->user->name ?? 'Unknown User' }}
-                                                    </h3>
-                                                    <span class="text-sm text-gray-500">
-                                                        {{ $comment->created_at->diffForHumans() }}
-                                                    </span>
+
+                                            <div class="flex-1 min-w-0">
+
+                                                {{-- HEADER --}}
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <div class="flex items-center gap-3 flex-wrap">
+                                                        <h3 class="font-semibold text-sm text-white">
+                                                            {{ $comment->user->name ?? 'Unknown User' }}
+                                                        </h3>
+                                                        <span class="text-sm text-gray-500">
+                                                            {{ $comment->created_at->diffForHumans() }}
+                                                            @if($comment->updated_at->gt($comment->created_at->addSecond()))
+                                                                <span class="italic">(edited)</span>
+                                                            @endif
+                                                        </span>
+                                                    </div>
+
+                                                    {{-- DROPDOWN MENU (hanya pemilik) --}}
+                                                    @auth
+                                                    @if(Auth::id() === $comment->user_id)
+                                                    <div class="relative" x-data="{ open: false }">
+                                                        <button @click="open = !open"
+                                                                class="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                                            </svg>
+                                                        </button>
+                                                        <div x-show="open"
+                                                            @click.outside="open = false"
+                                                            x-transition
+                                                            class="absolute right-0 mt-1 w-32 rounded-xl bg-[#0d1424] border border-white/10
+                                                                    shadow-xl z-50 overflow-hidden">
+                                                            <button
+                                                                @click="open = false; toggleEdit({{ $comment->id }})"
+                                                                class="w-full text-left px-4 py-2 text-sm text-gray-300
+                                                                    hover:bg-white/10 hover:text-yellow-300 transition flex items-center gap-2">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
+                                                                            m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                </svg>
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                @click="open = false; deleteComment({{ $comment->id }})"
+                                                                class="w-full text-left px-4 py-2 text-sm text-gray-300
+                                                                    hover:bg-white/10 hover:text-red-400 transition flex items-center gap-2">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7
+                                                                            m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    @endauth
                                                 </div>
- 
-                                                <p class="mt-2 text-gray-200 text-[16px] leading-relaxed">
-                                                    {{ $comment->content }}
-                                                </p>
- 
+
+                                                {{-- TEKS KOMENTAR --}}
+                                                <div id="comment-text-{{ $comment->id }}">
+                                                    <p class="mt-2 text-gray-200 text-[16px] leading-relaxed break-words">
+                                                        {{ $comment->content }}
+                                                    </p>
+                                                </div>
+
+                                                {{-- FORM EDIT (hidden) --}}
+                                                @auth
+                                                @if(Auth::id() === $comment->user_id)
+                                                <div id="edit-form-{{ $comment->id }}" class="hidden mt-2">
+                                                    <form action="{{ route('movie.comment.update', $comment->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <textarea
+                                                            name="content"
+                                                            rows="2"
+                                                            class="w-full resize-none bg-white/5 border border-white/10 rounded-lg
+                                                                focus:border-cyan-400 outline-none text-gray-200
+                                                                p-3 text-base transition">{{ $comment->content }}</textarea>
+                                                        <div class="flex gap-2 mt-2">
+                                                            <button type="submit"
+                                                                    class="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400
+                                                                        text-black text-sm font-semibold transition">
+                                                                Save
+                                                            </button>
+                                                            <button type="button"
+                                                                    onclick="toggleEdit({{ $comment->id }})"
+                                                                    class="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20
+                                                                        text-gray-300 text-sm transition">
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+
+                                                {{-- FORM DELETE (hidden, submit via JS) --}}
+                                                <form id="delete-form-{{ $comment->id }}"
+                                                    action="{{ route('movie.comment.destroy', $comment->id) }}"
+                                                    method="POST" class="hidden">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                                @endif
+                                                @endauth
+
+                                                {{-- ACTIONS --}}
                                                 <div class="flex gap-6 mt-3 text-sm text-gray-500">
                                                     <button class="hover:text-cyan-300 transition">Like</button>
                                                     @auth
@@ -484,39 +579,36 @@
                                                     @endauth
                                                     <button class="hover:text-red-400 transition">Report</button>
                                                 </div>
- 
+
                                             </div>
- 
                                         </div>
- 
+
                                         {{-- FORM REPLY KE KOMENTAR UTAMA --}}
                                         @auth
                                         <div id="reply-form-{{ $comment->id }}" class="hidden ml-14 mt-3">
                                             <form action="{{ route('movie.comment') }}" method="POST" class="flex gap-2">
                                                 @csrf
-                                                <input type="hidden" name="movie_id"  value="{{ $movie->tmdb_movie_id }}">
-                                                <input type="hidden" name="reply_id"  value="{{ $comment->id }}">
-                                                <div class="flex-1 flex gap-2">
-                                                    <textarea
-                                                        name="content"
-                                                        rows="1"
-                                                        placeholder="Reply to {{ $comment->user->name ?? '' }}…"
-                                                        class="flex-1 resize-none bg-transparent border-b border-white/10
-                                                               focus:border-cyan-400 outline-none text-gray-200
-                                                               placeholder-gray-500 pb-2 text-sm transition"></textarea>
-                                                    <button type="submit"
-                                                            class="self-end px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                                                                   text-black text-sm font-semibold transition">
-                                                        Reply
-                                                    </button>
-                                                </div>
+                                                <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
+                                                <input type="hidden" name="reply_id" value="{{ $comment->id }}">
+                                                <textarea
+                                                    name="content"
+                                                    rows="1"
+                                                    placeholder="Reply to {{ $comment->user->name ?? '' }}…"
+                                                    class="flex-1 resize-none bg-transparent border-b border-white/10
+                                                        focus:border-cyan-400 outline-none text-gray-200
+                                                        placeholder-gray-500 pb-2 text-sm transition"></textarea>
+                                                <button type="submit"
+                                                        class="self-end px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400
+                                                            text-black text-sm font-semibold transition">
+                                                    Reply
+                                                </button>
                                             </form>
                                         </div>
                                         @endauth
- 
+
                                         {{-- NESTED REPLY TREE --}}
                                         @if($comment->replies->isNotEmpty())
-                                        <div class="ml-14 mt-4 space-y-3 border-l border-white/5 pl-2">
+                                        <div class="ml-14 mt-4 space-y-3">
                                             @foreach($comment->replies as $reply)
                                                 <x-movie.comment-reply
                                                     :reply="$reply"
@@ -525,7 +617,7 @@
                                             @endforeach
                                         </div>
                                         @endif
- 
+
                                     </div>
                                     {{-- END KOMENTAR UTAMA --}}
  
@@ -704,5 +796,23 @@
                 }
             });
         });
+
+        // Toggle edit form
+        function toggleEdit(id) {
+            const textEl = document.getElementById('comment-text-' + id);
+            const formEl = document.getElementById('edit-form-' + id);
+            if (!textEl || !formEl) return;
+            textEl.classList.toggle('hidden');
+            formEl.classList.toggle('hidden');
+            if (!formEl.classList.contains('hidden')) {
+                formEl.querySelector('textarea')?.focus();
+            }
+        }
+
+        // Delete dengan konfirmasi
+        function deleteComment(id) {
+            if (!confirm('Hapus komentar ini?')) return;
+            document.getElementById('delete-form-' + id)?.submit();
+        }
     </script>
 </x-app-layout>
