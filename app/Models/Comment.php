@@ -11,7 +11,7 @@ class Comment extends Model
         'movie_id',
         'reply_id',
         'tagged_user_id',
-        'body',
+        'content',
     ];
 
     /*
@@ -30,16 +30,17 @@ class Comment extends Model
         return $this->belongsTo(Movie::class, 'movie_id', 'tmdb_movie_id');
     }
 
-    public function parent()
-    {
-        return $this->belongsTo(Comment::class, 'reply_id');
-    }
-
     public function replies()
     {
         return $this->hasMany(Comment::class, 'reply_id')
-            ->with('user')
-            ->latest();
+            ->with('replies', 'user')
+            ->oldest();
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Comment::class, 'reply_id')
+            ->with('user');
     }
 
     public function taggedUser()

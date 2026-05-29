@@ -6,11 +6,14 @@ use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\detailController as ControllersDetailController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\DetailController;
 use App\Http\Controllers\TopChartedController;
 use App\Services\LogActivityService;
+use App\Services\DetailService;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -96,83 +99,19 @@ Route::middleware('auth')->group(function () {
     return view('pages.actor-detail', compact('actorsData'));
     })->name('actor.detail');
 
-    Route::get('/movie/detail/{id}', function ($id) {
-    $user_id = auth()->id();
-    $movie = \App\Models\Movie::where(
-        'tmdb_movie_id',
-        $id
-    )->with('genres.genre:map_id,name')->firstOrFail();
-    $logActivityService = new LogActivityService();
-    $logActivityService->click(['user_id'=>$user_id,'movie_id'=>$id]);
-
-    $genreNames = $movie->genres->pluck('genre.name')->filter()->toArray();
-
-    $comments = $movie->comments()
-        ->with('user')
-        ->latest()
-        ->get();
-
-    $similarMovies = \App\Models\Movie::where(
-        'tmdb_movie_id',
-        '!=',
-        $movie->tmdb_movie_id
-    )
-    ->take(8)
-    ->get();
-
-    $isInWatchlist = \App\Models\Watchlist::where(
-        'user_id',
-        auth()->id()
-    )
-    ->where(
-        'movie_id',
-        $movie->tmdb_movie_id
-    )
-    ->exists();
-
-    $isFavorite = \App\Models\Favorite::where(
-        'user_id',
-        auth()->id()
-    )
-    ->where(
-        'movie_id',
-        $movie->tmdb_movie_id
-    )
-    ->exists();
-
-    return view('pages.movie-detail', compact(
-        'movie',
-        'comments',
-        'similarMovies',
-        'isInWatchlist',
-        'isFavorite',
-        'genreNames'
-    ));
-
-    })->name('movie.detail');
+    Route::get('/movie/detail/{id}', [DetailController::class,'index'])->name('movie.detail');
 
     //Search
 
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
     Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
 
-    Route::post('/movie/comment', function (Request $request) {
-    $request->validate([
-        'movie_id' => 'required',
-        'content' => 'required|string|max:1000',
-    ]);
-    Comment::create([
-        'user_id' => auth()->id(),
-        'movie_id' => $request->movie_id,
-        'reply_id' => $request->reply_id,
-        'tagged_user_id' => $request->tagged_user_id,
-        'content' => $request->content,
-    ]);
-    return back();
-    })->middleware('auth')->name('movie.comment');
-
-    Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
-    ->name('comments.store');
+    Route::post('/movie/comment', [CommentController::class, 'store'])
+        ->middleware('auth')
+        ->name('movie.comment');
+        
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('movie.comment.update')->middleware('auth');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('movie.comment.destroy')->middleware('auth');
 
     // Route::get('/actor/{id}', function ($id) {
     // $actor = \App\Models\Actor::where('tmdb_actor_id', $id)->first();
@@ -181,6 +120,11 @@ Route::middleware('auth')->group(function () {
     // }
     // return view('pages.actor-detail', compact('actor'));
     // })->name('actor.detail');
+    
+    Route::get('/profile/persona', [ProfileController::class, 'persona'])->name('profile.persona');
+    Route::post('/profile/persona/update', [ProfileController::class, 'updatePersona'])->name('profile.persona.update');
+    Route::post('/profile/persona/genres', [ProfileController::class, 'updateGenres'])->name('profile.persona.genres');
+    Route::delete('/profile/persona/genres/{genre}', [ProfileController::class, 'destroyGenre'])->name('profile.persona.genres.destroy');
 });
 
 require __DIR__ . '/auth.php';

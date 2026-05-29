@@ -12,13 +12,18 @@ class movie_genres_vector_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("/data/processed/fixed_movie_vector.json");
+        $path = base_path("data/processed/updated/movieVector.json");
         $json = file_get_contents($path);
         $vectors =json_decode($json, true);
+
+        $existingMovies = DB::table('movies')->pluck('tmdb_movie_id')->toArray();
         $data = [];
         $batchSize = 500;
 
         foreach($vectors as $vector){
+            if (!in_array($vector["movie_id"], $existingMovies)) {
+                continue;
+            }
             $data [] = [
                 'tmdb_movie_id'=>$vector["movie_id"],
                 'vector'=> json_encode($vector['vector']),

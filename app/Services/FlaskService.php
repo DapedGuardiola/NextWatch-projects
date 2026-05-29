@@ -70,4 +70,19 @@ class FlaskService
 
         return $response->json('ranked_id');
     }
+
+    public function getSimilar(array $target_movie, array $movies)
+    {
+        $response = Http::post("{$this->baseUrl}/cbf/similar", [
+            'target_movie' => $target_movie,
+            'movies' => $movies,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Flask API Error: ' . $response->status());
+        }
+
+        // dd($response->json('similar_ids'));  
+        return $response->json('similar_ids');
+    }
 }

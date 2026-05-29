@@ -13,13 +13,17 @@ class movie_actors_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path('data/processed/movie_actors_pivot.json');
+        $path = base_path('data/processed/updated/fixed_actor_pivot.json');
         $json = file_get_contents($path);
         $movie_actors = json_decode($json, true);
+        $existingMovies = DB::table('movies')->pluck('tmdb_movie_id')->toArray();
         $batchSize = 500;
         $data = [];
 
         foreach ($movie_actors as $movie_actor) {
+            if (!in_array($movie_actor["movie_id"], $existingMovies)) {
+                continue;
+            }
             $data[] = [
                 'tmdb_movie_id' => $movie_actor["movie_id"],
                 'tmdb_actor_id' => $movie_actor["cast_id"],

@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create("movies", function (Blueprint $table) {
             $table->bigIncrements("id");
             $table->unsignedBigInteger("tmdb_movie_id")->unique();
+            $table->unsignedBigInteger("collection_id")->nullable();
             $table->string("title");
             $table->text("overview")->nullable();
             $table->string("poster_path")->nullable();
+            $table->string("trailer_key")->nullable();
             $table->double("popularity")->nullable();
             $table->date("release_date")->nullable();
             $table->integer("runtime")->nullable();
+            $table->integer("trailer_size")->nullable();
             $table->string("tagline")->nullable();
             $table->decimal("rating",3,1)->nullable();
             $table->integer("rating_count")->nullable();
