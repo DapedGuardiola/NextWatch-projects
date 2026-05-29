@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->boolean('is_personalized')->default(false);
+            $table->boolean('persona_ready')->default(false);
+            $table->enum('persona_drift_count',[0,1,2,3])->default(0);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

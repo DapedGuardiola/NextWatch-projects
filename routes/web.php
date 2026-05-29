@@ -15,6 +15,21 @@ use App\Services\DetailService;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
+
+// Tinggal test di route sementara
+Route::get('/test-redis', function () {
+    Cache::put('test', 'Redis jalan! ✅', 60);
+    return Cache::get('test');
+});
+Route::get('/test-job', function () {
+    dispatch(function () {
+        Log::info('Worker jalan! ✅');
+    });
+    return 'Job dispatched!';
+});
 
 Route::get('/', function () {
     return view('welcome');

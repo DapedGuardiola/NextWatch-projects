@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Services\DashboardService;
 use App\Services\ActorService;
+use App\Models\UserGenre;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -26,7 +27,7 @@ class DashboardController extends Controller
         // Cek apakah user sudah login dan sudah mengisi persona
         if (auth()->check() && auth()->user()->is_personalized) {
             // Ambil ID genre favorit user dari database
-            $userGenres = \App\Models\UserGenre::where('user_id', auth()->id())->pluck('genre_id')->toArray();
+            $userGenres = UserGenre::where('user_id', auth()->id())->pluck('genre_id')->toArray();
             
             if (!empty($userGenres)) {
                 // Ambil film yang memiliki map_genre_id sesuai dengan genre favorit user
@@ -36,15 +37,13 @@ class DashboardController extends Controller
             }
         }
 
+        $content = $this->dashboardService->getMainContent();  
+
         return view('dashboard', compact(['movies','popularMovie','actors', 'forYouMovies']));
     }
     
     public function getActorMovie($id){
         $actorsData = $this->actorService->getActorMovies($id);
         return view('pages.actor-detail',compact('actorsData'));
-    }
-    
-    public function getDashboardContent(){
-        $content = $this->dashboardService->getMainContent(); 
     }
 }

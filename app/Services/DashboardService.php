@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Services\FlaskService;
 use App\Models\LogActivityModel;
+use App\Models\Favorite;
 
 class DashboardService
 {
@@ -18,7 +19,6 @@ class DashboardService
     {
         $this->flaskService = $flaskService;
         $this->user_id = Auth::id();
-
     }
     public function getMovie()
     {
@@ -91,15 +91,32 @@ class DashboardService
         return $popular;
     }
         public function getBasePersonalization($user_id){
-        
+        return
     }
-    public function getMainContent($user_id) {
-        $userLog = LogActivityModel::where('user_id', $user_id)->get();
-        $userPersona = $this->getBasePersonalization($user_id);
-        $minClick = 4;
-        $minFav = 1;
-        $minWatchlist = 1;
+    
+    public function count_log_activity($userLog){
+    $userClickCount = $userLog->where('type', 'click')->count();
+    $userFavoriteCount = $userLog->where('type', 'favorite')->count();
+    $userClickedMovieCount = $userLog->distinct('tmdb_movie_id')->count('tmdb_movie_id');
+        if($userClickCount > 3 
+        && $userFavoriteCount> 1
+        && $userClickedMovieCount>3){
+            Users::where('id',$this->user_id)->update(['persona_ready',true]);
+
+        }
+    }
+    public function getBasicPreference(){
+    $persona = Favorite::where(['user_id'=>$this->user_id,'is_persona'=>true]); 
     
     }
-
+    public function getMainContent($user_id) {
+        $user_persona_ready = Auth::user()->persona_ready;
+        $userLog = LogActivityModel::where('user_id', $user_id)->get();
+        if(!$user_persona_ready){
+            $this->count_log_activity($userLog);
+            $preference = $this->getBasicPreference();
+            return $preference;
+        }
+        $preference = 
+    }
 }

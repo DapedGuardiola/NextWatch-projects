@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('genre_id');
             $table->unsignedBigInteger('user_id');
+            $table->double('weight')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('genre_id')->references('map_id')->on('genres');

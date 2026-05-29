@@ -132,7 +132,7 @@
                                     <span class="text-gray-500 min-w-[90px]">
                                         Starring
 
-                                    <div class="grid grid-cols-3 mt-2 ml-4 gap-4 overflow-hidden">
+                                    <div class="grid grid-cols-3 mt-4 ml-4 gap-10 overflow-hidden">
                                         @foreach($movie->actors as $actor)
                                         <x-movie.small.small-actor-card
                                             :actor_id="$actor->tmdb_actor_id"
@@ -299,7 +299,7 @@
 
                             <button
                                 type="submit"
-                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                                class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
                                     bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
                                     text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
                                     flex items-center justify-center gap-2">
@@ -326,7 +326,7 @@
 
                         <!-- SHARE -->
                         <button onclick="copyShareLink()"
-                            class="group relative px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base
+                            class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
                                 bg-white/5 hover:bg-white/10
                                 border border-white/10 hover:border-cyan-400/40
                                 text-gray-100 transition-all duration-300

@@ -11,13 +11,9 @@ return new class extends Migration
         Schema::create('favorites', function (Blueprint $table) {
 
             $table->id();
-
             $table->unsignedBigInteger('user_id');
-
             $table->unsignedBigInteger('movie_id');
-
-            $table->boolean('is_persona')->nullable()->default(null);
-
+            $table->boolean('is_persona')->nullable()->default(false);
             $table->timestamps();
 
             $table->unique([
