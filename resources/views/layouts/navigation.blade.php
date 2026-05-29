@@ -25,12 +25,13 @@
             </div>
 
             <div class="hidden w-10 sm:flex sm:items-center">
+            @auth
+                {{-- Sudah login: dropdown profile biasa --}}
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         @php
-                            // Logika untuk mengecek apakah user punya avatar atau belum
-                            $avatarUrl = Auth::user()->avatar 
-                                ? asset('storage/' . Auth::user()->avatar) 
+                            $avatarUrl = Auth::user()->avatar
+                                ? asset('storage/' . Auth::user()->avatar)
                                 : "https://ui-avatars.com/api/?name=" . urlencode(Auth::user()->name) . "&background=333&color=fff";
                         @endphp
                         <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -48,17 +49,33 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-            </div>
+            @else
+                {{-- Belum login: icon default + dropdown login/register --}}
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent rounded-md text-gray-400 bg-transparent hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                            <div class="w-10 h-10 rounded-full bg-gray-500/80 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                    <x-dropdown-link
+                        href="#"
+                        @click.prevent="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))">
+                        Login
+                    </x-dropdown-link>
 
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
+                    <x-dropdown-link
+                        href="#"
+                        @click.prevent="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'register' }))">
+                        Register
+                    </x-dropdown-link>
+                </x-slot>
+                </x-dropdown>
+            @endauth
         </div>
     </div>
 
@@ -68,6 +85,8 @@
             <x-responsive-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">{{ __('Discover') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">{{ __('Top Charted') }}</x-responsive-nav-link>
         </div>
+
+        @auth
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
@@ -81,5 +100,13 @@
                 </form>
             </div>
         </div>
+        @else
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            <div class="mt-3 space-y-1 px-4">
+                <x-responsive-nav-link :href="route('login')">{{ __('Login') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('register')">{{ __('Register') }}</x-responsive-nav-link>
+            </div>
+        </div>
+        @endauth
     </div>
 </nav>

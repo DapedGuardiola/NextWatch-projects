@@ -74,4 +74,9 @@ class Movie extends Model
             'tmdb_actor_id'
         );
     }
+
+    public function favorite()
+    {
+        return $this->hasMany(Favorite::class, 'movie_id', 'tmdb_movie_id');
+    }
 }

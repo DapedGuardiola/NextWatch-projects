@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PersonalizationController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -13,13 +15,33 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', [App\Http\Controllers\LandingController::class, 'index']);
+
+Route::get('/login', function () {
+    $popularMovie  = \App\Models\Movie::orderBy('popularity', 'desc')->first();
+    $moviesByGenre = [];
+    $actors        = collect();
+    return view('landing', compact('popularMovie', 'moviesByGenre', 'actors'));
+})->middleware('guest')->name('login');
+
+Route::get('/register', function () {
+    $popularMovie  = \App\Models\Movie::orderBy('popularity', 'desc')->first();
+    $moviesByGenre = [];
+    $actors        = collect();
+    return view('landing', compact('popularMovie', 'moviesByGenre', 'actors'));
+})->middleware('guest')->name('register');
+
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    
+    Route::get('/personalization', [PersonalizationController::class, 'index'])->name('personalization.index');
+    Route::post('/personalization', [PersonalizationController::class, 'store'])->name('personalization.store');
 
     Route::get('/profileUI', [ProfileController::class, 'index'])->name('profile.index');
 
