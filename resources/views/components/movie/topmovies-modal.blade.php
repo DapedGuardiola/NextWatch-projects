@@ -81,7 +81,7 @@
                 <span class="text-[10px] md:text-xs text-white/40 bg-white/10 px-1.5 md:px-2 py-0.5 rounded">{{ $year }}</span>
                 @endisset
                 @isset($duration)
-                <span class="text-[10px] md:text-xs text-white/40 bg-white/10 px-1.5 md:px-2 py-0.5 rounded">{{ $duration }}</span>
+                <span class="text-[10px] md:text-xs text-white/40 bg-white/10 px-1.5 md:px-2 py-0.5 rounded">{{ $duration }} minutes</span>
                 @endisset
             </div>
 
@@ -96,7 +96,7 @@
             @endif
 
             @isset($overview)
-            <p class="text-[10px] md:text-xs text-white/60 leading-relaxed line-clamp-3 md:line-clamp-4">{{ $overview }}</p>
+            <p class="text-[10px] md:text-xs text-white/60 leading-relaxed line-clamp-[6] md:line-clamp-[9] lg:line-clamp-[13]">{{ $overview }}</p>
             @endisset
 
             @isset($rating)

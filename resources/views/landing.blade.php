@@ -2,11 +2,11 @@
     <x-slot name="title">{{ __('Dashboard') }}</x-slot>
 
     <div class="h-screen relative">
-        <img src="{{ $popularMovie->poster_url }}"
+        <img src="https://image.tmdb.org/t/p/original/{{ $popularMovie['poster_path'] }}"
             class="w-full h-full object-cover object-center" alt="hero">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-20% via-[#212121]/75 via-70% to-[#212121] to-100%"></div>
         <div class="absolute bottom-[15%] left-10">
-            <h1 class="text-white text-7xl font-bold">{{ $popularMovie->title }}</h1>
+            <h1 class="text-white text-7xl font-bold">{{ $popularMovie['title'] }}</h1>
         </div>
     </div>
 
@@ -15,23 +15,26 @@
             <x-movie.search-bar />
         </div>
 
-        @foreach($moviesByGenre as $section)
-        <div class="mx-10 my-10">
-            <p class="text-3xl text-white font-bold">Top On {{ $section['genre'] }}</p>
-        </div>
-        <div class="flex gap-8 px-2 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
-            @foreach($section['movies'] as $movie)
-            <x-movie.movie-modal
-                :poster="$movie->poster_url"
-                :title="$movie->title"
-                :tmdb_movie_id="$movie->tmdb_movie_id"
-                :year="$movie->year ?? null"
-                :rating="$movie->rating ?? null"
-                :overview="$movie->overview ?? null"
-                :genres="$movie->genres->pluck('genre.name')->filter()->toArray()"
-                :duration="$movie->runtime ?? null" />
-            @endforeach
-        </div>
+        @foreach($moviesByGenre as $genre => $movies)
+            <div class="text-white mx-4 md:mx-8 lg:mx-10">
+                <h2>
+                    <p class="text-2xl md:text-3xl text-white font-bold">Top on {{ $genre }}</p>
+                </h2>
+            </div>
+            <div class="flex gap-3 md:gap-4 py-4 px-4 md:px-8 lg:px-10 w-full md:w-[95%] lg:w-[90%] mx-auto overflow-x-auto scrollbar-hide">
+                @foreach($movies as $index => $movie)
+                    <x-movie.topmovies-modal
+                        :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"
+                        :title="$movie['title']"
+                        :tmdb_movie_id="$movie['id']"
+                        :year="$movie['year'] ?? null"
+                        :rating="$movie['rating'] ?? null"
+                        :overview="$movie['overview'] ?? null"
+                        :genres="[]"
+                        :duration="$movie['runtime'] ?? null" 
+                        :rank="$index + 1" />
+                @endforeach
+            </div>
         @endforeach
 
         <div class="mx-10 my-10">
@@ -155,7 +158,7 @@
                 {{-- kiri poster --}}
                 <div class="hidden lg:block w-64 relative flex-shrink-0">
                     <img
-                        src="{{ $popularMovie->poster_url }}"
+                        src="https://image.tmdb.org/t/p/original/{{ $popularMovie['poster_path'] }}"
                         class="w-full h-full object-cover"
                         alt="poster"
                     >
