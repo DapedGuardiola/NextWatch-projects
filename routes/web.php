@@ -33,26 +33,7 @@ Route::get('/test-job', function () {
     return 'Job dispatched!';
 });
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 Route::get('/', [App\Http\Controllers\LandingController::class, 'index']);
-
-Route::get('/login', function () {
-    $popularMovie  = \App\Models\Movie::orderBy('popularity', 'desc')->first();
-    $moviesByGenre = [];
-    $actors        = collect();
-    return view('landing', compact('popularMovie', 'moviesByGenre', 'actors'));
-})->middleware('guest')->name('login');
-
-Route::get('/register', function () {
-    $popularMovie  = \App\Models\Movie::orderBy('popularity', 'desc')->first();
-    $moviesByGenre = [];
-    $actors        = collect();
-    return view('landing', compact('popularMovie', 'moviesByGenre', 'actors'));
-})->middleware('guest')->name('register');
-
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Services\LandingService;
 use App\Services\ActorService;
 use App\Services\TopChartedService;
+use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
@@ -18,13 +19,14 @@ class LandingController extends Controller
         $this->topChartedService = $topChartedService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $moviesByGenre = $this->getMoviesByGenre();
         $popularMovie  = $this->getBestMovie();
         $actors        = $this->actorService->getActor();
+        $openModal     = $request->query('modal');
 
-        return view('landing', compact('moviesByGenre', 'popularMovie', 'actors'));
+        return view('landing', compact('moviesByGenre', 'popularMovie', 'actors', 'openModal'));
     }
 
     public function getBestMovie()
