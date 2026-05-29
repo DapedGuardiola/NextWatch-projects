@@ -40,4 +40,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function userGenres()
+    {
+        return $this->hasMany(UserGenre::class, 'user_id', 'id');
+    }
 }

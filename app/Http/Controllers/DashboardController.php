@@ -5,6 +5,7 @@ use App\Services\DashboardService;
 use App\Services\ActorService;
 use App\Models\UserGenre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -17,6 +18,11 @@ class DashboardController extends Controller
     }
     
     public function index(){
+
+        if (Auth::user()->is_personalized == 0) {
+            return redirect()->route('personalization.index');
+        }
+
         $movies = $this->dashboardService->getMovie();
         $popularMovie = $this->dashboardService->getPopularMovie();
         $actors = $this->actorService->getActor();

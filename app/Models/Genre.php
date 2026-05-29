@@ -14,4 +14,9 @@ class Genre extends Model
     {
         return $this->hasMany(MovieGenre::class, 'map_genre_id', 'map_id');
     }
+
+    public function userGenres()
+    {
+        return $this->hasMany(UserGenre::class, 'genre_id', 'id');
+    }
 }
