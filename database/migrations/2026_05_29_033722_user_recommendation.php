@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('tmdb_movie_id');
-            $table->enum('type',['movie','collection','actor']);          // 'movie', 'collection', 'actor'
-            $table->float('final_score');
             $table->timestamps();
-            $table->index(['user_id', 'type', 'final_score']);
         });
     }
 

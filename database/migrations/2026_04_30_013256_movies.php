@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create("movies", function (Blueprint $table) {
             $table->bigIncrements("id");
             $table->unsignedBigInteger("tmdb_movie_id")->unique();
-            $table->unsignedBigInteger("collection_id")->nullable();
+            $table->unsignedBigInteger("tmdb_collection_id")->nullable();
             $table->string("title");
             $table->text("overview")->nullable();
             $table->string("poster_path")->nullable();
@@ -27,6 +27,8 @@ return new class extends Migration
             $table->decimal("rating",3,1)->nullable();
             $table->integer("rating_count")->nullable();
             $table->char("original_language",2)->nullable();
+
+            $table->foreign('tmdb_collection_id')->references('tmdb_collection_id')->on('collections');
         });
     }
 

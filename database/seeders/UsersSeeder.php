@@ -35,7 +35,7 @@ class UsersSeeder extends Seeder
             [
                 'name' => 'David',
                 'email' => 'david@nextwatch.com',
-                'is_personalized' => true,
+                'is_personalized' => false,
                 'email_verified_at' => null,
                 'password' => Hash::make('password123'),
                 'remember_token' => null,
@@ -84,48 +84,48 @@ class UsersSeeder extends Seeder
                 'role' => 'user',
             ]
         ]);
-        DB::table('favorites')->insert([
-            [
-                'user_id' => 2,
-                'movie_id' => 19995,
-                'is_persona' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'user_id' => 2,
-                'movie_id' => 285,
-                'is_persona' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'user_id' => 2,
-                'movie_id' => 49026,
-                'is_persona' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-        ]);
-        DB::table('watchlists')->insert([
-            [
-                'user_id' => 2,
-                'movie_id' => 19995,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'user_id' => 2,
-                'movie_id' => 285,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'user_id' => 2,
-                'movie_id' => 49026,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-        ]);
+        // DB::table('favorites')->insert([
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 19995,
+        //         'is_persona' => true,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 285,
+        //         'is_persona' => true,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 49026,
+        //         'is_persona' => true,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        // ]);
+        // DB::table('watchlists')->insert([
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 19995,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 285,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        //     [
+        //         'user_id' => 2,
+        //         'movie_id' => 49026,
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ],
+        // ]);
     }
 }

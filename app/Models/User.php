@@ -45,4 +45,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserGenre::class, 'user_id', 'id');
     }
+
+    public function taste()
+    {
+        return $this->hasOne(UserTaste::class, 'user_id', 'id');
+    }
 }

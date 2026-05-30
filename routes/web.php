@@ -32,7 +32,6 @@ Route::get('/test-job', function () {
     });
     return 'Job dispatched!';
 });
-
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -57,7 +56,18 @@ Route::get('/register', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    
+   
+    Route::get('/test-function', [DiscoverController::class,'testFunction']);
+
+    Route::get('/persona-loading', function () {
+        return view('pages.loading-persona');
+    })->name('persona-loading');
+    Route::get('/persona-status', function () {
+        return response()->json([
+            'ready' => (bool) auth()->user()->persona_ready
+        ]);
+    });
+
     Route::get('/personalization', [PersonalizationController::class, 'index'])->name('personalization.index');
     Route::post('/personalization', [PersonalizationController::class, 'store'])->name('personalization.store');
 
@@ -82,22 +92,22 @@ Route::middleware('auth')->group(function () {
 
     //Movie Detail
     Route::post('/movie/{movie}/comment', [CommentController::class, 'store'])
-    ->name('comments.store');
+        ->name('comments.store');
 
     Route::post('/watchlist/{movie}', [WatchlistController::class, 'store'])
-    ->name('watchlist.store');
+        ->name('watchlist.store');
 
     Route::get('/watchlist', [WatchlistController::class, 'index'])
-    ->name('watchlist.index');
+        ->name('watchlist.index');
 
     Route::post('/watchlist/{movie}', [WatchlistController::class, 'store'])
-    ->name('watchlist.store');
+        ->name('watchlist.store');
 
     Route::delete('/watchlist/{movie}', [WatchlistController::class, 'destroy'])
-    ->name('watchlist.destroy');
+        ->name('watchlist.destroy');
 
     Route::post('/favorite/{movie}', [FavoriteController::class, 'store'])
-    ->name('favorite.store');
+        ->name('favorite.store');
 
     Route::delete('/favorite/{movie}', [FavoriteController::class, 'destroy'])
         ->name('favorite.destroy');
@@ -106,15 +116,24 @@ Route::middleware('auth')->group(function () {
         ->name('favorites.index');
 
     Route::get('/actor/{id}', function ($id) {
-    $actorsData = \App\Models\Actor::with([
-        'actormovies.movies.genres.genre'
-    ])
-    ->where('tmdb_actor_id', $id)
-    ->firstOrFail();
-    return view('pages.actor-detail', compact('actorsData'));
+        $actorsData = \App\Models\Actor::with([
+            'actormovies.movies.genres.genre'
+        ])
+            ->where('tmdb_actor_id', $id)
+            ->firstOrFail();
+        return view('pages.actor-detail', compact('actorsData'));
     })->name('actor.detail');
 
-    Route::get('/movie/detail/{id}', [DetailController::class,'index'])->name('movie.detail');
+      Route::get('/collection/{id}', function ($id) {
+        $collectionData = \App\Models\CollectionModel::with([
+            'movies.genres.genre'
+        ])
+            ->where('tmdb_collection_id', $id)
+            ->firstOrFail();
+        return view('pages.collection-detail', compact('collectionData'));
+    })->name('collection.detail');
+
+    Route::get('/movie/detail/{id}', [DetailController::class, 'index'])->name('movie.detail');
 
     //Search
 
@@ -124,7 +143,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/movie/comment', [CommentController::class, 'store'])
         ->middleware('auth')
         ->name('movie.comment');
-        
+
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('movie.comment.update')->middleware('auth');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('movie.comment.destroy')->middleware('auth');
 
@@ -135,7 +154,7 @@ Route::middleware('auth')->group(function () {
     // }
     // return view('pages.actor-detail', compact('actor'));
     // })->name('actor.detail');
-    
+
     Route::get('/profile/persona', [ProfileController::class, 'persona'])->name('profile.persona');
     Route::post('/profile/persona/update', [ProfileController::class, 'updatePersona'])->name('profile.persona.update');
     Route::post('/profile/persona/genres', [ProfileController::class, 'updateGenres'])->name('profile.persona.genres');

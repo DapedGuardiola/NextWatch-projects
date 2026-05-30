@@ -32,7 +32,7 @@ class movies_seeder extends Seeder
                 'rating' => $movie["rating"],
                 'rating_count' => $movie["rating_count"],
                 'original_language' => $movie["original_language"],
-                'collection_id' => $movie["collection_id"],
+                'tmdb_collection_id' => $movie["collection_id"],
                 'trailer_key' => $movie["trailer_key"],
                 'trailer_size' => $movie["trailer_size"],
                 ];
