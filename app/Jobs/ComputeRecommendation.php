@@ -39,7 +39,7 @@ class ComputeRecommendation implements ShouldQueue
         ])->get()->map(function ($movie) {
             return [
                 'movie_id' => $movie->tmdb_movie_id,
-                'genres' => $movie->genres,
+                'genre_ids' => $movie->genres->pluck('map_genre_id')->toArray(),
                 'release_year' => (
                     $movie->release_date
                     ? date(
@@ -48,8 +48,8 @@ class ComputeRecommendation implements ShouldQueue
                     )
                     : null
                 ),
-                'actors' => $movie->actors->pluck('tmdb_actor_id'),
-                'directors' => $movie->directors->pluck('tmdb_director_id'),
+                'actor_ids' => $movie->actors->pluck('tmdb_actor_id')->toArray(),
+                'director_ids' => $movie->directors->pluck('tmdb_director_id')->toArray(),
                 'normalizedData' => $movie->normalizedData,
             ];
         })->toArray();
