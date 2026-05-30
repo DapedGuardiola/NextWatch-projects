@@ -38,6 +38,7 @@ Route::get('/test-job', function () {
 
 Route::get('/', [App\Http\Controllers\LandingController::class, 'index']);
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/login', function () {
     $popularMovie  = \App\Models\Movie::orderBy('popularity', 'desc')->first();
     $moviesByGenre = [];
@@ -51,9 +52,6 @@ Route::get('/register', function () {
     $actors        = collect();
     return view('landing', compact('popularMovie', 'moviesByGenre', 'actors'));
 })->middleware('guest')->name('register');
-
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
    
