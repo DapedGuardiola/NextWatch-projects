@@ -390,7 +390,7 @@
                         <div class="relative p-8 md:p-10">
  
                             <!-- HEADER -->
-                            <div class="flex justify-between items-start mb-8">
+                            <div class="flex justify-between items-start mb-5">
  
                                 <div>
                                     <h2 class="text-3xl font-bold tracking-tight">Discussion</h2>
@@ -402,47 +402,6 @@
                                 </div>
  
                             </div>
- 
-                            <!-- COMMENT INPUT -->
-                            @auth
-                            <form action="{{ route('movie.comment') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
- 
-                                <div class="flex gap-4 mb-10">
- 
-                                    <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center flex-shrink-0">
-                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                                    </div>
- 
-                                    <div class="flex-1">
-                                        <textarea
-                                            name="content"
-                                            rows="2"
-                                            placeholder="Add a comment..."
-                                            class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"></textarea>
- 
-                                        <div class="flex justify-end mt-3">
-                                            <button type="submit"
-                                                class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
-                                                Comment
-                                            </button>
-                                        </div>
-                                    </div>
- 
-                                </div>
-                            </form>
-                            @else
-                            <div class="mb-10 flex items-center gap-3 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                </svg>
-                                <span>
-                                    <a href="{{ route('login') }}" class="text-cyan-400 hover:underline">Login</a> to join the discussion.
-                                </span>
-                            </div>
-                            @endauth
  
                             <!-- COMMENTS LIST -->
                             <div class="space-y-8">
@@ -638,6 +597,47 @@
                                 @endif
  
                             </div>
+
+                            <!-- COMMENT INPUT -->
+                            @auth
+                            <form action="{{ route('movie.comment') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
+ 
+                                <div class="flex gap-4 mb-5 mt-5">
+ 
+                                    <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center flex-shrink-0">
+                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                                    </div>
+ 
+                                    <div class="flex-1">
+                                        <textarea
+                                            name="content"
+                                            rows="2"
+                                            placeholder="Add a comment..."
+                                            class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"></textarea>
+ 
+                                        <div class="flex justify-end mt-3">
+                                            <button type="submit"
+                                                class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
+                                                Comment
+                                            </button>
+                                        </div>
+                                    </div>
+ 
+                                </div>
+                            </form>
+                            @else
+                            <div class="mb-10 flex items-center gap-3 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                <span>
+                                    <a href="{{ route('login') }}" class="text-cyan-400 hover:underline">Login</a> to join the discussion.
+                                </span>
+                            </div>
+                            @endauth
  
                         </div>
  

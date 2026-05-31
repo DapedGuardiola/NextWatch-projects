@@ -101,7 +101,8 @@ class DashboardService
         $recommended_ids = UserRecommendation::where('user_id', $user_id)
             ->pluck('tmdb_movie_id');
 
-        $movies = Movie::whereIn('tmdb_movie_id', $recommended_ids)
+        $movies = Movie::select('*', DB::raw('YEAR(release_date) as year'))
+            ->whereIn('tmdb_movie_id', $recommended_ids)
             ->orderByRaw('FIELD(tmdb_movie_id, ' . $recommended_ids->implode(',') . ')')
             ->with([
                 'genres:tmdb_movie_id,map_genre_id',

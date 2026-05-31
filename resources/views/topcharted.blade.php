@@ -3,7 +3,7 @@
         {{ __('Top Charted Movies') }}
     </x-slot>
     <div>
-        <div class="mx-4 md:mx-8 lg:mx-10 mt-56 mb-12">
+        <div class="mx-4 md:mx-8 lg:mx-10 mt-[75px] mb-5">
             <h1>
                 <p class="text-2xl md:text-3xl text-white font-bold">You Must Know These Movies!!</p>
             </h1>
