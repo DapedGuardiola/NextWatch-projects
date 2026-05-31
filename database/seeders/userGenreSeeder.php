@@ -13,19 +13,6 @@ class userGenreSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('user_genres')->insert([
-            [
-                'user_id' => 2,
-                'genre_id' => 1,
-            ],
-            [
-                'user_id' => 2,
-                'genre_id' => 2,
-            ],
-            [
-                'user_id' => 2,
-                'genre_id' => 16,
-            ],
-        ]);
+        
     }
 }

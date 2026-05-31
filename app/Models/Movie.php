@@ -63,6 +63,18 @@ class Movie extends Model
         return $this->hasMany(Watchlist::class, 'movie_id', 'tmdb_movie_id');
     }
 
+    public function directors()
+    {
+        return $this->belongsToMany(
+            Director::class,
+            'movie_directors',
+            'tmdb_movie_id',
+            'tmdb_director_id',
+            'tmdb_movie_id',
+            'tmdb_director_id'
+        );
+    }
+
     public function actors()
     {
         return $this->belongsToMany(
@@ -74,9 +86,13 @@ class Movie extends Model
             'tmdb_actor_id'
         );
     }
-
+    
     public function favorite()
     {
         return $this->hasMany(Favorite::class, 'movie_id', 'tmdb_movie_id');
+    }
+    public function collection()
+    {
+        return $this->hasOne(CollectionModel::class,'tmdb_collection_id','tmdb_collection_id');
     }
 }

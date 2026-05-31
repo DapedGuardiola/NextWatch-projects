@@ -17,7 +17,8 @@ class UserGenre extends Model
 
     protected $fillable = [
         'user_id',
-        'genre_id', // Disesuaikan dengan nama kolom di migration
+        'genre_id',
+        'weight' // Disesuaikan dengan nama kolom di migration
     ];
 
     public function user()

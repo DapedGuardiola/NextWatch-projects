@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ComputePersona;
+use App\Jobs\ComputeRecommendation;
 use Illuminate\Http\Request;
 use App\Models\Genre;
 use App\Models\Movie;
@@ -49,10 +51,11 @@ class PersonalizationController extends Controller
                 'is_persona' => 1,
             ]);
         }
-
-        // Update is_personalized
-        DB::table('users')->where('id', $user->id)->update(['is_personalized' => 1]);
-
-        return redirect()->route('dashboard');
+        
+        ComputePersona::withChain([
+            new ComputeRecommendation($user->id)
+        ])->dispatch($user->id);
+        return redirect()->route('persona-loading');
     }
 }
+

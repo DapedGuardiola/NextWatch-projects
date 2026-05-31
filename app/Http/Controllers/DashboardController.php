@@ -23,29 +23,14 @@ class DashboardController extends Controller
             return redirect()->route('personalization.index');
         }
 
-        $movies = $this->dashboardService->getMovie();
-        $popularMovie = $this->dashboardService->getPopularMovie();
-        $actors = $this->actorService->getActor();
-        
-        // --- LOGIKA TUGAS 2: SECTION "FOR YOU" ---
-        $forYouMovies = collect();
-        
-        // Cek apakah user sudah login dan sudah mengisi persona
-        if (auth()->check() && auth()->user()->is_personalized) {
-            // Ambil ID genre favorit user dari database
-            $userGenres = UserGenre::where('user_id', auth()->id())->pluck('genre_id')->toArray();
-            
-            if (!empty($userGenres)) {
-                // Ambil film yang memiliki map_genre_id sesuai dengan genre favorit user
-                $forYouMovies = \App\Models\Movie::whereHas('genres', function($query) use ($userGenres) {
-                    $query->whereIn('map_genre_id', $userGenres);
-                })->with('genres.genre')->inRandomOrder()->take(10)->get(); // Ambil 10 rekomendasi acak
-            }
-        }
-
-        $content = $this->dashboardService->getMainContent();  
-
-        return view('dashboard', compact(['movies','popularMovie','actors', 'forYouMovies']));
+        $mainContent = $this->dashboardService->getMainContent(Auth::user()->id);
+        $topOne = $mainContent['topOne'];
+        $forYou = $mainContent['forYou'];
+        $actors = $mainContent['actors'];
+        $topByGenre = $mainContent['topByGenre'];
+        $collections = $mainContent['collections'];
+        $others = $mainContent['others'];
+        return view('dashboard', compact(['topOne','forYou','actors','topByGenre','collections','others']));
     }
     
     public function getActorMovie($id){
