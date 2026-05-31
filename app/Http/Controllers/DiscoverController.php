@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Movie;
 use App\Services\DiscoverService;
 use Illuminate\Http\Request;
 
@@ -9,12 +10,28 @@ class DiscoverController extends Controller
 {
     public function __construct(protected DiscoverService $discoverService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $genres    = $this->discoverService->getGenres();
-        $languages = $this->discoverService->getLanguages();
+        $query = Movie::with('genres.genre');
 
-        return view('dashboard', compact('genres', 'languages'));
+        $genre = $request->query('genre');
+        if ($genre) {
+            $query->whereHas('genres.genre', function ($q) use ($genre) {
+                $q->where('name', $genre);
+            });
+        }
+
+        $language = $request->query('language');
+        if ($language) {
+            $query->where('original_language', $language);
+        }
+
+        $movies = $query
+            ->orderBy('popularity', 'desc')
+            ->take(20)
+            ->get();
+
+        return view('discover', compact('movies'));
     }
 
     public function results(Request $request)

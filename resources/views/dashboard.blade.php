@@ -12,12 +12,12 @@
         </div>
     </div>
     <div class="-mt-[200px] max-w [95%] left-0 right-0 relative z-10 ">
-        <div class="mt-[135px]">
+        <div class="mt-[500px]">
             <x-movie.search-bar />
         </div>
 
         @if(auth()->check() && auth()->user()->is_personalized && isset($forYouMovies) && $forYouMovies->count() > 0)
-        <div class="mx-10 my-10">
+        <div class="mx-10 mt-40 mb-10">
             <h1>
                 <p class="text-3xl text-white font-bold">For You</p>
                 <p class="text-sm text-gray-400 mt-1">Top collection on your preference</p>

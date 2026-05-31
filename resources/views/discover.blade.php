@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="title">{{ __('Discover') }}</x-slot>
 
-    <div class="min-h-screen px-10 pt-20 pb-12" style="background: linear-gradient(135deg, #2a2a2a 0%, #494949 50%, #3a3a3a 100%);">
+    <div class="min-h-screen px-10 pt-56 pb-12" style="background: linear-gradient(135deg, #2a2a2a 0%, #494949 50%, #3a3a3a 100%);">
 
         {{-- Header --}}
-        <div class="mb-10">
+        <div class="mb-24">
             <h1 class="text-4xl font-bold text-white leading-tight">Discover <span class="text-indigo-400">Films</span></h1>
             <p class="text-gray-400 text-sm mt-2">Find your next favorite movie</p>
 

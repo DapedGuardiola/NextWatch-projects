@@ -28,7 +28,7 @@
 
             <!-- SMOOTH GRADIENT -->
             <div class="absolute bottom-0 left-0 w-full h-[420px]
-        bg-gradient-to-b from-transparent via-[#020817]/70 to-[#020817]">
+            bg-gradient-to-b from-transparent via-[#020817]/70 to-[#020817]">
             </div>
 
             <!-- GLOW -->
@@ -70,11 +70,11 @@
                 <div id="content-col" class="flex flex-col justify-between transition-all duration-700">
                     <div class="mt-10">
                         <!-- TITLE -->
-                        <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight">
+                        <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight text-center">
                             {{ $movie->title }}
                         </h1>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid lg:grid-cols-[420px_1fr] gap-12">
                         <div>
                             <!-- TOP META -->
                             <div class="flex flex-wrap items-center gap-3 mt-8 text-sm">
@@ -104,9 +104,11 @@
                                 </div>
 
                                 <!-- Language -->
-                                <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 uppercase text-gray-200">
+                                <a href="{{ route('dashboard.discover') }}?language={{ urlencode($movie->original_language) }}"
+                                    class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 uppercase text-gray-200
+                                    hover:bg-cyan-500/20 hover:border-cyan-400/40 hover:text-cyan-100 transition duration-300 inline-block">
                                     {{ $movie->original_language }}
-                                </div>
+                                </a>
 
                             </div>
 
@@ -165,16 +167,20 @@
 
                                     @foreach($genreNames as $genre)
 
-                                    <div class="px-4 py-2 rounded-full 
+                                    <a href="{{ route('dashboard.discover') }}?genre={{ urlencode(is_object($genre) ? $genre->name : $genre) }}"
+                                        class="px-4 py-2 rounded-full 
                                             bg-cyan-500/10 border border-cyan-400/20
                                             backdrop-blur-xl
-                                            hover:bg-cyan-500/20
-                                            text-cyan-200 text-sm
-                                            transition duration-300">
+                                            hover:bg-cyan-500/30
+                                            hover:border-cyan-400/40
+                                            hover:shadow-lg hover:shadow-cyan-500/20
+                                            text-cyan-200 hover:text-cyan-100 text-sm
+                                            transition duration-300 cursor-pointer
+                                            inline-block">
 
                                         {{ is_object($genre) ? $genre->name : $genre }}
 
-                                    </div>
+                                    </a>
 
                                     @endforeach
 
@@ -813,6 +819,27 @@
         function deleteComment(id) {
             if (!confirm('Hapus komentar ini?')) return;
             document.getElementById('delete-form-' + id)?.submit();
+        }
+
+        function copyShareLink() {
+            const shareUrl = window.location.href;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    url: shareUrl,
+                }).catch(() => {});
+                return;
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => alert('Link berhasil disalin'))
+                    .catch(() => prompt('Salin link ini:', shareUrl));
+                return;
+            }
+
+            prompt('Salin link ini:', shareUrl);
         }
     </script>
 </x-app-layout>
