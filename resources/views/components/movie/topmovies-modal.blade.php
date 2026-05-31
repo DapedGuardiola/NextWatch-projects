@@ -10,7 +10,7 @@
 'rank' => null,
 ])
 
-<a href="{{ route('movie.detail',$tmdb_movie_id) }}" loading="lazy"
+<a href="{{ route('movie.detail',$tmdb_movie_id) }}"  onclick="logClick({{ $tmdb_movie_id }})" loading="lazy"
    class="shrink-0 w-36 md:w-44 lg:w-56 cursor-pointer relative block group" data-card>
 
     @isset($rank)
@@ -126,4 +126,18 @@ document.querySelectorAll('[data-card]').forEach(card => {
         }
     });
 });
+
+function logClick(movieId) {
+    fetch('/log-activity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            type: 'click',
+            tmdb_movie_id: movieId
+        })
+    });
+}
 </script>

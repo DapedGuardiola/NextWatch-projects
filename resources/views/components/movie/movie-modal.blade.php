@@ -9,7 +9,7 @@
 'duration' => null,
 ])
 
-<a href="{{ route('movie.detail',$tmdb_movie_id) }}" loading="lazy"
+<a href="{{ route('movie.detail',$tmdb_movie_id) }}" onclick="logClick({{$tmdb_movie_id}})" loading="lazy"
    class="shrink-0 w-36 md:w-44 lg:w-56 cursor-pointer relative block group" data-card>
 
     <div class="relative rounded-2xl aspect-[4/6] overflow-hidden border border-white/10
@@ -109,4 +109,18 @@ document.querySelectorAll('[data-card]').forEach(card => {
         }
     });
 });
+const logClickUrl = "{{ route('click-movie') }}";
+function logClick(movieId) {
+    fetch(logClickUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            type: 'click',
+            tmdb_movie_id: movieId
+        })
+    });
+}
 </script>

@@ -24,10 +24,6 @@ class DetailController extends Controller
         $movie = $this->detailService->getSelectedMovie($id);
         $userId = Auth::id();
 
-        if($movie){
-            $this->logActivityService->click(['user_id'=>$userId,'movie_id'=>$id]);
-        }
-
         $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
         $comments = $this->commentService->getCommentsByMovie($movie->tmdb_movie_id);
         $isInWatchlist = \App\Models\Watchlist::where(

@@ -10,6 +10,7 @@ use App\Models\Movie;
 use App\Models\UserRecommendation;
 use App\Models\UserTaste;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class ComputeRecommendation implements ShouldQueue
 {
@@ -48,24 +49,27 @@ class ComputeRecommendation implements ShouldQueue
                     )
                     : null
                 ),
-                'actor_ids' => $movie->actors->pluck('tmdb_actor_id')->toArray(),
                 'director_ids' => $movie->directors->pluck('tmdb_director_id')->toArray(),
                 'normalizedData' => $movie->normalizedData,
             ];
         })->toArray();
         if ($userGenres && $movies) {
             $recommendation_ids = $flaskService->computeRecommendation($userGenres, $userTastes, $movies);
-            if (!$recommendation_ids) {
-                $recommendation_ids = [];
-            }
-            foreach ($recommendation_ids as $i) {
-                UserRecommendation::insert([
-                    'user_id' => $this->userId,
+
+            if ($recommendation_ids) {
+                $data = collect($recommendation_ids)->map(fn($i) => [
+                    'user_id'       => $this->userId,
                     'tmdb_movie_id' => $i,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ])->toArray();
+
+                DB::transaction(function () use ($data) {
+                    UserRecommendation::where('user_id', $this->userId)->delete();
+                    UserRecommendation::insert($data);
+                });
             }
+
             User::where('id', $this->userId)->update(['persona_ready' => true]);
         }
     }

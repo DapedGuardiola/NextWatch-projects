@@ -124,4 +124,24 @@ class FlaskService
         Log::info('Flask Service Response : ' . json_encode($response));
         return $recomendation_ids;
     }
+    public function computeReevalTastes(array $userTastes,array $userGenres,array $userLog,array $movies)
+    {
+        Log::info('userGenresForRecommendation: ' . json_encode($userGenres));
+        Log::info('userTastesForRecommendation: ' . json_encode($userTastes));
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("{$this->baseUrl}/compute/recompute-tastes", [
+            'userGenres' => $userGenres,
+            'userLog' => $userLog,
+            'userTastes' =>$userTastes,
+            'movies' => $movies,
+        ]);
+        $userNewTastes= $response->json('userNewTastes');
+        Log::info('userRecommendation: ' . json_encode($response));
+        if ($response->failed()) {
+            throw new \Exception('Flask API Error: ' . $response->status());
+        }
+        Log::info('Flask Service Response : ' . json_encode($response));
+        return $userNewTastes;
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Movie;
 use App\Services\DiscoverService;
 use Illuminate\Http\Request;
 use App\Services\FlaskService;

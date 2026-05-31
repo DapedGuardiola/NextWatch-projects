@@ -16,7 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('tmdb_movie_id');
             $table->unsignedBigInteger('user_id');
             $table->enum('type',['click','search','comment','favorite','watchlist','watch_trailer','click_actor']);
+            $table->boolean('is_evaluated')->default(false);
             $table->timestamp('created_at');
+            $table->timestamp('updated_at')->nullable();
             $table->foreign('tmdb_movie_id')->references('tmdb_movie_id')->on('movies');
             $table->foreign('user_id')->references('id')->on('users');
         });

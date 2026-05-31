@@ -157,6 +157,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/persona/update', [ProfileController::class, 'updatePersona'])->name('profile.persona.update');
     Route::post('/profile/persona/genres', [ProfileController::class, 'updateGenres'])->name('profile.persona.genres');
     Route::delete('/profile/persona/genres/{genre}', [ProfileController::class, 'destroyGenre'])->name('profile.persona.genres.destroy');
+
+
+    //
+    Route::post('/log-activity', [LogActivityService::class, 'click'])->name('click-movie');
 });
 
 require __DIR__ . '/auth.php';
