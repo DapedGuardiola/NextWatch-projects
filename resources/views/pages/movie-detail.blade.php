@@ -117,7 +117,6 @@
 
                                 <!-- Director -->
                                 <div class="flex gap-3">
-                                @foreach($movie->directors as $director)
                                     <span class="text-gray-500 min-w-[90px]">
                                         Director
                                     </span>
