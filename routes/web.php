@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+ Route::get('/persona-loading-test', function () {
+        return view('pages.loading-persona');
+    })->name('persona-loading-test');
 
 // Tinggal test di route sementara
 Route::get('/test-redis', function () {
