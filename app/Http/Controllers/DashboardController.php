@@ -30,7 +30,8 @@ class DashboardController extends Controller
         $topByGenre = $mainContent['topByGenre'];
         $collections = $mainContent['collections'];
         $others = $mainContent['others'];
-        return view('dashboard', compact(['topOne','forYou','actors','topByGenre','collections','others']));
+        $upcomming = $mainContent['upcomming'];
+        return view('dashboard', compact(['topOne','forYou','actors','topByGenre','collections','others','upcomming']));
     }
     
     public function getActorMovie($id){

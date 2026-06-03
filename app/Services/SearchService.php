@@ -15,6 +15,13 @@ class SearchService
 
         $movies = Movie::where('title', 'LIKE', "%{$query}%")
             ->select('tmdb_movie_id', 'title', 'poster_path', 'rating')
+            ->orderByRaw("
+                CASE
+                    WHEN title LIKE ? THEN 1
+                    WHEN title LIKE ? THEN 2
+                    ELSE 3
+                END, title ASC
+            ", ["{$query}%", "% {$query}%"])
             ->limit(5)
             ->get()
             ->map(fn($m) => [
@@ -27,6 +34,13 @@ class SearchService
 
         $actors = Actor::where('name', 'LIKE', "%{$query}%")
             ->select('tmdb_actor_id', 'name', 'image_path')
+            ->orderByRaw("
+                CASE
+                    WHEN name LIKE ? THEN 1
+                    WHEN name LIKE ? THEN 2
+                    ELSE 3
+                END, name ASC
+            ", ["{$query}%", "% {$query}%"])
             ->limit(5)
             ->get()
             ->map(fn($a) => [
@@ -45,12 +59,26 @@ class SearchService
     public function search(string $query): array
     {
         $movies = Movie::where('title', 'LIKE', "%{$query}%")
-            ->select('tmdb_movie_id', 'title', 'poster_path', 'rating', 'release_date','overview')
+            ->select('tmdb_movie_id', 'title', 'poster_path', 'rating', 'release_date', 'overview')
+            ->orderByRaw("
+                CASE
+                    WHEN title LIKE ? THEN 1
+                    WHEN title LIKE ? THEN 2
+                    ELSE 3
+                END, title ASC
+            ", ["{$query}%", "% {$query}%"])
             ->limit(20)
             ->get();
 
         $actors = Actor::where('name', 'LIKE', "%{$query}%")
             ->select('tmdb_actor_id', 'name', 'image_path')
+            ->orderByRaw("
+                CASE
+                    WHEN name LIKE ? THEN 1
+                    WHEN name LIKE ? THEN 2
+                    ELSE 3
+                END, name ASC
+            ", ["{$query}%", "% {$query}%"])
             ->limit(10)
             ->get();
 

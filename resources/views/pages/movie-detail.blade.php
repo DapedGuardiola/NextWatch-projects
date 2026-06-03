@@ -121,11 +121,11 @@
                                     <span class="text-gray-500 min-w-[90px]">
                                         Director
                                     </span>
-
+                                    @foreach($movie->directors as $director)
                                     <span class="text-white font-medium">
-                                        {{ $movie->director ?? 'Unknown Director' }}
+                                        {{ $director->name ?? 'Unknown Director' }}
                                     </span>
-
+                                    @endforeach
                                 </div>
 
                                 <!-- Starring -->
