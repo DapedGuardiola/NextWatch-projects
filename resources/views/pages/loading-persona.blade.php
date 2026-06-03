@@ -26,8 +26,8 @@
         <div class="rounded-full mb-6" style="width:48px;height:48px;border:2px solid rgba(255,255,255,0.1);border-top:2px solid #fff;animation:spin 1s linear infinite"></div>
 
         {{-- Text --}}
-        <p class="text-white text-xl font-bold text-center" style="letter-spacing:-0.3px">Kami sedang belajar<br>selera kamu 🎬</p>
-        <p class="text-center mt-2 text-sm" style="color:rgba(255,255,255,0.4);max-width:280px;line-height:1.6">
+        <p class="text-white text-3xl font-bold text-center" style="letter-spacing:-0.3px">Kami sedang mempelajari selera mu 🎬</p>
+        <p class="text-center mt-2 text-sm" style="color:rgba(255,255,255,0.4);max-width:320px;line-height:1.6">
             Ini hanya terjadi sekali saat akun dibuat. Sebentar lagi kamu bisa menikmati rekomendasi yang personal.
         </p>
 

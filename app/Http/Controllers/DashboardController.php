@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Services\DashboardService;
 use App\Services\ActorService;
 use App\Models\UserGenre;
@@ -18,7 +19,6 @@ class DashboardController extends Controller
     }
     
     public function index(){
-
         if (Auth::user()->is_personalized == 0) {
             return redirect()->route('personalization.index');
         }
@@ -35,7 +35,12 @@ class DashboardController extends Controller
     }
     
     public function getActorMovie($id){
+        // Tarik data utama aktor
         $actorsData = $this->actorService->getActorMovies($id);
-        return view('pages.actor-detail',compact('actorsData'));
+        
+        // Tarik data aktor serupa berdasarkan logika genre
+        $similarActors = $this->actorService->getSimilarActors($actorsData);
+        
+        return view('pages.actor-detail', compact('actorsData', 'similarActors'));
     }
 }

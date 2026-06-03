@@ -1,15 +1,33 @@
 <x-app-layout>
-    <div class="h-screen relative">
-        <img src="{{ $collectionData->backdrop_url }}" alt="{{ $collectionData->name }}" class="absolute inset-0 object-cover object-center w-full h-full overflow-hidden">
-        <div class="absolute backdrop-blur-3xl inset-0 bg-gradient-to-b from-transparent via-transparent from-0 via-[#212121]/20 via-25% via-[#212121]/50 via-50% via-[#212121]/70 via-75% to-[#212121] to-100%">
-            <div class="ml-20 mt-12 font-bold text-2xl text-white">Movie in{{ $collectionData->name }} Collection</div>
-            <div class="grid grid-cols-5 max-w-[90%] place-items-center gap-8 mt-10 mx-auto mb-10">
-                @foreach($collectionData->movies as $movie)
+    <div class="min-h-screen relative bg-[#212121] pb-10">
+        {{-- Backdrop Koleksi sebagai Background (Ditambahkan opacity agar tulisan & poster film lebih kontras) --}}
+        <img src="{{ $collection->backdrop_url }}" alt="{{ $collection->name }}" class="absolute inset-0 object-cover object-center w-full h-full overflow-hidden opacity-30 pointer-events-none">
+        
+        {{-- Overlay Gradient & Wadah Konten yang Mendukung Fitur Scroll Halaman --}}
+        <div class="relative min-h-screen bg-gradient-to-b from-transparent via-[#212121]/40 via-25% via-[#212121]/80 via-50% to-[#212121] to-100% pt-12">
+            
+            {{-- Bagian Teks Informasi Koleksi (Sesuai Jobdesk Menampilkan Overview) --}}
+            <div class="ml-20 max-w-[80%] mb-4">
+                <div class="font-bold text-4xl text-white tracking-tight">{{ $collection->name }}</div>
+                
+                {{-- Menampilkan Teks Deskripsi Ringkas / Overview Koleksi Film --}}
+                @if($collection->overview)
+                    <p class="text-gray-300 mt-4 text-sm leading-relaxed max-w-3xl bg-black/40 border border-white/5 p-5 rounded-2xl backdrop-blur-md">
+                        {{ $collection->overview }}
+                    </p>
+                @endif
+                
+                <div class="font-bold text-xl text-white mt-10">Movies in {{ $collection->name }} Collection</div>
+            </div>
+
+            {{-- Grid Tampilan Daftar Film Waralaba --}}
+            <div class="grid grid-cols-5 max-w-[90%] place-items-center gap-8 mt-6 mx-auto mb-10">
+                @foreach($collection->movies as $movie)
                 <x-movie.movie-modal
                     :poster="$movie->poster_url"
                     :title="$movie->title"
                     :tmdb_movie_id="$movie->tmdb_movie_id"
-                    :year="$movie->year ?? null"
+                    :year="$movie->release_date ? date('Y', strtotime($movie->release_date)) : null"
                     :rating="$movie->rating ?? null"
                     :overview="$movie->overview ?? null"
                     :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
@@ -17,6 +35,5 @@
                 @endforeach
             </div>
         </div>
-
     </div>
 </x-app-layout>
