@@ -10,39 +10,111 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; // Tambahan untuk menarik nama dari DB
 use Illuminate\View\View;
 
-// IMPORT MODEL UNTUK PERSONA GENRE
+// IMPORT MODEL
 use App\Models\Genre;
 use App\Models\UserGenre;
+use App\Models\UserTaste;
 
 class ProfileController extends Controller
 {
+    /**
+     * Helper aman untuk menarik nama dari tabel berdasarkan ID
+     */
+    private function getNameSafely($table, $column, $id, $fallbackPrefix)
+    {
+        try {
+            $name = DB::table($table)->where($column, $id)->value('name');
+            if (!$name && $column !== 'id') {
+                $name = DB::table($table)->where('id', $id)->value('name');
+            }
+            return $name ?: $fallbackPrefix . ' ' . $id;
+        } catch (\Exception $e) {
+            return $fallbackPrefix . ' ' . $id;
+        }
+    }
+
     /**
      * Menampilkan halaman Profile UI.
      */
     public function index(Request $request): View
     {
+        $user = $request->user();
+
+        // 1. Ambil Data User Genre untuk Grafik
+        $userGenres = UserGenre::with('genre')
+            ->where('user_id', $user->id)
+            ->orderBy('weight', 'desc')
+            ->get();
+
+        $maxGenreWeight = $userGenres->max('weight') ?? 1;
+        $genreLabels = [];
+        $genreWeights = [];
+        foreach ($userGenres as $ug) {
+            $genreLabels[] = $ug->genre ? $ug->genre->name : 'Unknown';
+            $w = $ug->weight ?? 0;
+            // Konversi ke persentase berdasarkan bobot max
+            $genreWeights[] = $maxGenreWeight > 0 ? round(($w / $maxGenreWeight) * 100) : 0;
+        }
+
+        // 2. Ambil Data User Taste (Aktor, Sutradara, Era)
+        $userTaste = UserTaste::where('user_id', $user->id)->first();
+
+        $actorsData = [];
+        $directorsData = [];
+        $erasData = [];
+
+        if ($userTaste) {
+            // Kalkulasi Persentase Aktor
+            $actors = (array) ($userTaste->preferred_actors ?? []);
+            arsort($actors);
+            $maxActor = !empty($actors) ? max($actors) : 1;
+            foreach ($actors as $id => $score) {
+                $name = $this->getNameSafely('actors', 'tmdb_actor_id', $id, 'Actor');
+                $actorsData[$name] = $maxActor > 0 ? round(($score / $maxActor) * 100) : 0;
+            }
+
+            // Kalkulasi Persentase Sutradara
+            $directors = (array) ($userTaste->preferred_directors ?? []);
+            arsort($directors);
+            $maxDir = !empty($directors) ? max($directors) : 1;
+            foreach ($directors as $id => $score) {
+                // Mencoba tabel directors atau crews
+                $name = $this->getNameSafely('directors', 'tmdb_director_id', $id, 'Director');
+                if (str_starts_with($name, 'Director')) {
+                    $name = $this->getNameSafely('crews', 'tmdb_crew_id', $id, 'Director');
+                }
+                $directorsData[$name] = $maxDir > 0 ? round(($score / $maxDir) * 100) : 0;
+            }
+
+            // Kalkulasi Persentase Era
+            $eras = (array) ($userTaste->preferred_era ?? []);
+            arsort($eras);
+            $maxEra = !empty($eras) ? max($eras) : 1;
+            foreach ($eras as $eraName => $score) {
+                $erasData[$eraName] = $maxEra > 0 ? round(($score / $maxEra) * 100) : 0;
+            }
+        }
+
         return view('profile.index', [
-            'user' => $request->user(),
+            'user' => $user,
+            'userGenres' => $userGenres,
+            'userTaste' => $userTaste,
+            'genreLabels' => $genreLabels,
+            'genreWeights' => $genreWeights,
+            'actorsData' => $actorsData,
+            'directorsData' => $directorsData,
+            'erasData' => $erasData,
         ]);
     }
 
-    /**
-     * Menampilkan halaman Account Settings.
-     */
-    public function settings(Request $request): View
-    {
-        return view('profile.settings', [
-            'user' => $request->user(),
-        ]);
+    public function settings(Request $request): View {
+        return view('profile.settings', ['user' => $request->user()]);
     }
 
-    /**
-     * Memperbarui pengaturan akun (Email, Phone, Password).
-     */
-    public function updateSettings(Request $request): RedirectResponse
-    {
+    public function updateSettings(Request $request): RedirectResponse {
         $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.Auth::id()],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -50,13 +122,10 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-        
         $user->email = $request->email;
         $user->phone = $request->phone;
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
+        if ($user->isDirty('email')) $user->email_verified_at = null;
 
         if ($request->filled('password')) {
             Log::info("MOCK EMAIL: Permintaan ganti password untuk user: {$user->email}. Link verifikasi simulasi telah dipicu.");
@@ -67,103 +136,63 @@ class ProfileController extends Controller
         }
 
         $user->save();
-
         return Redirect::route('profile.settings')->with('status', 'settings-updated');
     }
 
-    /**
-     * Memperbarui data profil (Nama, Gender, DOB, Bio).
-     */
-    public function updateProfile(Request $request): RedirectResponse
-    {
+    public function updateProfile(Request $request): RedirectResponse {
         $request->validate([
             'name' => ['required', 'string', 'min:4', 'max:255'],
             'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
             'dob' => ['nullable', 'date'],
             'bio' => ['nullable', 'string'],
-        ], [
-            'name.min' => 'Nama harus terdiri dari minimal 4 karakter.',
         ]);
 
         $user = $request->user();
-        
         $user->name = $request->name;
         $user->gender = $request->gender;
         $user->dob = $request->dob;
         $user->bio = $request->bio;
-        
         $user->save();
 
         return Redirect::route('profile.index')->with('status', 'profile-updated');
     }
 
-    /**
-     * Memperbarui foto profil pengguna (Avatar).
-     */
-    public function updateAvatar(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-        ]);
-
+    public function updateAvatar(Request $request): RedirectResponse {
+        $request->validate(['avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048']]);
         $user = $request->user();
 
         if ($request->hasFile('avatar')) {
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+            if ($user->avatar) Storage::disk('public')->delete($user->avatar);
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
             $user->save();
         }
-
         return Redirect::route('profile.index')->with('status', 'avatar-updated');
     }
 
-    public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+    public function edit(Request $request): View {
+        return view('profile.edit', ['user' => $request->user()]);
     }
 
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
+    public function destroy(Request $request): RedirectResponse {
+        $request->validateWithBag('userDeletion', ['password' => ['required', 'current_password']]);
         $user = $request->user();
         Auth::logout();
         $user->delete();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return Redirect::to('/');
     }
 
     // ==============================================
-    // LOGIKA FITUR PERSONA (TUGAS 1)
+    // LOGIKA FITUR PERSONA 
     // ==============================================
 
-    /**
-     * Menampilkan halaman Edit Persona.
-     */
-    public function persona(Request $request): View
-    {
-        // Mengambil film-film yang dipilih user sebagai persona awal
+    public function persona(Request $request): View {
         $personaMovies = \App\Models\Favorite::with('movie')
             ->where('user_id', Auth::id())
-            ->where('is_persona', true)
-            ->get();
-
-        // Mengambil semua daftar master genre untuk ditampilkan di pilihan modal
+            ->where('is_persona', true)->get();
         $allGenres = Genre::all();
-        
-        // Mengambil daftar id genre yang saat ini sedang aktif dipilih oleh pengguna
-        $myGenres = UserGenre::where('user_id', Auth::id())
-            ->pluck('genre_id')
-            ->toArray();
+        $myGenres = UserGenre::where('user_id', Auth::id())->pluck('genre_id')->toArray();
 
         return view('profile.persona', [
             'user' => $request->user(),
@@ -173,52 +202,26 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan atau memperbarui data genre dari Modal Pilihan.
-     */
-    public function updateGenres(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'genres' => 'nullable|array|max:4',
-        ]);
-
-        // Hapus semua pilihan genre lama milik user ini
+    public function updateGenres(Request $request): RedirectResponse {
+        $request->validate(['genres' => 'nullable|array|max:4']);
         UserGenre::where('user_id', Auth::id())->delete();
-
-        // Masukkan data genre baru hasil pilihan modal jika ada
         if ($request->has('genres')) {
             foreach ($request->genres as $genreId) {
-                UserGenre::create([
-                    'user_id' => Auth::id(),
-                    'genre_id' => $genreId,
-                ]);
+                UserGenre::create(['user_id' => Auth::id(), 'genre_id' => $genreId]);
             }
         }
-
         return Redirect::route('profile.persona')->with('status', 'genres-updated');
     }
 
-    /**
-     * Menghapus salah satu genre secara langsung tanpa modal lewat tombol (X).
-     */
-    public function destroyGenre($genreId): RedirectResponse
-    {
-        UserGenre::where('user_id', Auth::id())
-            ->where('genre_id', $genreId)
-            ->delete();
-
+    public function destroyGenre($genreId): RedirectResponse {
+        UserGenre::where('user_id', Auth::id())->where('genre_id', $genreId)->delete();
         return Redirect::route('profile.persona')->with('status', 'genre-deleted');
     }
 
-    /**
-     * Menyimpan status final aktivasi persona pengguna ke tabel users.
-     */
-    public function updatePersona(Request $request): RedirectResponse
-    {
+    public function updatePersona(Request $request): RedirectResponse {
         $user = $request->user();
         $user->is_personalized = true;
         $user->save();
-
         return Redirect::route('profile.persona')->with('status', 'persona-updated');
     }
 }
