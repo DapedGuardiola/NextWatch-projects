@@ -56,6 +56,6 @@ class ReevalTriger implements ShouldQueue, ShouldBeUnique
                 RecomputePersona::withChain([new ComputeRecommendation($this->userId)])->dispatch($this->userId, $movie_ids,$this->userLogIds);
             }
             LogActivityModel::whereIn('id', $this->userLogIds)->update(['is_evaluated' => true]);
-        }
+        }   
     }
 }

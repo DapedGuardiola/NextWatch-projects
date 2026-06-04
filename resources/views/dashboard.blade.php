@@ -89,6 +89,25 @@
         </div>
         <div class="mx-10 my-10">
             <h1>
+                <p class="text-3xl text-white font-bold">Upcoming Movies</p>
+                <p class="text-sm text-gray-400 mt-1">Movies coming soon</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+            @foreach($upcomming as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
+            @endforeach
+        </div>
+        <div class="mx-10 my-10">
+            <h1>
                 <p class="text-3xl text-white font-bold">Others Movie</p>
                 <p class="text-sm text-gray-400 mt-1">Other movies you must know</p>
             </h1>

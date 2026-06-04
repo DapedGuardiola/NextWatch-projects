@@ -11,6 +11,7 @@ use App\Models\UserRecommendation;
 use App\Models\UserTaste;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class ComputeRecommendation implements ShouldQueue
 {
@@ -69,6 +70,8 @@ class ComputeRecommendation implements ShouldQueue
                     UserRecommendation::insert($data);
                 });
             }
+
+            Cache::put("user_recomendation_{$this->userId}", $recommendation_ids, 7600);
 
             User::where('id', $this->userId)->update(['persona_ready' => true]);
         }

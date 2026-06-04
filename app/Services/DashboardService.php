@@ -13,6 +13,7 @@ use App\Models\LogActivityModel;
 use App\Models\Favorite;
 use Illuminate\Database\Eloquent\Collection\distinct;
 use App\Models\User;
+use App\Models\UserGenre;
 use App\Models\Actor;
 use App\Models\UserRecommendation;
 
@@ -132,7 +133,16 @@ class DashboardService
             ->take(7)
             ->pluck('tmdb_collection_id');
         $collections = CollectionModel::whereIn('tmdb_collection_id', $topCollections)->get();
-        return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors,'collections'=>$collections,'others'=>$others];
+        $userGenre = UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
+        $upcomming = Movie::where('status', 'upcoming')
+            ->whereHas('genres', function ($query) use ($userGenre) {
+                $query->whereIn('map_genre_id', $userGenre);
+            })
+            ->with('genres:tmdb_movie_id,map_genre_id')
+            ->orderBy('popularity', 'desc')
+            ->take(10)
+            ->get();
+        return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors, 'collections' => $collections, 'others' => $others, 'upcomming' => $upcomming];
     }
 
     // public function getBasePersonalization($user_id)

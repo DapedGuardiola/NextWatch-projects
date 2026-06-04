@@ -16,9 +16,9 @@
                     {{ __('Home') }}
                 </x-nav-link>
                 {{-- Discover → trigger modal --}}
-                <x-nav-link @click="$dispatch('open-discover')" :active="request()->routeIs('discover.results')"
+                <x-nav-link href="#" @click.prevent="$dispatch('open-discover')" :active="request()->routeIs('discover.results')"
                     class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium leading-5 transition
-                    hover:bg-gray-400/50 active:bg-gray-400/50
+                    cursor-pointer hover:bg-gray-400/50 active:bg-gray-400/50
                     border-transparent focus:outline-none">
                     {{ __('Discover') }}
                 </x-nav-link>

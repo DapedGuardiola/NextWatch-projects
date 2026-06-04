@@ -12,7 +12,7 @@ class collection_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path('data/processed/updated/collection.json');
+        $path = base_path('data/processed/updated2/collections_updated.json');
         $json = file_get_contents($path);
         $collections = json_decode($json, true);
         $batchSize = 500;
