@@ -204,6 +204,10 @@
                     {{-- LOGIN --}}
                     <div x-show="tab === 'login'">
 
+                        <!-- Brand logo (Centered above login card) -->
+                        <!-- <img src="{{ asset('images/brand/brand.png') }}" alt="NextWatch"
+                            class="h-20 w-auto mx-auto mb-6" /> -->
+
                         <h2 class="text-xl font-bold text-white mb-1">
                             Selamat datang kembali
                         </h2>
