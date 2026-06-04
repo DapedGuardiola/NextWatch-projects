@@ -5,10 +5,14 @@ namespace App\Services;
 use App\Models\Movie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class TopChartedService
 {
     protected $flaskService;
+    protected const CACHE_ALL_TIME_BEST = 'topcharted:all_time_best';
+    protected const CACHE_BY_GENRE = 'topcharted:by_genre';
+    protected const CACHE_TTL = 86400; // 24 jam
 
     public function __construct(FlaskService $flaskService)
     {
@@ -17,6 +21,15 @@ class TopChartedService
 
     public function getAllTimeBest()
     {
+        // Cek cache terlebih dahulu
+        $cacheKey = self::CACHE_ALL_TIME_BEST;
+        $cachedResult = Cache::get($cacheKey);
+
+        if ($cachedResult !== null) {
+            Log::info('EDAS all time best retrieved from cache');
+            return collect($cachedResult);
+        }
+
         // 1. Ambil semua kandidat + data normalisasi
         $candidates = Movie::select(['tmdb_movie_id'])
             ->orderByRaw('popularity DESC, rating DESC')
@@ -63,9 +76,7 @@ class TopChartedService
             ->whereIn('tmdb_movie_id', $topIds)
             ->get();
 
-        Log::info('EDAS all time best retrieved', ['count' => $movies->count()]);
-
-        return $movies->map(function ($movie) {
+        $result = $movies->map(function ($movie) {
             return [
                 'id'          => $movie->tmdb_movie_id,
                 'title'       => $movie->title,
@@ -74,10 +85,26 @@ class TopChartedService
                 'rating'      => $movie->rating,
             ];
         });
+
+        // Simpan ke cache sebagai array (untuk menghindari Collection serialization issues)
+        Cache::put($cacheKey, $result->toArray(), self::CACHE_TTL);
+
+        Log::info('EDAS all time best retrieved', ['count' => $result->count()]);
+
+        return $result;
     }
 
     public function getBestMoviesByGenre()
     {
+        // Cek cache terlebih dahulu
+        $cacheKey = self::CACHE_BY_GENRE;
+        $cachedResult = Cache::get($cacheKey);
+
+        if ($cachedResult !== null) {
+            Log::info('EDAS best movies by genre retrieved from cache');
+            return $cachedResult;
+        }
+
         $genres = DB::table('genres')->get();
         $moviesByGenre = [];
 
@@ -154,8 +181,30 @@ class TopChartedService
             })->toArray();
         }
 
+        // Simpan ke cache
+        Cache::put($cacheKey, $moviesByGenre, self::CACHE_TTL);
+
         Log::info('EDAS best movies by genre', ['genres_count' => count($moviesByGenre)]);
 
         return $moviesByGenre;
+    }
+
+    public function clearCache()
+    {
+        Cache::forget(self::CACHE_ALL_TIME_BEST);
+        Cache::forget(self::CACHE_BY_GENRE);
+        Log::info('Top charted cache cleared');
+    }
+
+    public function clearAllTimeCache()
+    {
+        Cache::forget(self::CACHE_ALL_TIME_BEST);
+        Log::info('All time best cache cleared');
+    }
+
+    public function clearByGenreCache()
+    {
+        Cache::forget(self::CACHE_BY_GENRE);
+        Log::info('By genre cache cleared');
     }
 }
