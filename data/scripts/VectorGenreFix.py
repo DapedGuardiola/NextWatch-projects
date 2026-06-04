@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from collections import defaultdict
 
-path_movie_genre = Path('data/processed/updated/updated_genre_pivot.json')
-output = Path('data/processed/updated/movieVector.json')
+path_movie_genre = Path('data/processed/updated2/new_genre_pivot.json')
+output = Path('data/processed/updated2/movieVector.json')
 with open(path_movie_genre, 'r', encoding= 'utf-8')as f:
     movieData = json.load(f)
 

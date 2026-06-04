@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal("rating",3,1)->nullable();
             $table->integer("rating_count")->nullable();
             $table->char("original_language",2)->nullable();
+            $table->string('status')->default('released');
 
             $table->foreign('tmdb_collection_id')->references('tmdb_collection_id')->on('collections');
         });
