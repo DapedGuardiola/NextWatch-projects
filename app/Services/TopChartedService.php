@@ -23,7 +23,13 @@ class TopChartedService
     {
         // Cek cache terlebih dahulu
         $cacheKey = self::CACHE_ALL_TIME_BEST;
-        $cachedResult = Cache::get($cacheKey);
+        $cachedResult = null;
+        
+        try {
+            $cachedResult = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            Log::warning('Cache retrieval failed, proceeding without cache', ['error' => $e->getMessage()]);
+        }
 
         if ($cachedResult !== null) {
             Log::info('EDAS all time best retrieved from cache');
@@ -87,7 +93,11 @@ class TopChartedService
         });
 
         // Simpan ke cache sebagai array (untuk menghindari Collection serialization issues)
-        Cache::put($cacheKey, $result->toArray(), self::CACHE_TTL);
+        try {
+            Cache::put($cacheKey, $result->toArray(), self::CACHE_TTL);
+        } catch (\Exception $e) {
+            Log::warning('Cache save failed for all time best', ['error' => $e->getMessage()]);
+        }
 
         Log::info('EDAS all time best retrieved', ['count' => $result->count()]);
 
@@ -98,7 +108,13 @@ class TopChartedService
     {
         // Cek cache terlebih dahulu
         $cacheKey = self::CACHE_BY_GENRE;
-        $cachedResult = Cache::get($cacheKey);
+        $cachedResult = null;
+        
+        try {
+            $cachedResult = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            Log::warning('Cache retrieval failed for by genre, proceeding without cache', ['error' => $e->getMessage()]);
+        }
 
         if ($cachedResult !== null) {
             Log::info('EDAS best movies by genre retrieved from cache');
@@ -182,7 +198,11 @@ class TopChartedService
         }
 
         // Simpan ke cache
-        Cache::put($cacheKey, $moviesByGenre, self::CACHE_TTL);
+        try {
+            Cache::put($cacheKey, $moviesByGenre, self::CACHE_TTL);
+        } catch (\Exception $e) {
+            Log::warning('Cache save failed for by genre', ['error' => $e->getMessage()]);
+        }
 
         Log::info('EDAS best movies by genre', ['genres_count' => count($moviesByGenre)]);
 
@@ -191,20 +211,32 @@ class TopChartedService
 
     public function clearCache()
     {
-        Cache::forget(self::CACHE_ALL_TIME_BEST);
-        Cache::forget(self::CACHE_BY_GENRE);
+        try {
+            Cache::forget(self::CACHE_ALL_TIME_BEST);
+            Cache::forget(self::CACHE_BY_GENRE);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed', ['error' => $e->getMessage()]);
+        }
         Log::info('Top charted cache cleared');
     }
 
     public function clearAllTimeCache()
     {
-        Cache::forget(self::CACHE_ALL_TIME_BEST);
+        try {
+            Cache::forget(self::CACHE_ALL_TIME_BEST);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed for all time best', ['error' => $e->getMessage()]);
+        }
         Log::info('All time best cache cleared');
     }
 
     public function clearByGenreCache()
     {
-        Cache::forget(self::CACHE_BY_GENRE);
+        try {
+            Cache::forget(self::CACHE_BY_GENRE);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed for by genre', ['error' => $e->getMessage()]);
+        }
         Log::info('By genre cache cleared');
     }
 }

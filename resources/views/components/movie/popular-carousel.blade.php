@@ -26,14 +26,14 @@
          class="absolute top-0 bottom-0 right-0 flex items-center justify-left carousel-stage">
         <div class="flex items-center scrollbar-hide transition-transform duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]" id="carouselTrack">
             @foreach($movies as $i => $movie)
-                <div onclick="goToSlide({{ $i }})"
+                <a onclick="goToSlide({{ $i }})"
                      data-index="{{ $i }}"
-                     class="poster-item shrink-0 rounded-[14px] cursor-pointer transition-all duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]">
+                     class="poster-item shrink-0 rounded-[14px] cursor-pointer transition-all duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]" href="{{ route('movie.detail',$movie['id']) }}" loading="lazy">
                     <img src="https://image.tmdb.org/t/p/original/{{ $movie['poster_path'] }}" class="w-full h-full rounded-[14px] object-cover" alt="{{ $movie['title'] }}">
                     <div class="p-2 text-center">
                         <p class="text-white text-xs font-semibold truncate">{{ $movie['title'] }}</p>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
     </div>
