@@ -169,32 +169,34 @@ class TopChartedService
 
             // 5. Query detail movies
             $movies = Movie::select([
-                    'tmdb_movie_id',
-                    'title',
-                    DB::raw('YEAR(release_date) as year'),
-                    'rating',
-                    'rating_count',
-                    'overview',
-                    'runtime',
-                    'poster_path',
-                    'popularity',
-                ])
-                ->whereIn('tmdb_movie_id', $topIds)
-                ->get();
+                'tmdb_movie_id',
+                'title',
+                DB::raw('YEAR(release_date) as year'),
+                'rating',
+                'rating_count',
+                'overview',
+                'runtime',
+                'poster_path',
+                'popularity',
+            ])
+            ->with(['genres.genre'])
+            ->whereIn('tmdb_movie_id', $topIds)
+            ->get();
 
-            $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
-                return [
-                    'id'           => $movie->tmdb_movie_id,
-                    'title'        => $movie->title,
-                    'year'         => $movie->year,
-                    'rating'       => $movie->rating,
-                    'rating_count' => $movie->rating_count,
-                    'overview'     => $movie->overview,
-                    'runtime'      => $movie->runtime,
-                    'poster_path'  => $movie->poster_path,
-                    'popularity'   => $movie->popularity,
-                ];
-            })->toArray();
+        $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
+            return [
+                'id'           => $movie->tmdb_movie_id,
+                'title'        => $movie->title,
+                'year'         => $movie->year,
+                'rating'       => $movie->rating,
+                'rating_count' => $movie->rating_count,
+                'overview'     => $movie->overview,
+                'runtime'      => $movie->runtime,
+                'poster_path'  => $movie->poster_path,
+                'popularity'   => $movie->popularity,
+                'genres'       => $movie->genres->pluck('genre.name')->filter()->values()->toArray(),
+            ];
+        })->toArray();
         }
 
         // Simpan ke cache
