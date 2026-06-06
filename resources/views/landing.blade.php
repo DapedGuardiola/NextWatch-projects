@@ -30,7 +30,7 @@
                         :year="$movie['year'] ?? null"
                         :rating="$movie['rating'] ?? null"
                         :overview="$movie['overview'] ?? null"
-                        :genres="[]"
+                        :genres="$movie['genres'] ?? []"
                         :duration="$movie['runtime'] ?? null" 
                         :rank="$index + 1" />
                 @endforeach
