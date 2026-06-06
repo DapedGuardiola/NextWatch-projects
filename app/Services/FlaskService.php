@@ -4,9 +4,10 @@ namespace App\Services;
 
 use App\Models\UserTaste;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\use; 
+use Illuminate\Support\Facades\use;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+
 class FlaskService
 {
     protected string $baseUrl;
@@ -24,17 +25,31 @@ class FlaskService
     }
     public function getDiscoverTest(array $user_vector, array $movies): array
     {
-        $response = Http::post("{$this->baseUrl}/saw/discoverTest", [
+        $response = Http::timeout(15)->post("{$this->baseUrl}/saw/discoverTest", [
             'user_vector' => $user_vector,
-            'movies' => $movies,
+            'movie_ids'   => $movies,
+        ]);
+
+        // Tambahkan ini sementara untuk debug
+        Log::debug('Flask raw response', [
+            'status' => $response->status(),
+            'body'   => $response->body(), // <-- lihat ini di log
         ]);
 
         if ($response->failed()) {
             throw new \Exception('Flask API Error: ' . $response->status());
         }
 
-        return $response->json('ranked_id');
+        $data = $response->json();
+
+        if (!isset($data['ranked_id'])) {
+            Log::error('Flask response missing ranked_id', ['response' => $data]);
+            return [];
+        }
+
+        return $data['ranked_id'];
     }
+    
     public function getDiscover(array $movies): array
     {
         $response = Http::post("{$this->baseUrl}/saw/discover", [
@@ -113,7 +128,7 @@ class FlaskService
             'Content-Type' => 'application/json',
         ])->post("{$this->baseUrl}/compute/new-recommendation", [
             'userGenres' => $userGenres,
-            'userTastes' =>$userTastes,
+            'userTastes' => $userTastes,
             'movies' => $movies,
         ]);
         $recomendation_ids = $response->json('recommendation_ids');
@@ -124,7 +139,7 @@ class FlaskService
         Log::info('Flask Service Response : ' . json_encode($response));
         return $recomendation_ids;
     }
-    public function computeReevalTastes(array $userTastes,array $userGenres,array $userLog,array $movies)
+    public function computeReevalTastes(array $userTastes, array $userGenres, array $userLog, array $movies)
     {
         Log::info('userGenresForRecommendation: ' . json_encode($userGenres));
         Log::info('userTastesForRecommendation: ' . json_encode($userTastes));
@@ -133,10 +148,10 @@ class FlaskService
         ])->post("{$this->baseUrl}/compute/recompute-tastes", [
             'userGenres' => $userGenres,
             'userLog' => $userLog,
-            'userTastes' =>$userTastes,
+            'userTastes' => $userTastes,
             'movies' => $movies,
         ]);
-        $userNewTastes= $response->json('userNewTastes');
+        $userNewTastes = $response->json('userNewTastes');
         Log::info('userRecommendation: ' . json_encode($response));
         if ($response->failed()) {
             throw new \Exception('Flask API Error: ' . $response->status());

@@ -79,7 +79,7 @@ class DiscoverService
     {
         // Generate cache key
         $cacheKey = $this->generateCacheKey($genres, $languages, 'filterTest');
-        
+
         // Cek cache terlebih dahulu
         try {
             $cachedResult = Cache::get($cacheKey);
@@ -100,10 +100,7 @@ class DiscoverService
         $query = Movie::select([
             'tmdb_movie_id',
             'original_language',
-        ])->with([
-            'genreVector:tmdb_movie_id,vector',
-            'normalizedData:tmdb_movie_id,n_rating,n_popularity,n_rating_count'
-        ]);
+        ])->with(['genreVector:tmdb_movie_id,vector']);
 
         $user_vector = array_fill(0, 20, 0);
         $adjusted_genres = array_map(fn($g) => $g - 1, $genres);
@@ -120,32 +117,14 @@ class DiscoverService
                 $q->whereIn('map_genre_id', $genres);
             });
         }
-
-        $movies = $query->get()->map(function ($movie) {
-            return [
-                'id'           => $movie->tmdb_movie_id,
-                'popularity'   => $movie->normalizedData?->n_popularity ?? 0,    // ✓ Akses via relationship
-                'rating'       => $movie->normalizedData?->n_rating ?? 0,        // ✓ Akses via relationship
-                'rating_count' => $movie->normalizedData?->n_rating_count ?? 0,  // ✓ Akses via relationship
-                'vector'       => $movie->genreVector?->vector ?? '[]',          // ✓ Akses via relationship
-            ];
-        })->toArray();
-
-        Log::info('Movies setelah filter', [
-            'total' => count($movies),
-            'genres' => $genres,
-            'languages' => $languages,
-        ]);
-
-        if (empty($movies)) {
-            return collect();
-        }
+        $movies = $query->pluck('tmdb_movie_id')->toArray();
 
         // 2. Kirim ke Flask hanya data yang sudah difilter
         $rankedIds = $this->flaskService->getDiscoverTest($user_vector, $movies);
 
-        if (empty($rankedIds)) {
-            return collect();
+        if (empty($rankedIds) || !is_array($rankedIds)) {
+            Log::error('Respon Flask bermasalah atau bukan array', ['data' => $rankedIds]);
+            return collect(); // Return kosong secara damai, ANTI CRASH!
         }
 
         // 3. Query movie untuk tampilan
@@ -161,7 +140,6 @@ class DiscoverService
             ->whereIn('tmdb_movie_id', $rankedIds)
             ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $rankedIds) . ')')
             ->get();
-            
 
         // Simpan ke cache
         try {
