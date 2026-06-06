@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use App\Models\CollectionModel;
 use App\Models\Movie;
 use App\Models\MovieGenre;
+use App\Models\Genre;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -99,51 +101,95 @@ class DashboardService
 
     public function getMainContent(int $user_id)
     {
-        $recommended_ids = UserRecommendation::where('user_id', $user_id)
-            ->pluck('tmdb_movie_id');
-
-        $movies = Movie::select('*', DB::raw('YEAR(release_date) as year'))
-            ->whereIn('tmdb_movie_id', $recommended_ids)
-            ->orderByRaw('FIELD(tmdb_movie_id, ' . $recommended_ids->implode(',') . ')')
-            ->with([
-                'genres:tmdb_movie_id,map_genre_id',
-                'actors:tmdb_actor_id',
-                'directors:tmdb_director_id'
-            ])->get();
-        $topOne = $movies->first();
-        $forYou = $movies->skip(1)->take(9)->values();
-        $others = $movies->skip(10)->values();
-        $topByGenre = $movies->groupBy(function ($movie) {
-            return $movie->genres->first()?->map_genre_id;
+        class_exists(\App\Models\Movie::class);
+        $user_id = $this->user_id;
+        $recommended_ids = Cache::remember("user_rec_movie_{$user_id}", now()->addDays(7), function () use ($user_id) {
+            return UserRecommendation::where('user_id', $user_id)
+                ->pluck('tmdb_movie_id')->toArray();
+        });
+        $finalMoviesArray = [];
+        foreach ($recommended_ids as $id) {
+            $finalMoviesArray[] = Cache::remember("movie_detail_{$id}", now()->addDays(7), function () use ($id) {
+                $movie = Movie::selectRaw('movies.*, YEAR(release_date) as year')
+                    ->where('tmdb_movie_id', $id)->first();
+                return $movie ? $movie->toArray() : null;
+            });
+        }
+        $cleanArrays = array_filter($finalMoviesArray);
+        $finalMovies = Movie::hydrate($cleanArrays);
+        $finalMovies->load([
+            'genres:tmdb_movie_id,map_genre_id',
+            'actors:tmdb_actor_id',
+            'directors:tmdb_director_id'
+        ]);
+        $topOne = $finalMovies->first();
+        $forYou = $finalMovies->skip(1)->take(9)->values();
+        $others = $finalMovies->skip(10)->values();
+        $topByGenre = $finalMovies->groupBy(function ($movie) {
+            // data_get akan membaca $movie->genres indeks ke-0, lalu mengambil 'map_genre_id' 
+            // secara aman, baik berbentuk array ['map_genre_id' => 1] maupun objek $genre->map_genre_id
+            return data_get($movie, 'genres.0.map_genre_id');
         })->map(function ($group) {
-            return $group->first();
-        })->values()
-            ->unique('tmdb_movie_id'); // ← pastikan tidak duplikat
-        $topActors = $movies->flatMap(function ($movie) {
-            return $movie->actors->pluck('tmdb_actor_id');
+            return collect($group)->first();
         })
-            ->countBy()
-            ->sortDesc()
-            ->take(12)
-            ->keys();
-        $actors = Actor::whereIn('tmdb_actor_id', $topActors)->get();
-        $topCollections = $movies
-            ->whereNotNull('tmdb_collection_id')
-            ->unique('tmdb_collection_id')
-            ->take(7)
-            ->pluck('tmdb_collection_id');
-        $collections = CollectionModel::whereIn('tmdb_collection_id', $topCollections)->get();
-        $userGenre = UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
-        $upcomming = Movie::where('status', 'upcoming')
-            ->whereHas('genres', function ($query) use ($userGenre) {
-                $query->whereIn('map_genre_id', $userGenre);
+            ->filter(function ($value, $key) {
+                return $key !== '' && !is_null($key);
             })
-            ->with('genres:tmdb_movie_id,map_genre_id')
-            ->orderBy('popularity', 'desc')
-            ->take(10)
-            ->get();
-        return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors, 'collections' => $collections, 'others' => $others, 'upcomming' => $upcomming];
+            ->values()
+            ->unique('tmdb_movie_id');
+        $actor_ids = cache::remember("user_rec_actor_{$user_id}", 7600, function () use ($finalMovies) {
+            return $finalMovies->flatMap(function ($movie) {
+                return $movie->actors ? $movie->actors->pluck('tmdb_actor_id') : [];
+            })
+                ->countBy()
+                ->sortDesc()
+                ->take(12)
+                ->keys()
+                ->toArray();
+        });
+
+        $actorsArray = [];
+        foreach ($actor_ids as $id) {
+            $actorsArray[] = cache::remember("actor_detail_{$id}", 7600, function () use ($id) {
+                $actor = Actor::where('tmdb_actor_id', $id)->first();
+                return $actor ? $actor->toArray() : null;
+            });
+        }
+        $cleanActorArrays = array_filter($actorsArray);
+        // KUNCI JAWABANNYA DI SINI:
+        // Kita ubah array murni tadi kembali menjadi Objek Model Movie asli Laravel
+        $actors = Actor::hydrate($cleanActorArrays);
+
+        $collection_ids = cache::remember("user_rec_collection_{$user_id}", 7600, function () use ($finalMovies) {
+            return $finalMovies
+                ->whereNotNull('tmdb_collection_id')
+                ->unique('tmdb_collection_id')
+                ->take(7)
+                ->pluck('tmdb_collection_id')->toArray();
+        });
+        $collectionsArray = [];
+        foreach ($collection_ids as $id) {
+            $collectionsArray[] = cache::remember("collection_detail_{$id}", 7600, function () use ($id) {
+                $collection =  CollectionModel::where('tmdb_collection_id', $id)->first();
+                return $collection ? $collection->toArray() : null;
+            });
+        }
+        $cleanCollection = array_filter($collectionsArray);
+        $collections = CollectionModel::hydrate($cleanCollection);
+
+
+        return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors, 'collections' => $collections, 'others' => $others];
     }
+
+    // $userGenre = UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
+    // $upcomming = Movie::where('status', 'upcoming')
+    //     ->whereHas('genres', function ($query) use ($userGenre) {
+    //         $query->whereIn('map_genre_id', $userGenre);
+    //     })
+    //     ->with('genres:tmdb_movie_id,map_genre_id')
+    //     ->orderBy('popularity', 'desc')
+    //     ->take(10)
+    //     ->get();
 
     // public function getBasePersonalization($user_id)
     // {
