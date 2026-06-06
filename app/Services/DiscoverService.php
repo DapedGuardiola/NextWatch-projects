@@ -8,14 +8,53 @@ use App\Models\Movie;
 use App\Models\NormalizedMovieData;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class DiscoverService
 {
     protected FlaskService $flaskService;
+    protected const CACHE_PREFIX = 'discover:filter:';
+    protected const CACHE_TTL = 604800; // 7 days
 
     public function __construct(FlaskService $flaskService)
     {
         $this->flaskService = $flaskService;
+    }
+
+    /**
+     * Generate cache key berdasarkan genres dan languages filter
+     */
+    protected function generateCacheKey(array $genres, array $languages, string $type = 'filter'): string
+    {
+        $genreKey = implode('-', sort($genres) ? $genres : []);
+        $langKey = implode('-', sort($languages) ? $languages : []);
+        return self::CACHE_PREFIX . $type . ':' . md5($genreKey . '|' . $langKey);
+    }
+
+    protected function convertCachedDataToCollection($cachedData)
+    {
+        return collect($cachedData)->map(function ($item) {
+            $movie = (object) $item;
+
+            if (isset($item['genres']) && is_array($item['genres'])) {
+                $movie->genres = collect($item['genres'])->map(function ($genre) {
+                    $g = (object) $genre;
+
+                    // Rebuild nested genre object dari array
+                    if (isset($genre['genre'])) {
+                        $g->genre = (object) $genre['genre'];
+                    } else {
+                        $g->genre = (object) ['name' => null];
+                    }
+
+                    return $g;
+                })->values();
+            } else {
+                $movie->genres = collect();
+            }
+
+            return $movie;
+        })->values();
     }
 
     public function getGenres(): array
@@ -38,6 +77,25 @@ class DiscoverService
     }
     public function filterTest(array $genres, array $languages): object
     {
+        // Generate cache key
+        $cacheKey = $this->generateCacheKey($genres, $languages, 'filterTest');
+        
+        // Cek cache terlebih dahulu
+        try {
+            $cachedResult = Cache::get($cacheKey);
+            if ($cachedResult !== null) {
+                Log::info('Discover filterTest results retrieved from cache', [
+                    'cache_key' => $cacheKey,
+                    'result_count' => count($cachedResult),
+                ]);
+                return $this->convertCachedDataToCollection($cachedResult);
+            }
+        } catch (\Exception $e) {
+            Log::warning('Cache retrieval failed for discover filterTest, proceeding without cache', [
+                'error' => $e->getMessage()
+            ]);
+        }
+
         // 1. Filter di Laravel dulu sebelum kirim ke Flask
         $query = Movie::select([
             'tmdb_movie_id',
@@ -91,7 +149,7 @@ class DiscoverService
         }
 
         // 3. Query movie untuk tampilan
-        return Movie::select([
+        $result = Movie::select([
             'tmdb_movie_id',
             'title',
             DB::raw('YEAR(release_date)as year'),
@@ -99,9 +157,25 @@ class DiscoverService
             'rating',
             'overview',
             'runtime',
-        ])->whereIn('tmdb_movie_id', $rankedIds)
+        ])->with(['genres.genre'])
+            ->whereIn('tmdb_movie_id', $rankedIds)
             ->orderByRaw('FIELD(tmdb_movie_id, ' . implode(',', $rankedIds) . ')')
             ->get();
+            
+
+        // Simpan ke cache
+        try {
+            Cache::put($cacheKey, $result->toArray(), self::CACHE_TTL);
+            Log::info('Discover filterTest results cached', [
+                'cache_key' => $cacheKey,
+                'ttl' => self::CACHE_TTL,
+                'result_count' => count($result),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Cache save failed for discover filterTest', ['error' => $e->getMessage()]);
+        }
+
+        return $result;
     }
     public function filter(array $genres, array $languages): object
     {

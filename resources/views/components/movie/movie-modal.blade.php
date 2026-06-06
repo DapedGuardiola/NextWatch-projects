@@ -79,7 +79,7 @@
             @endif
 
             @isset($overview)
-            <p class="text-[10px] md:text-xs text-white/60 leading-relaxed line-clamp-[6] md:line-clamp-[9] lg:line-clamp-[13]">{{ $overview }}</p>
+            <p class="text-[10px] md:text-xs text-white/60 leading-relaxed line-clamp-[5] md:line-clamp-[7] lg:line-clamp-[11]">{{ $overview }}</p>
             @endisset
 
             @isset($rating)

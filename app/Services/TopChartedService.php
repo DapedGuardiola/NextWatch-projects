@@ -5,10 +5,14 @@ namespace App\Services;
 use App\Models\Movie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class TopChartedService
 {
     protected $flaskService;
+    protected const CACHE_ALL_TIME_BEST = 'topcharted:all_time_best';
+    protected const CACHE_BY_GENRE = 'topcharted:by_genre';
+    protected const CACHE_TTL = 86400; // 24 jam
 
     public function __construct(FlaskService $flaskService)
     {
@@ -17,6 +21,21 @@ class TopChartedService
 
     public function getAllTimeBest()
     {
+        // Cek cache terlebih dahulu
+        $cacheKey = self::CACHE_ALL_TIME_BEST;
+        $cachedResult = null;
+        
+        try {
+            $cachedResult = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            Log::warning('Cache retrieval failed, proceeding without cache', ['error' => $e->getMessage()]);
+        }
+
+        if ($cachedResult !== null) {
+            Log::info('EDAS all time best retrieved from cache');
+            return collect($cachedResult);
+        }
+
         // 1. Ambil semua kandidat + data normalisasi
         $candidates = Movie::select(['tmdb_movie_id'])
             ->orderByRaw('popularity DESC, rating DESC')
@@ -63,9 +82,7 @@ class TopChartedService
             ->whereIn('tmdb_movie_id', $topIds)
             ->get();
 
-        Log::info('EDAS all time best retrieved', ['count' => $movies->count()]);
-
-        return $movies->map(function ($movie) {
+        $result = $movies->map(function ($movie) {
             return [
                 'id'          => $movie->tmdb_movie_id,
                 'title'       => $movie->title,
@@ -74,10 +91,36 @@ class TopChartedService
                 'rating'      => $movie->rating,
             ];
         });
+
+        // Simpan ke cache sebagai array (untuk menghindari Collection serialization issues)
+        try {
+            Cache::put($cacheKey, $result->toArray(), self::CACHE_TTL);
+        } catch (\Exception $e) {
+            Log::warning('Cache save failed for all time best', ['error' => $e->getMessage()]);
+        }
+
+        Log::info('EDAS all time best retrieved', ['count' => $result->count()]);
+
+        return $result;
     }
 
     public function getBestMoviesByGenre()
     {
+        // Cek cache terlebih dahulu
+        $cacheKey = self::CACHE_BY_GENRE;
+        $cachedResult = null;
+        
+        try {
+            $cachedResult = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            Log::warning('Cache retrieval failed for by genre, proceeding without cache', ['error' => $e->getMessage()]);
+        }
+
+        if ($cachedResult !== null) {
+            Log::info('EDAS best movies by genre retrieved from cache');
+            return $cachedResult;
+        }
+
         $genres = DB::table('genres')->get();
         $moviesByGenre = [];
 
@@ -126,36 +169,76 @@ class TopChartedService
 
             // 5. Query detail movies
             $movies = Movie::select([
-                    'tmdb_movie_id',
-                    'title',
-                    DB::raw('YEAR(release_date) as year'),
-                    'rating',
-                    'rating_count',
-                    'overview',
-                    'runtime',
-                    'poster_path',
-                    'popularity',
-                ])
-                ->whereIn('tmdb_movie_id', $topIds)
-                ->get();
+                'tmdb_movie_id',
+                'title',
+                DB::raw('YEAR(release_date) as year'),
+                'rating',
+                'rating_count',
+                'overview',
+                'runtime',
+                'poster_path',
+                'popularity',
+            ])
+            ->with(['genres.genre'])
+            ->whereIn('tmdb_movie_id', $topIds)
+            ->get();
 
-            $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
-                return [
-                    'id'           => $movie->tmdb_movie_id,
-                    'title'        => $movie->title,
-                    'year'         => $movie->year,
-                    'rating'       => $movie->rating,
-                    'rating_count' => $movie->rating_count,
-                    'overview'     => $movie->overview,
-                    'runtime'      => $movie->runtime,
-                    'poster_path'  => $movie->poster_path,
-                    'popularity'   => $movie->popularity,
-                ];
-            })->toArray();
+        $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
+            return [
+                'id'           => $movie->tmdb_movie_id,
+                'title'        => $movie->title,
+                'year'         => $movie->year,
+                'rating'       => $movie->rating,
+                'rating_count' => $movie->rating_count,
+                'overview'     => $movie->overview,
+                'runtime'      => $movie->runtime,
+                'poster_path'  => $movie->poster_path,
+                'popularity'   => $movie->popularity,
+                'genres'       => $movie->genres->pluck('genre.name')->filter()->values()->toArray(),
+            ];
+        })->toArray();
+        }
+
+        // Simpan ke cache
+        try {
+            Cache::put($cacheKey, $moviesByGenre, self::CACHE_TTL);
+        } catch (\Exception $e) {
+            Log::warning('Cache save failed for by genre', ['error' => $e->getMessage()]);
         }
 
         Log::info('EDAS best movies by genre', ['genres_count' => count($moviesByGenre)]);
 
         return $moviesByGenre;
+    }
+
+    public function clearCache()
+    {
+        try {
+            Cache::forget(self::CACHE_ALL_TIME_BEST);
+            Cache::forget(self::CACHE_BY_GENRE);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed', ['error' => $e->getMessage()]);
+        }
+        Log::info('Top charted cache cleared');
+    }
+
+    public function clearAllTimeCache()
+    {
+        try {
+            Cache::forget(self::CACHE_ALL_TIME_BEST);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed for all time best', ['error' => $e->getMessage()]);
+        }
+        Log::info('All time best cache cleared');
+    }
+
+    public function clearByGenreCache()
+    {
+        try {
+            Cache::forget(self::CACHE_BY_GENRE);
+        } catch (\Exception $e) {
+            Log::warning('Cache clear failed for by genre', ['error' => $e->getMessage()]);
+        }
+        Log::info('By genre cache cleared');
     }
 }

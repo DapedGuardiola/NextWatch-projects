@@ -3,8 +3,11 @@
         <div class="flex justify-between h-16 relative items-center">
 
             <div class="shrink-0 w-10 flex items-center">
-                <a href="{{ route('dashboard') }}">
-                    <x-application-logo class="block h-9 w-auto fill-current text-[#20FFEC]" />
+                <a href="{{ route('dashboard') }}" class="flex items-center">
+                    <!-- Desktop / tablet: full brand (show on md and up)
+                    <img src="{{ asset('images/brand/logo2.png') }}" alt="NextWatch" class="hidden md:block h-10 w-auto">
+                    Mobile: smaller logo (same asset) -->
+                    <!--<img src="{{ asset('images/brand/logo2.png') }}" alt="NextWatch" class="md:hidden h-8 w-auto"> -->
                 </a>
             </div>
 
