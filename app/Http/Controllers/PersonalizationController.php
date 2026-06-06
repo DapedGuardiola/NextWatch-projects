@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ComputePersona;
 use App\Jobs\ComputeRecommendation;
+use App\Jobs\ComputeTopCharted;
 use Illuminate\Http\Request;
 use App\Models\Genre;
 use App\Models\Movie;
@@ -53,7 +54,7 @@ class PersonalizationController extends Controller
         }
         
         ComputePersona::withChain([
-            new ComputeRecommendation($user->id)
+            new ComputeRecommendation($user->id), new ComputeTopCharted('all_time'), new ComputeTopCharted('by_genre')
         ])->dispatch($user->id);
         return redirect()->route('persona-loading');
     }
