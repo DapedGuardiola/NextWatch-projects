@@ -5,7 +5,7 @@
     <div class="h-screen relative">
         <img src="{{ $topOne->poster_url }}"
             class="w-full h-full object-cover object-center" alt="hero">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-20% via-[#212121]/75 via-70% to-[#212121] to-100%"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
 
         <div class="absolute top-[60%] left-10">
             <h1 class="text-white text-7xl font-bold">{{ $topOne->title }}</h1>

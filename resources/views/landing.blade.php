@@ -4,7 +4,7 @@
     <div class="h-screen relative">
         <img src="https://image.tmdb.org/t/p/original/{{ $popularMovie['poster_path'] }}"
             class="w-full h-full object-cover object-center" alt="hero">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-20% via-[#212121]/75 via-70% to-[#212121] to-100%"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
         <div class="absolute bottom-[15%] left-10">
             <h1 class="text-white text-7xl font-bold">{{ $popularMovie['title'] }}</h1>
         </div>
@@ -145,7 +145,7 @@
             x-cloak>
             <div
                 @click.away="closeModal()"
-                class="bg-[#1a1a1f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-3xl h-[560px] overflow-hidden flex">
+                class="bg-[#1a1a1f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-3xl h-[600px] overflow-hidden flex">
 
                 {{-- kiri poster --}}
                 <div class="hidden lg:block w-64 relative flex-shrink-0">
