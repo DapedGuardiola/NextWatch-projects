@@ -19,12 +19,18 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
+            collection_seeder::class,
             genres_seeder::class,
             actors_seeder::class,
             movies_seeder::class,
             movie_genres_seeder::class,
             movie_actors_seeder::class,
             movie_genres_vector_seeder::class,
+            UsersSeeder::class,
+            normalizeMovieSeeder::class,
+            userGenreSeeder::class,
+            directors_seeder::class,
+            movie_directors_seeder::class,
         ]);
     }
 }

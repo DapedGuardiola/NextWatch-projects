@@ -17,6 +17,12 @@ return new class extends Migration
             $table->unsignedBigInteger("tmdb_actor_id")->unique();
             $table->string("name");
             $table->string("image_path")->nullable();
+            $table->string("place_of_birth")->nullable();
+            $table->double("popularity")->nullable();
+            $table->text("biography")->nullable();
+            $table->date("birthday")->nullable();
+            $table->date("deathday")->nullable();
+            $table->integer("gender")->nullable();
         });
     }
 

@@ -3,39 +3,107 @@
         {{ __('Dashboard') }}
     </x-slot>
     <div class="h-screen relative">
-        <img src="{{ asset('images/extraction.jpg') }}"
-            class="w-full h-full object-cover" alt="hero">
+        <img src="{{ $topOne->poster_url }}"
+            class="w-full h-full object-cover object-center" alt="hero">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-20% via-[#212121]/75 via-70% to-[#212121] to-100%"></div>
 
-        <!-- Konten di atas gambar -->
-        <div class="absolute bottom-10 left-10">
-            <h1 class="text-white text-5xl font-bold">Extraction</h1>
+        <div class="absolute top-[60%] left-10">
+            <h1 class="text-white text-7xl font-bold">{{ $topOne->title }}</h1>
         </div>
     </div>
-    <div>
-    <div class="mx-10 my-5">
-        <h1>
-            <p class="text-2xl font-bold">Top On Its Genre</p>
-        </h1>
-    </div>
+    <div class="-mt-[200px] max-w [95%] left-0 right-0 relative z-10 ">
+        <div>
+            <x-movie.search-bar />
+        </div>
 
-    <div class="flex gap-4 px-10 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
-    @foreach($movies as $movie)
-    <x-movie.movie-modal>
-        <x-slot name="poster">
-        {{ $movie['poster_path'] }}
-        </x-slot>
-        <x-slot name="title">
-        {{ $movie['title'] }}
-        </x-slot>
-    </x-movie.movie-modal>
-    @endforeach
-    </div>
-    </div>
-    
+        @if(auth()->check() && auth()->user()->is_personalized && auth()->user()->persona_ready && isset($forYou) && $forYou->count() > 0)
+        <div class="mx-10 mb-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">For You</p>
+                <p class="text-sm text-gray-400 mt-1">Top movies on your preference</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+            @foreach($forYou as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
+            @endforeach
+        </div>
+        @endif
+        
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">Suggested Collection</p>
+                <p class="text-sm text-gray-400 mt-1">Top Collections by your preference</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+            @foreach($collections as $collection)
+            <x-movie.collection-modal
+                :poster="$collection->backdrop_url"
+                :name="$collection->name"
+                :tmdb_collection_id="$collection->tmdb_collection_id"
+                :overview="$collection->overview ?? null" />
+            @endforeach
+        </div>
 
-    <dv class="h-100">
-        <p>a</p>
-    </dv>
-
-
-</x-app-layout>
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">Top On Its Genre</p>
+                <p class="text-sm text-gray-400 mt-1">One the best movie in each genre</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+            @foreach($topByGenre as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
+            @endforeach
+        </div>
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">Actors</p>
+                <p class="text-sm text-gray-400 mt-1">Suggested actors for you</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+            @foreach($actors as $actor)
+            <x-movie.actor-card
+                :actor_id="$actor->tmdb_actor_id"
+                :image_url="$actor->image_url"
+                :name="$actor->name"/>
+            @endforeach
+        </div>
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">Others Movie</p>
+                <p class="text-sm text-gray-400 mt-1">Other movies you must know</p>
+            </h1>
+        </div>
+        <div class="grid grid-cols-5 gap-8 px-2 max-w-[90%] mx-auto overflow-hidden">
+             @foreach($others as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
+            @endforeach
+        </div>
+    </div> </x-app-layout>

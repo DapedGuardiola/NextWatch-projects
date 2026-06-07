@@ -1,20 +1,25 @@
-<nav x-data="{ open: false }" class="absolute top-0 left-0 right-0 z-50 bg-transparent">
+<nav x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 bg-transparent">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 relative items-center">
 
-            <!-- Logo (kiri) -->
-            <div class="shrink-0 flex items-center">
-                <a href="{{ route('dashboard') }}">
-                    <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+            <div class="shrink-0 w-10 flex items-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center">
+                    <!-- Desktop / tablet: full brand (show on md and up) -->
+                    <img src="{{ asset('images/brand/logo2.png') }}" alt="NextWatch" class="hidden md:block h-10 w-auto">
+                    <!-- Mobile: smaller logo (same asset) -->
+                    <img src="{{ asset('images/brand/logo2.png') }}" alt="NextWatch" class="md:hidden h-8 w-auto">
                 </a>
             </div>
 
-            <!-- Navigation Links (TENGAH) -->
             <div class="hidden sm:flex sm:absolute sm:left-1/2 sm:-translate-x-1/2 gap-2">
                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Home') }}
                 </x-nav-link>
-                <x-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">
+                {{-- Discover → trigger modal --}}
+                <x-nav-link href="#" @click.prevent="$dispatch('open-discover')" :active="request()->routeIs('discover.results')"
+                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium leading-5 transition
+                    cursor-pointer hover:bg-gray-400/50 active:bg-gray-400/50
+                    border-transparent focus:outline-none">
                     {{ __('Discover') }}
                 </x-nav-link>
                 <x-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">
@@ -22,12 +27,18 @@
                 </x-nav-link>
             </div>
 
-            <!-- Settings Dropdown (kanan) -->
-            <div class="hidden sm:flex sm:items-center">
+            <div class="hidden w-10 sm:flex sm:items-center">
+                @auth
+                {{-- Sudah login: dropdown profile biasa --}}
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <img class="w-10 h-10 rounded-full" src="{{asset('images/image1.png')}}" alt="Image">
+                        @php
+                        $avatarUrl = Auth::user()->avatar
+                        ? asset('storage/' . Auth::user()->avatar)
+                        : "https://ui-avatars.com/api/?name=" . urlencode(Auth::user()->name) . "&background=333&color=fff";
+                        @endphp
+                        <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <img class="shrink-0 w-10 h-10 rounded-full object-cover" src="{{ $avatarUrl }}" alt="{{ Auth::user()->name }}">
                         </button>
                     </x-slot>
                     <x-slot name="content">
@@ -41,40 +52,64 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-            </div>
+                @else
+                {{-- Belum login: icon default + dropdown login/register --}}
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button class="shrink-0 inline-flex items-center px-3 py-2 border border-transparent rounded-md text-gray-400 bg-transparent hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                            <div class="w-10 h-10 rounded-full bg-gray-500/80 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                        <x-dropdown-link
+                            href="#"
+                            @click.prevent="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))">
+                            Login
+                        </x-dropdown-link>
 
-            <!-- Hamburger (mobile) -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Responsive Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Home') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">{{ __('Discover') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">{{ __('Top Charted') }}</x-responsive-nav-link>
-        </div>
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-responsive-nav-link>
-                </form>
+                        <x-dropdown-link
+                            href="#"
+                            @click.prevent="window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'register' }))">
+                            Register
+                        </x-dropdown-link>
+                    </x-slot>
+                </x-dropdown>
+                @endauth
             </div>
         </div>
-    </div>
+
+        <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+            <div class="pt-2 pb-3 space-y-1">
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Home') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('dashboard.discover')" :active="request()->routeIs('dashboard.discover')">{{ __('Discover') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('dashboard.topCharted')" :active="request()->routeIs('dashboard.topCharted')">{{ __('Top Charted') }}</x-responsive-nav-link>
+            </div>
+
+            @auth
+            <div class="pt-4 pb-1 border-t border-gray-200">
+                <div class="px-4">
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
+                <div class="mt-3 space-y-1">
+                    <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-responsive-nav-link>
+                    </form>
+                </div>
+            </div>
+            @else
+            <div class="pt-4 pb-1 border-t border-gray-200">
+                <div class="mt-3 space-y-1 px-4">
+                    <x-responsive-nav-link :href="route('login')">{{ __('Login') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('register')">{{ __('Register') }}</x-responsive-nav-link>
+                </div>
+            </div>
+            @endauth
+        </div>
 </nav>
