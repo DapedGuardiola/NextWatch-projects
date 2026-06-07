@@ -23,9 +23,11 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans bg-[#212121] antialiased overflow-x-hidden">
+<body class="font-sans bg-[#212121] antialiased overflow-x-hidden flex flex-col min-h-screen">
     @include('layouts.navigation')
-    <div class="relative min-h-screen bg-[#212121]">
+    
+    <!-- Berikan class flex-1 agar footer otomatis tertendang ke bawah jika konten sedikit -->
+    <div class="relative flex-1 bg-[#212121]">
         <!-- Page Heading -->
         @isset($header)
         <header class="bg-transparent">
@@ -34,11 +36,42 @@
             </div>
         </header>
         @endisset
+        
         <!-- Page Content -->
         <main>
             {{ $slot }}
         </main>
     </div>
+
+    <!-- FOOTER START -->
+    <footer class="bg-[#1a1a1a] mt-6 border-t border-gray-800 text-gray-400 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                
+                <!-- Sisi Kiri: Nama Aplikasi & Copyright -->
+                <div class="text-center md:text-left">
+                    <p class="text-white font-semibold text-lg mb-1">{{ config('app.name', 'FilmApp') }}</p>
+                    <p class="text-sm">&copy; {{ date('Y') }} All rights reserved.</p>
+                </div>
+
+                <!-- Sisi Kapan/Tengah: Atribusi TMDB -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 max-w-md bg-[#222] p-3 rounded-lg border border-gray-800/60">
+                    <!-- Logo TMDB Resmi (Primary Short Version) -->
+                    <img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" 
+                         alt="TMDB Logo" 
+                         class="h-8 object-contain shrink-0" />
+                    
+                    <!-- Teks Disclaimer Wajib -->
+                    <p class="text-xs text-justify leading-relaxed text-gray-400">
+                        This product uses the TMDB API but is not endorsed or certified by TMDB.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+    <!-- FOOTER END -->
+
     <x-discover-modal />
 </body>
 
