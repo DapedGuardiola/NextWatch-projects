@@ -532,8 +532,33 @@
                                             @endauth
 
                                             {{-- ACTIONS --}}
-                                            <div class="flex gap-6 mt-3 text-sm text-gray-500">
-                                                <button class="hover:text-cyan-300 transition">Like</button>
+                                            <div class="flex gap-6 mt-3 text-sm text-gray-500 items-center">
+                                            
+                                                {{-- LIKE BUTTON --}}
+                                                @auth
+                                                <button
+                                                    data-like-btn="{{ $comment->id }}"
+                                                    data-liked="{{ $comment->isLikedBy(Auth::id()) ? 'true' : 'false' }}"
+                                                    class="flex items-center gap-1.5 transition
+                                                        {{ $comment->isLikedBy(Auth::id()) ? 'text-cyan-400' : 'hover:text-cyan-300' }}">
+                                                    <svg class="w-4 h-4" fill="{{ $comment->isLikedBy(Auth::id()) ? 'currentColor' : 'none' }}"
+                                                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
+                                                    </svg>
+                                                    <span data-like-count="{{ $comment->id }}">{{ $comment->likes->count() }}</span>
+                                                </button>
+                                                @else
+                                                <span class="flex items-center gap-1.5 cursor-default">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
+                                                    </svg>
+                                                    {{ $comment->likes->count() }}
+                                                </span>
+                                                @endauth
+                                            
+                                                {{-- REPLY BUTTON --}}
                                                 @auth
                                                 <button
                                                     data-reply-toggle="{{ $comment->id }}"
@@ -541,7 +566,20 @@
                                                     Reply
                                                 </button>
                                                 @endauth
-                                                <button class="hover:text-red-400 transition">Report</button>
+                                            
+                                                {{-- REPORT BUTTON --}}
+                                                @auth
+                                                @if(Auth::id() !== $comment->user_id)
+                                                <button
+                                                    data-report-btn="{{ $comment->id }}"
+                                                    data-reported="{{ $comment->isReportedBy(Auth::id()) ? 'true' : 'false' }}"
+                                                    class="flex items-center gap-1.5 transition
+                                                        {{ $comment->isReportedBy(Auth::id()) ? 'text-red-400 cursor-default' : 'hover:text-red-400' }}">
+                                                    <span>{{ $comment->isReportedBy(Auth::id()) ? 'Reported' : 'Report' }}</span>
+                                                </button>
+                                                @endif
+                                                @endauth
+                                            
                                             </div>
 
                                         </div>
@@ -908,6 +946,186 @@
                     }
                 });
             });
+        });
+
+        document.querySelectorAll('[data-like-btn]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const commentId = btn.dataset.likeBtn;
+                const isLiked   = btn.dataset.liked === 'true';
+                const countEl   = document.querySelector(`[data-like-count="${commentId}"]`);
+        
+                // Optimistic update
+                const newLiked = !isLiked;
+                btn.dataset.liked = String(newLiked);
+                applyLikeStyle(btn, newLiked);
+        
+                try {
+                    const res  = await fetch(`/comments/${commentId}/like`, {
+                        method:  'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept':       'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const data = await res.json();
+        
+                    // Sync dengan server
+                    btn.dataset.liked = String(data.liked);
+                    applyLikeStyle(btn, data.liked);
+                    if (countEl) countEl.textContent = data.like_count;
+        
+                } catch (err) {
+                    // Rollback jika gagal
+                    btn.dataset.liked = String(isLiked);
+                    applyLikeStyle(btn, isLiked);
+                    console.error('Like error:', err);
+                }
+            });
+        });
+        
+        function applyLikeStyle(btn, liked) {
+            const svg = btn.querySelector('svg');
+            if (liked) {
+                btn.classList.add('text-cyan-400');
+                btn.classList.remove('text-gray-500', 'hover:text-cyan-300');
+                if (svg) svg.setAttribute('fill', 'currentColor');
+            } else {
+                btn.classList.remove('text-cyan-400');
+                btn.classList.add('text-gray-500', 'hover:text-cyan-300');
+                if (svg) svg.setAttribute('fill', 'none');
+            }
+        }
+        
+        const modalHTML = `
+        <div id="global-report-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="report-backdrop"></div>
+            <div class="relative w-full max-w-md rounded-2xl bg-[#0d1424] border border-white/10 shadow-2xl p-6 z-10">
+                <h3 class="text-lg font-bold text-white mb-1">Laporkan Komentar</h3>
+                <p class="text-sm text-gray-400 mb-5">Pilih alasan pelaporanmu agar tim kami bisa meninjau.</p>
+                <div id="report-form-wrapper">
+                    <div class="space-y-2 mb-5">
+                        ${[
+                            ['inappropriate', 'Konten tidak pantas'],
+                            ['spam', 'Spam atau iklan'],
+                            ['hate_speech', 'Ujaran kebencian'],
+                            ['other', 'Lainnya'],
+                        ].map(([value, label]) => `
+                            <label class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer
+                                        border border-white/10 hover:border-cyan-400/40 hover:bg-white/5 transition">
+                                <input type="radio" name="reason" value="${value}" class="accent-cyan-400"
+                                    ${value === 'inappropriate' ? 'checked' : ''}>
+                                <span class="text-sm text-gray-200">${label}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <textarea id="report-note" rows="2" placeholder="Catatan tambahan (opsional)..."
+                        class="w-full resize-none bg-white/5 border border-white/10 rounded-xl
+                            focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500
+                            p-3 text-sm transition mb-4"></textarea>
+                    <div class="flex gap-3 justify-end">
+                        <button id="report-cancel" class="px-5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 text-sm transition">
+                            Batal
+                        </button>
+                        <button id="report-submit" class="px-5 py-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white text-sm font-semibold transition">
+                            Kirim Laporan
+                        </button>
+                    </div>
+                </div>
+                <div id="report-success" class="hidden text-center py-4">
+                    <svg class="w-12 h-12 text-cyan-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-white font-semibold">Laporan Terkirim</p>
+                    <p class="text-gray-400 text-sm mt-1">Tim kami akan meninjau komentar ini.</p>
+                </div>
+            </div>
+        </div>`;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // State
+        let activeCommentId = null;
+
+        // Buka modal
+        document.querySelectorAll('[data-report-btn]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.reported === 'true') return;
+                activeCommentId = btn.dataset.reportBtn;
+                document.getElementById('global-report-modal').classList.remove('hidden');
+                document.getElementById('report-success').classList.add('hidden');
+                document.getElementById('report-form-wrapper').classList.remove('hidden');
+                document.getElementById('report-note').value = '';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Tutup modal
+        function closeGlobalReportModal() {
+            document.getElementById('global-report-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            activeCommentId = null;
+        }
+
+        document.getElementById('report-backdrop').addEventListener('click', closeGlobalReportModal);
+        document.getElementById('report-cancel').addEventListener('click', closeGlobalReportModal);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGlobalReportModal(); });
+
+        // Submit
+        document.getElementById('report-submit').addEventListener('click', async () => {
+            if (!activeCommentId) return;
+
+            const reason  = document.querySelector('#global-report-modal input[name="reason"]:checked')?.value;
+            const note    = document.getElementById('report-note').value;
+            const submitBtn = document.getElementById('report-submit');
+
+            submitBtn.disabled    = true;
+            submitBtn.textContent = 'Mengirim...';
+
+            try {
+                const res  = await fetch(`/comments/${activeCommentId}/report`, {
+                    method:  'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept':       'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason, note }),
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    document.getElementById('report-form-wrapper').classList.add('hidden');
+                    document.getElementById('report-success').classList.remove('hidden');
+
+                    // Update tombol
+                    const btn = document.querySelector(`[data-report-btn="${activeCommentId}"]`);
+                    if (btn) {
+                        btn.dataset.reported = 'true';
+                        btn.classList.add('text-red-400', 'cursor-default');
+                        btn.classList.remove('hover:text-red-400');
+                        btn.querySelector('span').textContent = 'Reported';
+                    }
+
+                    if (data.deleted) {
+                        // Komentar dihapus, reload halaman setelah modal tertutup
+                        setTimeout(() => {
+                            closeGlobalReportModal();
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        setTimeout(closeGlobalReportModal, 2000);
+                    }
+                } else {
+                    alert(data.message || 'Gagal mengirim laporan.');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                submitBtn.disabled    = false;
+                submitBtn.textContent = 'Kirim Laporan';
+            }
         });
     </script>
 </x-app-layout>

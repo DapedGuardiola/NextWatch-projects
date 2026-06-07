@@ -108,6 +108,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/movie/comment', [CommentController::class, 'store'])->name('movie.comment');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('movie.comment.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('movie.comment.destroy');
+    Route::post('/comments/{comment}/like', [CommentController::class, 'toggle'])
+        ->name('comment.like');
+ 
+    // Report
+    Route::post('/comments/{comment}/report', [CommentController::class, 'store_report'])
+        ->name('comment.report');
 
     // Persona & Genres
     Route::get('/profile/persona', [ProfileController::class, 'persona'])->name('profile.persona');
