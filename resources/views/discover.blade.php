@@ -20,7 +20,6 @@
             <div class="absolute bottom-0 left-0 w-full h-[200px] bg-gradient-to-b from-transparent to-[#020817]"></div>
 
             {{-- Glow --}}
-            <div class="absolute -top-20 -right-20 w-[350px] h-[350px] bg-cyan-500/15 rounded-full blur-3xl"></div>
 
             {{-- Header content --}}
             <div class="relative z-10 max-w-[90%] mx-auto px-6 pt-32 pb-4">
@@ -34,23 +33,23 @@
             </div>
 
         </section>
-
         {{-- MOVIE GRID --}}
         <div class="relative z-10 bg-[#020817]">
+            <div class="absolute z-1000 -top-[160px] -right-20 w-[350px] h-[350px] bg-cyan-500/15 rounded-full blur-3xl"></div>
             <div class="max-w-[90%] mx-auto px-6 pt-4 pb-12">
 
                 @if($movies->isNotEmpty())
-                <div class="flex flex-wrap gap-5">
+                <div class="grid grid-cols-5 justify-center gap-4">
                     @foreach($movies as $movie)
-                        <x-movie.movie-modal
-                            :poster="$movie->poster_url"
-                            :title="$movie->title"
-                            :tmdb_movie_id="$movie->tmdb_movie_id"
-                            :year="$movie->year ?? null"
-                            :rating="$movie->rating ?? null"
-                            :overview="$movie->overview ?? null"
-                            :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                            :duration="$movie->runtime ?? null" />
+                    <x-movie.movie-modal
+                        :poster="$movie->poster_url"
+                        :title="$movie->title"
+                        :tmdb_movie_id="$movie->tmdb_movie_id"
+                        :year="$movie->year ?? null"
+                        :rating="$movie->rating ?? null"
+                        :overview="$movie->overview ?? null"
+                        :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                        :duration="$movie->runtime ?? null" />
                     @endforeach
                 </div>
                 @else
@@ -59,7 +58,7 @@
                     <div class="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
                         <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-2">No films found</h3>

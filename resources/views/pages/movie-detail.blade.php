@@ -53,7 +53,7 @@
                     </div>
 
                     <!-- CONTENT -->
-                    <div id="trailer-layout" class="opacity-100 scale-100 transform transition-all duration-700 ease-out flex-col gap-10">
+                    <div id="trailer-layout" class="opacity-100 scale-100 transform transition-all duration-700 ease-out flex-col gap-10" wire:ignore>
 
                         <!-- TRAILER -->
                         @if($movie->trailer_key)
