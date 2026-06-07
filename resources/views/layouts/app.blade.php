@@ -23,11 +23,11 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans bg-[#212121] antialiased overflow-x-hidden flex flex-col min-h-screen">
+<body class="font-sans bg-[#020817] antialiased overflow-x-hidden flex flex-col min-h-screen">
     @include('layouts.navigation')
     
     <!-- Berikan class flex-1 agar footer otomatis tertendang ke bawah jika konten sedikit -->
-    <div class="relative flex-1 bg-[#212121]">
+    <div class="relative flex-1 bg-[#020817]">
         <!-- Page Heading -->
         @isset($header)
         <header class="bg-transparent">

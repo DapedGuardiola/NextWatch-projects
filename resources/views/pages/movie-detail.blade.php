@@ -655,42 +655,18 @@
 
                     </div>
 
-                    <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-6">
-
-                        @foreach($similarMovies as $s)
-
-                        <div class="group min-w-[220px]">
-
-                            <div
-                                class="relative overflow-hidden rounded-[28px]
-                                    border border-white/10
-                                    transition duration-500
-                                    group-hover:-translate-y-2
-                                    group-hover:shadow-[0_20px_60px_rgba(34,211,238,0.25)]">
-
-                                <img
-                                    src="https://image.tmdb.org/t/p/w500/{{ $s->poster_path }}"
-                                    alt="{{ $s->title }}"
-                                    class="w-full h-[330px] object-cover
-                                        transition duration-500
-                                        group-hover:scale-110">
-
-                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
-
-                                <div class="absolute bottom-0 p-5">
-
-                                    <h3 class="font-semibold text-lg">
-                                        {{ $s->title }}
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
+                    <div class="flex gap-3 md:gap-4 py-4 w-full mx-auto overflow-x-auto scrollbar-hide">
+                        @foreach($similarMovies as $similar)
+                            <x-movie.movie-modal
+                                :poster="$similar->poster_url"
+                                :title="$similar->title"
+                                :tmdb_movie_id="$similar->tmdb_movie_id"
+                                :year="$similar->year ?? null"
+                                :rating="$similar->rating ?? null"
+                                :overview="$similar->overview ?? null"
+                                :genres="$similar->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                                :duration="$similar->runtime ?? null" />
                         @endforeach
-
                     </div>
 
                 </section>
@@ -840,5 +816,98 @@
 
             prompt('Salin link ini:', shareUrl);
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle all movie cards with hover panels
+            document.querySelectorAll('[data-card]').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    
+                    // Determine panel width based on screen size
+                    let panelWidth;
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    // Check if panel would exceed viewport width
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        // Panel akan keluar dari kanan, posisikan ke kiri
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        // Panel bisa normal ke kanan
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+                
+                // Repositionkan saat window resize
+                card.addEventListener('mousemove', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+                    
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+            
+            // Handle window resize untuk re-check positioning
+            window.addEventListener('resize', function() {
+                document.querySelectorAll('[data-card]').forEach(card => {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel || panel.style.visibility === 'hidden') return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+                    
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+        });
     </script>
 </x-app-layout>

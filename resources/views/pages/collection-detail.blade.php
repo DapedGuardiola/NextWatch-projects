@@ -21,17 +21,17 @@
             </div>
 
             {{-- Grid Tampilan Daftar Film Waralaba --}}
-            <div class="grid grid-cols-5 max-w-[90%] place-items-center gap-8 mt-6 mx-auto mb-10">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 px-2 max-w-[90%] mx-auto" id="others-grid">
                 @foreach($collection->movies as $movie)
-                <x-movie.movie-modal
-                    :poster="$movie->poster_url"
-                    :title="$movie->title"
-                    :tmdb_movie_id="$movie->tmdb_movie_id"
-                    :year="$movie->release_date ? date('Y', strtotime($movie->release_date)) : null"
-                    :rating="$movie->rating ?? null"
-                    :overview="$movie->overview ?? null"
-                    :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                    :duration="$movie->runtime ?? null" />
+                    <x-movie.movie-modal
+                        :poster="$movie->poster_url"
+                        :title="$movie->title"
+                        :tmdb_movie_id="$movie->tmdb_movie_id"
+                        :year="$movie->release_date ? date('Y', strtotime($movie->release_date)) : null"
+                        :rating="$movie->rating ?? null"
+                        :overview="$movie->overview ?? null"
+                        :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                        :duration="$movie->runtime ?? null" />
                 @endforeach
             </div>
         </div>
