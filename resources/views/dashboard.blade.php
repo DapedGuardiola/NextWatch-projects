@@ -73,6 +73,38 @@
                 :duration="$movie->runtime ?? null" />
             @endforeach
         </div>
+
+        @if(isset($watchlist) && $watchlist->isNotEmpty())
+        <div class="mx-10 my-10">
+            <h1>
+                <p class="text-3xl text-white font-bold">In Your Watchlist</p>
+                <p class="text-sm text-gray-400 mt-1">Movies you want to watch later</p>
+            </h1>
+        </div>
+        <div class="flex gap-8 px-2 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+            @foreach($watchlist as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
+            @endforeach
+            <a href="{{ route('watchlist.index') }}" class="flex flex-col items-center justify-center">
+                <button
+                class="flex z-10 bg-white/15 hover:bg-white/25 text-white border-0
+                    w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center
+                    text-base md:text-lg cursor-pointer transition">&#8250;</button>
+                <p class="text-sm text-white font-bold justify-content justify-center items-center flex mt-2">
+                    See All
+                </p>
+            </a>
+        </div>
+        @endif
+
         <div class="mx-10 my-10">
             <h1>
                 <p class="text-3xl text-white font-bold">Actors</p>
