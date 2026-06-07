@@ -7,6 +7,8 @@ use App\Services\LogActivityService;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use App\Models\Movie;
 
 class DetailController extends Controller
 {
@@ -21,15 +23,21 @@ class DetailController extends Controller
     }
     public function index(int $id) {
         $similarMovies = $this->detailService->filterSimilar($id);
-        $movie = $this->detailService->getSelectedMovie($id);
+        $movie_raw = Cache::rememberForever("movie_detail_{$id}",function() use($id){
+            return $this->detailService->getSelectedMovie($id);
+        });
+        $movie = Movie::hydrate([$movie_raw])->first();
+        $movie->load([
+            'genres:tmdb_movie_id,map_genre_id',
+            'actors',
+            'directors'
+        ]);
         $userId = Auth::id();
-
         $genreNames = $movie->genres->pluck('genre.name')->filter()->unique()->toArray();
         $comments = $this->commentService->getCommentsByMovie($movie->tmdb_movie_id);
         $isInWatchlist = \App\Models\Watchlist::where(
             'user_id', $userId
         )
-        
         ->where(
             'movie_id',
             $movie->tmdb_movie_id
