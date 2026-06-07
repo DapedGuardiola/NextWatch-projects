@@ -18,7 +18,7 @@
                     <p class="text-2xl md:text-3xl text-white font-bold">{{ $genre }}</p>
                 </h2>
             </div>
-            <div class="flex gap-3 md:gap-4 py-4 px-4 md:px-8 lg:px-10 w-full md:w-[95%] lg:w-[90%] mx-auto overflow-x-auto scrollbar-hide">
+            <div class="flex gap-3 md:gap-4 py-4 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
                 @foreach($movies as $index => $movie)
                     <x-movie.topmovies-modal
                         :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"

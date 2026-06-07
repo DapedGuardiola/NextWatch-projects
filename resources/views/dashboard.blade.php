@@ -87,23 +87,119 @@
                 :name="$actor->name"/>
             @endforeach
         </div>
-        <div class="mx-10 my-10">
+        <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
-                <p class="text-3xl text-white font-bold">Others Movie</p>
-                <p class="text-sm text-gray-400 mt-1">Other movies you must know</p>
+                <p class="text-xl sm:text-3xl text-white font-bold">Others Movie</p>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">Other movies you must know</p>
             </h1>
         </div>
-        <div class="grid grid-cols-5 gap-8 px-2 max-w-[90%] mx-auto overflow-hidden">
-             @foreach($others as $movie)
-            <x-movie.movie-modal
-                :poster="$movie->poster_url"
-                :title="$movie->title"
-                :tmdb_movie_id="$movie->tmdb_movie_id"
-                :year="$movie->year ?? null"
-                :rating="$movie->rating ?? null"
-                :overview="$movie->overview ?? null"
-                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                :duration="$movie->runtime ?? null" />
-            @endforeach
+        <div class="max-w-full mx-auto overflow-visible">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 px-2 max-w-[95%] sm:max-w-[90%] mx-auto" id="others-grid">
+                 @foreach($others as $movie)
+                <div class="others-movie-item">
+                    <x-movie.movie-modal
+                        :poster="$movie->poster_url"
+                        :title="$movie->title"
+                        :tmdb_movie_id="$movie->tmdb_movie_id"
+                        :year="$movie->year ?? null"
+                        :rating="$movie->rating ?? null"
+                        :overview="$movie->overview ?? null"
+                        :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                        :duration="$movie->runtime ?? null" />
+                </div>
+                @endforeach
+            </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+            // Handle all movie cards with hover panels
+            document.querySelectorAll('[data-card]').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    
+                    // Determine panel width based on screen size
+                    let panelWidth;
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    // Check if panel would exceed viewport width
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        // Panel akan keluar dari kanan, posisikan ke kiri
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        // Panel bisa normal ke kanan
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+                
+                // Repositionkan saat window resize
+                card.addEventListener('mousemove', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+                    
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+            
+            // Handle window resize untuk re-check positioning
+            window.addEventListener('resize', function() {
+                document.querySelectorAll('[data-card]').forEach(card => {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel || panel.style.visibility === 'hidden') return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+                    
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+                    
+                    const panelRightEdge = rect.left + panelWidth;
+                    
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+        });
+        </script>
     </div> </x-app-layout>
