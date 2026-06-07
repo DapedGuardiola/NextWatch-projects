@@ -30,8 +30,9 @@ class DashboardController extends Controller
         $topByGenre = $mainContent['topByGenre'];
         $collections = $mainContent['collections'];
         $others = $mainContent['others'];
+        $watchlist = $this->dashboardService->getWatchlist(Auth::user()->id);
         // $upcomming = $mainContent['upcomming'];
-        return view('dashboard', compact(['topOne','forYou','actors','topByGenre','collections','others']));
+        return view('dashboard', compact(['topOne','forYou','actors','topByGenre','collections','others','watchlist']));
     }
     
     public function getActorMovie($id){

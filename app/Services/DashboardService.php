@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Collection\distinct;
 use App\Models\User;
 use App\Models\UserGenre;
 use App\Models\Actor;
+use App\Models\Watchlist;
 use App\Models\UserRecommendation;
 
 class DashboardService
@@ -179,6 +180,15 @@ class DashboardService
 
 
         return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors, 'collections' => $collections, 'others' => $others];
+    }
+
+    public function getWatchlist(int $user_id)
+    {
+        return Movie::whereHas('watchlists', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id);
+        })
+        ->take(5)
+        ->get();
     }
 
     // $userGenre = UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
