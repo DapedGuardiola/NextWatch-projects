@@ -126,14 +126,54 @@
         @endauth
 
         {{-- ACTIONS --}}
-        <div class="flex gap-6 mt-2 text-xs text-gray-500">
-            <button class="hover:text-cyan-300 transition">Like</button>
+        <div class="flex gap-6 mt-3 text-sm text-gray-500 items-center">
+        
+            {{-- LIKE BUTTON --}}
             @auth
-            <button data-reply-toggle="{{ $reply->id }}" class="hover:text-cyan-300 transition">
+            <button
+                data-like-btn="{{ $reply->id }}"
+                data-liked="{{ $reply->isLikedBy(Auth::id()) ? 'true' : 'false' }}"
+                class="flex items-center gap-1.5 transition
+                    {{ $reply->isLikedBy(Auth::id()) ? 'text-cyan-400' : 'hover:text-cyan-300' }}">
+                <svg class="w-4 h-4" fill="{{ $reply->isLikedBy(Auth::id()) ? 'currentColor' : 'none' }}"
+                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
+                </svg>
+                <span data-like-count="{{ $reply->id }}">{{ $reply->likes->count() }}</span>
+            </button>
+            @else
+            <span class="flex items-center gap-1.5 cursor-default">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
+                </svg>
+                {{ $reply->likes->count() }}
+            </span>
+            @endauth
+        
+            {{-- REPLY BUTTON --}}
+            @auth
+            <button
+                data-reply-toggle="{{ $reply->id }}"
+                class="hover:text-cyan-300 transition">
                 Reply
             </button>
             @endauth
-            <button class="hover:text-red-400 transition">Report</button>
+        
+            {{-- REPORT BUTTON --}}
+            @auth
+            @if(Auth::id() !== $reply->user_id)
+            <button
+                data-report-btn="{{ $reply->id }}"
+                data-reported="{{ $reply->isReportedBy(Auth::id()) ? 'true' : 'false' }}"
+                class="flex items-center gap-1.5 transition
+                    {{ $reply->isReportedBy(Auth::id()) ? 'text-red-400 cursor-default' : 'hover:text-red-400' }}">
+                <span>{{ $reply->isReportedBy(Auth::id()) ? 'Reported' : 'Report' }}</span>
+            </button>
+            @endif
+            @endauth
+        
         </div>
 
         {{-- FORM REPLY (hidden) --}}
