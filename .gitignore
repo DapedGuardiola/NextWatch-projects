@@ -16,3 +16,4 @@ dist/
 /storage/*.key
 .env/
 /public/build
+/public/hot

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('userLogActivity',function(Blueprint $table){
+        Schema::create('user_log_activity',function(Blueprint $table){
             $table->id();
             $table->unsignedBigInteger('tmdb_movie_id');
             $table->unsignedBigInteger('user_id');

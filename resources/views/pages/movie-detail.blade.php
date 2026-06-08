@@ -1,4 +1,7 @@
 <x-app-layout>
+    <x-slot name="title">
+        {{ __($movie->title) }}
+    </x-slot>
     <style>
         #youtube-player iframe {
             width: 100% !important;

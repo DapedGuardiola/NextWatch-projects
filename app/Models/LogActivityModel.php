@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Table('userlogactivity')]
+#[Table('user_log_activity')]
 #[Fillable(['tmdb_movie_id','user_id','type','is_evaluated','created_at'])]
 class LogActivityModel extends Model
 {
