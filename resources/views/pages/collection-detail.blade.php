@@ -1,4 +1,8 @@
 <x-app-layout>
+    <x-slot name="title">
+        {{ __($collection->name) }}
+    </x-slot>
+
     <div class="min-h-screen relative bg-[#212121] pb-10">
         {{-- Backdrop Koleksi sebagai Background (Ditambahkan opacity agar tulisan & poster film lebih kontras) --}}
         <img src="{{ $collection->backdrop_url }}" alt="{{ $collection->name }}" class="absolute inset-0 object-cover object-center w-full h-full overflow-hidden opacity-30 pointer-events-none">
