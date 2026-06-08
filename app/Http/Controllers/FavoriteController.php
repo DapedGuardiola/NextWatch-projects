@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Favorite;
+use App\Models\userMovieInteracted;
 use App\Services\LogActivityService;
 
 class FavoriteController extends Controller
@@ -17,6 +18,7 @@ class FavoriteController extends Controller
             'movie_id' => $movie,
         ]);
         $logActivityService->favorite(['user_id'=>$user_id,'movie_id'=>$movie]);
+        userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie]);
         return back();
     }
 
@@ -25,7 +27,7 @@ class FavoriteController extends Controller
         Favorite::where('user_id', auth()->id())
             ->where('movie_id', $movie)
             ->delete();
-
+        
         return back();
     }
 

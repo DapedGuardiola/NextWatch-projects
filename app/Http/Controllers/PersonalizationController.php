@@ -12,6 +12,8 @@ use App\Models\Favorite;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\userMovieInteracted;
+use Illuminate\Support\Facades\Cache;
 
 class PersonalizationController extends Controller
 {
@@ -51,8 +53,12 @@ class PersonalizationController extends Controller
                 'movie_id'   => $movieId,
                 'is_persona' => 1,
             ]);
+            userMovieInteracted::firstOrCreate([
+                'user_id'    => $user->id,
+                'tmdb_movie_id'   => $movieId,
+            ]);
         }
-        
+        Cache::forget("user_interacted_{$user->id}");
         ComputePersona::withChain([
             new ComputeRecommendation($user->id), new ComputeTopCharted('all_time'), new ComputeTopCharted('by_genre')
         ])->dispatch($user->id);
