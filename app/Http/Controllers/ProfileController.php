@@ -49,7 +49,7 @@ class ProfileController extends Controller
             ->orderBy('weight', 'desc')
             ->get();
 
-        $maxGenreWeight = $userGenres->max('weight') ?? 1;
+        $maxGenreWeight = 1;
         $genreLabels = [];
         $genreWeights = [];
         foreach ($userGenres as $ug) {
@@ -70,7 +70,7 @@ class ProfileController extends Controller
             // Kalkulasi Persentase Aktor
             $actors = (array) ($userTaste->preferred_actors ?? []);
             arsort($actors);
-            $maxActor = !empty($actors) ? max($actors) : 1;
+            $maxActor = 1;
             foreach ($actors as $id => $score) {
                 $name = $this->getNameSafely('actors', 'tmdb_actor_id', $id, 'Actor');
                 $actorsData[$name] = $maxActor > 0 ? round(($score / $maxActor) * 100) : 0;
@@ -79,7 +79,7 @@ class ProfileController extends Controller
             // Kalkulasi Persentase Sutradara
             $directors = (array) ($userTaste->preferred_directors ?? []);
             arsort($directors);
-            $maxDir = !empty($directors) ? max($directors) : 1;
+            $maxDir = 1;
             foreach ($directors as $id => $score) {
                 // Mencoba tabel directors atau crews
                 $name = $this->getNameSafely('directors', 'tmdb_director_id', $id, 'Director');
@@ -92,7 +92,7 @@ class ProfileController extends Controller
             // Kalkulasi Persentase Era
             $eras = (array) ($userTaste->preferred_era ?? []);
             arsort($eras);
-            $maxEra = !empty($eras) ? max($eras) : 1;
+            $maxEra = 1;
             foreach ($eras as $eraName => $score) {
                 $erasData[$eraName] = $maxEra > 0 ? round(($score / $maxEra) * 100) : 0;
             }

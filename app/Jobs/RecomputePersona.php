@@ -71,15 +71,19 @@ class RecomputePersona implements ShouldQueue
                     ['weight' => $weight]
                 );
             }
-            UserTaste::updateOrCreate([
-                'user_id'                         => $this->userId,
+          UserTaste::updateOrCreate(
+            [
+                'user_id' => $this->userId,  // hanya ini sebagai kondisi pencarian
+            ],
+            [
                 'preferred_directors'              => $userNewTastes['preferred_directors'],
                 'preferred_actors'                 => $userNewTastes['preferred_actors'],
                 'preferred_era'                    => $userNewTastes['preferred_era'],
-                'preferred_normalized_rating'     => $userNewTastes['preferred_normalized_rating'],
-                'preferred_normalized_popularity' => $userNewTastes['preferred_normalized_popularity'],
-                'created_at'                      => now(),
-                'updated_at'                      => now(),
-            ]);    
+                'preferred_normalized_rating'      => $userNewTastes['preferred_normalized_rating'],
+                'preferred_normalized_popularity'  => $userNewTastes['preferred_normalized_popularity'],
+                'updated_at'                       => now(),
+            ]
+        );
+                
     }
 }

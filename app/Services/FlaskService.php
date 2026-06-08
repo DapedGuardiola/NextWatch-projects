@@ -159,4 +159,20 @@ class FlaskService
         Log::info('Flask Service Response : ' . json_encode($response));
         return $userNewTastes;
     }
+    public function getIntersectGenres(array $moviesData): array
+    {
+        try {
+            $response = Http::post("{$this->baseUrl}/compute/intersect-genres", [
+                'movies' => $moviesData
+            ]);
+
+            if ($response->successful()) {
+                return $response->json()['valid_movie_ids'] ?? [];
+            }
+            return [];
+        } catch (\Exception $e) {
+            Log::error("Flask Error (Intersect): " . $e->getMessage());
+            return [];
+        }
+    }
 }
