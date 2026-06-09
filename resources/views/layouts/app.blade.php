@@ -20,6 +20,8 @@
     <link rel="shortcut icon" href="{{ asset('images/brand/logo2.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/brand/logo2.png') }}">
 
+    <!-- Alpine Cloak -->
+    <style>[x-cloak] { display: none !important; }</style>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

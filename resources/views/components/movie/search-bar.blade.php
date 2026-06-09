@@ -39,7 +39,7 @@
         <div class="flex">
 
             {{-- Kolom Movie --}}
-            <div :class="actors.length > 0 ? 'w-2/3 border-r border-white/10' : 'w-full'" x-show="movies.length > 0">
+            <div :class="actors.length > 0 ? 'w-2/3 border-r border-white/10' : 'w-full'" x-show="movies.length > 0" x-cloak>
                 <p class="text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Films</p>
                 <template x-for="movie in movies" :key="movie.id">
                     <a :href="movie.url" class="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition">
@@ -53,7 +53,7 @@
             </div>
 
             {{-- Kolom Actor --}}
-            <div :class="movies.length > 0 ? 'w-1/3' : 'w-full'" x-show="actors.length > 0">
+            <div :class="movies.length > 0 ? 'w-1/3' : 'w-full'" x-show="actors.length > 0" x-cloak>
                 <p class="text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Actors</p>
                 <template x-for="actor in actors" :key="actor.id">
                     <a :href="actor.url" class="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition">

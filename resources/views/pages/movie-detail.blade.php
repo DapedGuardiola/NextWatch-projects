@@ -526,6 +526,7 @@
                                                     <div x-show="open"
                                                         @click.outside="open = false"
                                                         x-transition
+                                                        x-cloak
                                                         class="absolute right-0 mt-1 w-32 rounded-xl bg-[#0d1424] border border-white/10
                                                                     shadow-xl z-50 overflow-hidden">
                                                         <button

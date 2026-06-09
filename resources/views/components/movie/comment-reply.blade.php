@@ -47,7 +47,7 @@
                         <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
                     </svg>
                 </button>
-                <div x-show="open" @click.outside="open = false" x-transition
+                <div x-show="open" @click.outside="open = false" x-transition x-cloak
                      class="absolute right-0 mt-1 w-28 rounded-xl bg-[#0d1424] border border-white/10
                             shadow-xl z-50 overflow-hidden">
                     <button @click="open = false; toggleEdit({{ $reply->id }})"
