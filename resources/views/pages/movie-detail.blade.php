@@ -119,60 +119,107 @@
                     </div>
 
                     {{-- 5. Action Buttons (horizontal) --}}
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 mx-auto">
 
                         {{-- Watchlist --}}
-                        @if($isInWatchlist)
-                        <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
-                                bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                <span>Watchlist</span>
-                            </button>
-                        </form>
-                        @else
-                        <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
-                                bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
-                                text-black transition shadow-lg hover:shadow-cyan-500/50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                <span>Watchlist</span>
-                            </button>
-                        </form>
-                        @endif
+                        <div>
+                                <!-- WATCHLIST -->
+                                <div id="watchlist-btn" x-data="{
+    isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
+    loading: false,
+    storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
+    destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
+    toggleWatchlist() {
+        this.loading = true;
+        fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
+            method: this.isWatchlist ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed');
+            this.isWatchlist = !this.isWatchlist;
+            this.loading = false;
+        })
+        .catch(() => this.loading = false)
+    }
+}">
 
-                        {{-- Favorite --}}
-                        @if($isFavorite)
-                        <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
-                                bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                                </svg>
-                                <span>Favorited</span>
-                            </button>
-                        </form>
-                        @else
-                        <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
-                                bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
-                                text-white transition hover:shadow-lg hover:shadow-purple-500/20">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                                </svg>
-                                <span>Favorite</span>
-                            </button>
-                        </form>
-                        @endif
+                                    <button
+                                        @click="toggleWatchlist()"
+                                        :disabled="loading"
+                                        :class="isWatchlist 
+            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+            : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
+                                        class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm transition">
+                                        <!-- Spinner -->
+                                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
 
+                                        <!-- Icon Plus (add) -->
+                                        <svg x-show="!loading && !isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+
+                                        <!-- Icon X (remove) -->
+                                        <svg x-show="!loading && isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span x-text="isWatchlist ? 'Remove' : 'Watchlist'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            {{-- Favorite --}}
+                            <div>
+                                <!-- FAVORITE -->
+                                <div id="favorite-btn" x-data="{
+    isFavorite: {{ $isFavorite ? 'true' : 'false' }},
+    loading: false,
+    destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
+    storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
+    toggleFavorite() {
+        this.loading = true;
+        fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
+            method: this.isFavorite ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed');
+            this.isFavorite = !this.isFavorite;
+            this.loading = false;
+        })
+        .catch(() => this.loading = false)
+    }
+}">
+                                    <button @click="toggleFavorite()" :disabled="loading"
+
+                                        :class="isFavorite 
+            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+            : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
+                                        class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm transition">
+                                        <svg x-show="!loading" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                        </svg>
+
+                                        <!-- Spinner saat loading -->
+                                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                        <span x-text="isFavorite ? 'Favorited' : 'Favorite'"></span>
+                                    </button>
+                                </div>
+                                    
+                            </div>
                         {{-- Share --}}
                         <button onclick="copyShareLink()"
                             class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
