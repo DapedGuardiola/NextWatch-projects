@@ -1,4 +1,5 @@
-<nav x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 bg-transparent">
+<nav x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 bg-transparent"
+    :class="open ? 'bg-[#141414]' : 'bg-transparent'">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 relative items-center">
 
@@ -100,7 +101,7 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-2"
-         class="sm:hidden bg-black/80 backdrop-blur-md border-t border-white/10">
+         class="sm:hidden bg-[#141414]">
 
         {{-- Nav Links --}}
         @auth
