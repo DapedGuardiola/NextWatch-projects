@@ -1,27 +1,30 @@
 <x-app-layout>
-    <x-slot name="title">{{ __('Dashboard') }}</x-slot>
+    <x-slot name="title">{{ __('Landing Page') }}</x-slot>
 
-    <div class="h-screen relative">
+    <div class="w-screen md:h-screen relative">
         <img src="https://image.tmdb.org/t/p/original/{{ $popularMovie['poster_path'] }}"
             class="w-full h-full object-cover object-center" alt="hero">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
-        <div class="absolute bottom-[15%] left-10">
-            <h1 class="text-white text-7xl font-bold">{{ $popularMovie['title'] }}</h1>
+
+        <div class="absolute bottom-[200px] left-6 sm:left-10 right-6 sm:right-10">
+            <h1 class="text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                {{ $popularMovie['title'] }}
+            </h1>
         </div>
     </div>
 
-    <div class="-mt-[200px] max-w-[95%] left-0 right-0 relative z-10">
-        <div class="mt-[135px]">
+    <div class="-mt-[180px] w-full left-0 right-0 relative z-10 mx-auto">
+        <div>
             <x-movie.search-bar />
         </div>
 
         @foreach($moviesByGenre as $genre => $movies)
-            <div class="text-white mx-4 md:mx-8 lg:mx-10">
+            <div class="mx-4 sm:mx-10 my-6 sm:my-10">
                 <h2>
-                    <p class="text-2xl md:text-3xl text-white font-bold">Top on {{ $genre }}</p>
+                    <p class="text-xl sm:text-3xl text-white font-bold">Top on {{ $genre }}</p>
                 </h2>
             </div>
-            <div class="flex gap-3 md:gap-4 py-4 px-4 md:px-8 lg:px-10 w-full md:w-[95%] lg:w-[90%] mx-auto overflow-x-auto scrollbar-hide">
+            <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
                 @foreach($movies as $index => $movie)
                     <x-movie.topmovies-modal
                         :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"
