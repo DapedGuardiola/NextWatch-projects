@@ -329,7 +329,7 @@
                 </h2>
                 <p style="font-size:14px;color:rgba(255,255,255,0.35);margin-bottom:32px;">
                     Pilih 4 genre favoritmu
-                    <span x-show="selectedGenres.length > 0" x-text="' · ' + selectedGenres.length + '/4'" style="color:rgba(255,255,255,0.6)"></span>
+                    <span x-show="selectedGenres.length > 0" x-text="' · ' + selectedGenres.length + '/4'" style="color:rgba(255,255,255,0.6)" x-cloak></span>
                 </p>
 
                 {{-- Genre pills --}}
@@ -371,7 +371,7 @@
                 </h2>
                 <p style="font-size:14px;color:rgba(255,255,255,0.35);margin-bottom:24px;">
                     Pilih 3 film favoritmu
-                    <span x-show="selectedMovies.length > 0" x-text="' · ' + selectedMovies.length + '/3'" style="color:rgba(255,255,255,0.6)"></span>
+                    <span x-show="selectedMovies.length > 0" x-text="' · ' + selectedMovies.length + '/3'" style="color:rgba(255,255,255,0.6)" x-cloak></span>
                 </p>
 
                 {{-- Search --}}
@@ -388,7 +388,7 @@
                         :class="selectedMovies.length >= 3 ? 'opacity-30 cursor-not-allowed' : ''">
 
                     {{-- Dropdown --}}
-                    <div class="search-dropdown" x-show="search.length > 1 && searchResults.length > 0" @click.outside="searchResults = []">
+                    <div class="search-dropdown" x-show="search.length > 1 && searchResults.length > 0" @click.outside="searchResults = []" x-cloak>
                         <template x-for="movie in searchResults" :key="movie.id">
                             <div class="search-item" @mousedown.prevent @click.stop="selectMovie(movie)">
                                 <img :src="movie.poster_url" :alt="movie.title">
@@ -414,7 +414,7 @@
                     </template>
 
                     {{-- Empty state --}}
-                    <div x-show="selectedMoviesData.length === 0"
+                    <div x-show="selectedMoviesData.length === 0" x-cloak
                         style="width:100%;display:flex;align-items:center;justify-content:center;height:96px;border:1px dashed rgba(255,255,255,0.08);border-radius:16px;gap:8px;">
                         <svg style="width:16px;height:16px;color:rgba(255,255,255,0.15)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>

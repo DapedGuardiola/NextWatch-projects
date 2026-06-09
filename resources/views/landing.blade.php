@@ -195,7 +195,7 @@
                     </div>
 
                     {{-- LOGIN --}}
-                    <div x-show="tab === 'login'">
+                    <div x-show="tab === 'login'" x-cloak>
 
                         <!-- Brand logo (Centered above login card) -->
                         <!-- <img src="{{ asset('images/brand/brand.png') }}" alt="NextWatch"
@@ -247,7 +247,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -263,7 +264,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -309,7 +311,7 @@
                     </div>
 
                     {{-- REGISTER --}}
-                    <div x-show="tab === 'register'">
+                    <div x-show="tab === 'register'" x-cloak>
 
                         <h2 class="text-xl font-bold text-white mb-1">
                             Buat akun baru
@@ -373,7 +375,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -389,7 +392,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -422,7 +426,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
@@ -438,7 +443,8 @@
                                         viewBox="0 0 24 24"
                                         stroke-width="1.8"
                                         stroke="currentColor"
-                                        class="w-5 h-5">
+                                        class="w-5 h-5"
+                                        x-cloak>
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"

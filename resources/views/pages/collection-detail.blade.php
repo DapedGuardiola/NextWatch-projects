@@ -28,7 +28,7 @@
             </div>
 
             {{-- Grid Film --}}
-            <div class="max-w-full mx-auto px-10 overflow-x-auto justify-items-center scrollbar-hide">
+            <div class="max-w-full mx-auto px-10 justify-items-center scrollbar-hide">
                 <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5
                     gap-3 sm:gap-6 md:gap-8
                     w-full max-w-[95%] sm:max-w-[90%] mx-auto justify-items-center">

@@ -55,7 +55,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
                         Genre
-                        <span x-show="selectedGenres.length >= 4" class="text-xs text-red-400 ml-2">
+                        <span x-show="selectedGenres.length >= 4" class="text-xs text-red-400 ml-2" x-cloak>
                         Max 4 genre
                     </span>
                     </label>
@@ -80,7 +80,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
                         Bahasa
-                        <span x-show="selectedLanguages.length >= 1" class="text-xs text-red-400 ml-2">
+                        <span x-show="selectedLanguages.length >= 1" class="text-xs text-red-400 ml-2" x-cloak>
                         Max 1 bahasa
                     </span>
                     </label>
@@ -128,7 +128,7 @@
             </div>
 
             {{-- Empty state --}}
-            <div x-show="searched && results.length === 0" class="px-6 pb-6 text-center text-gray-400">
+            <div x-show="searched && results.length === 0" class="px-6 pb-6 text-center text-gray-400" x-cloak>
                 Tidak ada film ditemukan 😔
             </div>
 
