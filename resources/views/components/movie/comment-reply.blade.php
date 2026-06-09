@@ -1,11 +1,12 @@
 @props(['reply', 'movie', 'depth' => 0])
 
-<div class="flex gap-3">
+<div class="flex gap-2 md:gap-3">
 
     {{-- AVATAR + GARIS VERTIKAL --}}
     <div class="flex flex-col items-center flex-shrink-0">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
-                    text-black font-bold flex items-center justify-center text-xs
+        <div class="w-7 h-7 md:w-10 md:h-10 rounded-full 
+                    bg-gradient-to-br from-cyan-400 to-cyan-600
+                    text-black font-bold flex items-center justify-center text-xs md:text-sm
                     shadow-[0_0_20px_rgba(34,211,238,0.35)]">
             {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
         </div>
@@ -14,21 +15,21 @@
         @endif
     </div>
 
-    {{-- KONTEN + CHILDREN --}}
+    {{-- KONTEN --}}
     <div class="flex-1 min-w-0 pb-2">
 
         {{-- HEADER --}}
-        <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="font-semibold text-sm text-white">
+        <div class="flex items-start justify-between gap-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+                <h3 class="font-semibold text-xs md:text-sm text-white truncate">
                     {{ $reply->user->name ?? 'Unknown User' }}
                 </h3>
                 @if($reply->parent && $reply->parent->user)
-                    <span class="text-cyan-400 text-xs font-medium">
-                        reply to &#64;{{ $reply->parent->user->name }}
+                    <span class="text-cyan-400 text-[10px] md:text-xs font-medium truncate">
+                        ↩ @ {{ $reply->parent->user->name }}
                     </span>
                 @endif
-                <span class="text-xs text-gray-500">
+                <span class="text-[10px] md:text-xs text-gray-500">
                     {{ $reply->created_at->diffForHumans() }}
                     @if($reply->updated_at->gt($reply->created_at->addSecond()))
                         <span class="italic">(edited)</span>
@@ -36,37 +37,33 @@
                 </span>
             </div>
 
-            {{-- DROPDOWN MENU (hanya pemilik) --}}
+            {{-- DROPDOWN MENU --}}
             @auth
             @if(auth()->id() === $reply->user_id)
-            <div class="relative" x-data="{ open: false }">
+            <div class="relative flex-shrink-0" x-data="{ open: false }">
                 <button @click="open = !open"
                         class="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                         <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
                     </svg>
                 </button>
-                <div x-show="open"
-                     @click.outside="open = false"
-                     x-transition
-                     class="absolute right-0 mt-1 w-32 rounded-xl bg-[#0d1424] border border-white/10
+                <div x-show="open" @click.outside="open = false" x-transition
+                     class="absolute right-0 mt-1 w-28 rounded-xl bg-[#0d1424] border border-white/10
                             shadow-xl z-50 overflow-hidden">
-                    <button
-                        @click="open = false; toggleEdit({{ $reply->id }})"
-                        class="w-full text-left px-4 py-2 text-sm text-gray-300
-                               hover:bg-white/10 hover:text-yellow-300 transition flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button @click="open = false; toggleEdit({{ $reply->id }})"
+                            class="w-full text-left px-3 py-2 text-xs md:text-sm text-gray-300
+                                   hover:bg-white/10 hover:text-yellow-300 transition flex items-center gap-2">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
                                      m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                         Edit
                     </button>
-                    <button
-                        @click="open = false; deleteComment({{ $reply->id }})"
-                        class="w-full text-left px-4 py-2 text-sm text-gray-300
-                               hover:bg-white/10 hover:text-red-400 transition flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button @click="open = false; deleteComment({{ $reply->id }})"
+                            class="w-full text-left px-3 py-2 text-xs md:text-sm text-gray-300
+                                   hover:bg-white/10 hover:text-red-400 transition flex items-center gap-2">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7
                                      m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -81,7 +78,7 @@
 
         {{-- TEKS KOMENTAR --}}
         <div id="comment-text-{{ $reply->id }}">
-            <p class="mt-1 text-gray-300 text-[15px] leading-relaxed break-words">
+            <p class="mt-0 text-gray-300 text-xs md:text-sm leading-relaxed break-words">
                 {{ $reply->content }}
             </p>
         </div>
@@ -91,51 +88,34 @@
         @if(auth()->id() === $reply->user_id)
         <div id="edit-form-{{ $reply->id }}" class="hidden mt-2">
             <form action="{{ route('movie.comment.update', $reply->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <textarea
-                    name="content"
-                    rows="2"
+                @csrf @method('PUT')
+                <textarea name="content" rows="2"
                     class="w-full resize-none bg-white/5 border border-white/10 rounded-lg
-                           focus:border-cyan-400 outline-none text-gray-200
-                           p-3 text-sm transition">{{ $reply->content }}</textarea>
+                           focus:border-cyan-400 outline-none text-gray-200 p-2 text-xs md:text-sm transition">{{ $reply->content }}</textarea>
                 <div class="flex gap-2 mt-2">
                     <button type="submit"
-                            class="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                                   text-black text-xs font-semibold transition">
-                        Save
-                    </button>
-                    <button type="button"
-                            onclick="toggleEdit({{ $reply->id }})"
-                            class="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20
-                                   text-gray-300 text-xs transition">
-                        Cancel
-                    </button>
+                            class="px-3 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black text-xs md:text-sm font-semibold transition">Save</button>
+                    <button type="button" onclick="toggleEdit({{ $reply->id }})"
+                            class="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 text-xs md:text-sm transition">Cancel</button>
                 </div>
             </form>
         </div>
-
-        {{-- FORM DELETE (hidden, submit via JS) --}}
         <form id="delete-form-{{ $reply->id }}"
               action="{{ route('movie.comment.destroy', $reply->id) }}"
               method="POST" class="hidden">
-            @csrf
-            @method('DELETE')
+            @csrf @method('DELETE')
         </form>
         @endif
         @endauth
 
         {{-- ACTIONS --}}
-        <div class="flex gap-6 mt-3 text-sm text-gray-500 items-center">
-        
-            {{-- LIKE BUTTON --}}
+        <div class="flex gap-4 mt-1 text-xs md:text-sm text-gray-500 items-center">
             @auth
-            <button
-                data-like-btn="{{ $reply->id }}"
-                data-liked="{{ $reply->isLikedBy(Auth::id()) ? 'true' : 'false' }}"
-                class="flex items-center gap-1.5 transition
-                    {{ $reply->isLikedBy(Auth::id()) ? 'text-cyan-400' : 'hover:text-cyan-300' }}">
-                <svg class="w-4 h-4" fill="{{ $reply->isLikedBy(Auth::id()) ? 'currentColor' : 'none' }}"
+            <button data-like-btn="{{ $reply->id }}"
+                    data-liked="{{ $reply->isLikedBy(Auth::id()) ? 'true' : 'false' }}"
+                    class="flex items-center gap-1 transition
+                        {{ $reply->isLikedBy(Auth::id()) ? 'text-cyan-400' : 'hover:text-cyan-300' }}">
+                <svg class="w-3.5 h-3.5" fill="{{ $reply->isLikedBy(Auth::id()) ? 'currentColor' : 'none' }}"
                     stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
@@ -143,37 +123,29 @@
                 <span data-like-count="{{ $reply->id }}">{{ $reply->likes->count() }}</span>
             </button>
             @else
-            <span class="flex items-center gap-1.5 cursor-default">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <span class="flex items-center gap-1 cursor-default">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.924L10 4.382A1 1 0 0111 4h.5a1.5 1.5 0 011.5 1.5V10z" />
                 </svg>
                 {{ $reply->likes->count() }}
             </span>
             @endauth
-        
-            {{-- REPLY BUTTON --}}
+
             @auth
-            <button
-                data-reply-toggle="{{ $reply->id }}"
-                class="hover:text-cyan-300 transition">
-                Reply
-            </button>
+            <button data-reply-toggle="{{ $reply->id }}" class="hover:text-cyan-300 transition">Reply</button>
             @endauth
-        
-            {{-- REPORT BUTTON --}}
+
             @auth
             @if(Auth::id() !== $reply->user_id)
-            <button
-                data-report-btn="{{ $reply->id }}"
-                data-reported="{{ $reply->isReportedBy(Auth::id()) ? 'true' : 'false' }}"
-                class="flex items-center gap-1.5 transition
-                    {{ $reply->isReportedBy(Auth::id()) ? 'text-red-400 cursor-default' : 'hover:text-red-400' }}">
+            <button data-report-btn="{{ $reply->id }}"
+                    data-reported="{{ $reply->isReportedBy(Auth::id()) ? 'true' : 'false' }}"
+                    class="flex items-center gap-1 transition
+                        {{ $reply->isReportedBy(Auth::id()) ? 'text-red-400 cursor-default' : 'hover:text-red-400' }}">
                 <span>{{ $reply->isReportedBy(Auth::id()) ? 'Reported' : 'Report' }}</span>
             </button>
             @endif
             @endauth
-        
         </div>
 
         {{-- FORM REPLY (hidden) --}}
@@ -183,33 +155,17 @@
                 @csrf
                 <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
                 <input type="hidden" name="reply_id" value="{{ $reply->id }}">
-                <textarea
-                    name="content"
-                    rows="1"
+                <textarea name="content" rows="1"
                     placeholder="Reply to {{ $reply->user->name ?? '' }}…"
                     class="flex-1 resize-none bg-transparent border-b border-white/10
                            focus:border-cyan-400 outline-none text-gray-200
-                           placeholder-gray-500 pb-2 text-sm transition"></textarea>
+                           placeholder-gray-500 pb-2 text-xs md:text-sm transition"></textarea>
                 <button type="submit"
-                        class="self-end px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                               text-black text-sm font-semibold transition">
-                    Reply
-                </button>
+                        class="self-end px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400
+                               text-black text-xs md:text-sm font-semibold transition">Reply</button>
             </form>
         </div>
         @endauth
-
-        {{-- CHILDREN --}}
-        @if($reply->replies->isNotEmpty())
-        <div class="mt-3 space-y-3">
-            @foreach($reply->replies as $child)
-                <x-movie.comment-reply
-                    :reply="$child"
-                    :movie="$movie"
-                    :depth="$depth + 1" />
-            @endforeach
-        </div>
-        @endif
 
     </div>
 </div>

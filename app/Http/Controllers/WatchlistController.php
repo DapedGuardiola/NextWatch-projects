@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Watchlist;
 use Illuminate\Http\Request;
 use App\Services\LogActivityService;
+use App\Models\userMovieInteracted;
+use Illuminate\Support\Facades\Cache;
 
 class WatchlistController extends Controller
 {
@@ -17,7 +19,11 @@ class WatchlistController extends Controller
             'movie_id' => $movie,
         ]);
         $logActivityService->watchlist(['user_id'=>$user_id , 'movie_id'=>$movie]);
-        return back();
+        $interacted = userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie]);
+        if($interacted){
+            Cache::forget("user_movie_interacted_{$user_id}");
+        }
+        return response()->json(['success' => true]); 
     }
 
     public function destroy($movie)
@@ -26,7 +32,7 @@ class WatchlistController extends Controller
             ->where('movie_id', $movie)
             ->delete();
 
-        return back();
+        return response()->json(['success' => true]); 
     }
 
     // FUNGSI BARU UNTUK MENAMPILKAN HALAMAN WATCHLIST

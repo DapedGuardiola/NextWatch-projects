@@ -19,9 +19,11 @@ class SearchController extends Controller
         $results = $this->searchService->search($query);
 
         $selected_movie_id = $results['movies']->first()?->tmdb_movie_id;
-        $logActivityService->search(['user_id'=>$user_id,'movie_id'=>$selected_movie_id]);
+        if ($selected_movie_id) {
+            $logActivityService->search(['user_id' => $user_id, 'movie_id' => $selected_movie_id]);
+        }
         return view('pages.search-results', array_merge($results, compact('query')));
-    }   
+    }
     public function live(Request $request)
     {
         $query   = $request->input('q', '');

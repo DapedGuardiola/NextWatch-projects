@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\CommentLike;
 use App\Models\CommentReport;
+use App\Models\LogActivityModel;
+use App\Models\userMovieInteracted;
 use App\Services\CommentService;
+use App\Services\LogActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class CommentController extends Controller
 {
@@ -21,9 +25,14 @@ class CommentController extends Controller
             'reply_id'       => 'nullable|exists:comments,id',
             'tagged_user_id' => 'nullable|exists:users,id',
         ]);
-
         $this->commentService->store($validated);
-
+        $logActivityService = new LogActivityService();
+        $user_id = Auth::id();
+        $logActivityService->comment(['user_id'=>$user_id,'movie_id'=>$validated['movie_id']]);
+        $interacted = userMovieInteracted::firstOrCreate(['user_id'=>$user_id,'tmdb_movie_id'=>$validated['movie_id']]);
+        if($interacted){
+            Cache::forget("user_movie_interacted_{$user_id}");
+        }
         return back();
     }
 
@@ -35,9 +44,7 @@ class CommentController extends Controller
         $request->validate([
             'content' => 'required|string|max:1000',
         ]);
-
         $this->commentService->update($comment, $request->content);
-
         return back();
     }
 

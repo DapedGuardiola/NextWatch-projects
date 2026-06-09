@@ -15,10 +15,10 @@
         @foreach($moviesByGenre as $genre => $movies)
             <div class="text-white mx-4 md:mx-8 lg:mx-10">
                 <h2>
-                    <p class="text-2xl md:text-3xl text-white font-bold">{{ $genre }}</p>
+                    <p class="text-xl sm:text-3xl text-white font-bold">{{ $genre }}</p>
                 </h2>
             </div>
-            <div class="flex gap-3 md:gap-4 py-4 w-[90%] mx-auto overflow-x-auto scrollbar-hide">
+            <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
                 @foreach($movies as $index => $movie)
                     <x-movie.topmovies-modal
                         :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"

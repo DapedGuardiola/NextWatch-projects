@@ -285,7 +285,7 @@
                         scales: {
                             x: { 
                                 beginAtZero: true,
-                                max: 100, // Memaksa grafik memiliki batas maksimal 100%
+                                max: {{ !empty($genreWeights) ? min(100, round(max($genreWeights) * 1.05)) : 100 }},                               
                                 grid: { color: 'rgba(255,255,255,0.05)' },
                                 ticks: { color: '#9ca3af', callback: function(value) { return value + "%" } }
                             },
