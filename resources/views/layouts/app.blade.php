@@ -46,23 +46,20 @@
     <!-- FOOTER START -->
     <footer class="bg-[#1a1a1a] mt-6 border-t border-gray-800 text-gray-400 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center justify-between gap-4">
                 
-                <!-- Sisi Kiri: Nama Aplikasi & Copyright -->
-                <div class="text-center md:text-left">
-                    <p class="text-white font-semibold text-lg mb-1">{{ config('app.name', 'FilmApp') }}</p>
-                    <p class="text-sm">&copy; {{ date('Y') }} All rights reserved.</p>
+                <!-- Kiri: Nama Aplikasi & Copyright -->
+                <div class="text-left">
+                    <p class="text-white font-semibold text-base md:text-lg mb-1">{{ config('app.name', 'FilmApp') }}</p>
+                    <p class="text-xs text-gray-400">&copy; {{ date('Y') }} All rights reserved.</p>
                 </div>
 
-                <!-- Sisi Kapan/Tengah: Atribusi TMDB -->
-                <div class="flex flex-col sm:flex-row items-center gap-4 max-w-md bg-[#222] p-3 rounded-lg border border-gray-800/60">
-                    <!-- Logo TMDB Resmi (Primary Short Version) -->
+                <!-- Kanan: Atribusi TMDB -->
+                <div class="flex items-center gap-2 bg-[#222] p-2.5 rounded-lg border border-gray-800/60 max-w-[180px] md:max-w-lg">
                     <img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" 
-                         alt="TMDB Logo" 
-                         class="h-8 object-contain shrink-0" />
-                    
-                    <!-- Teks Disclaimer Wajib -->
-                    <p class="text-xs text-justify leading-relaxed text-gray-400">
+                        alt="TMDB Logo" 
+                        class="h-7 object-contain shrink-0" />
+                    <p class="text-[9px] md:text-xs leading-relaxed text-gray-400">
                         This product uses the TMDB API but is not endorsed or certified by TMDB.
                     </p>
                 </div>
