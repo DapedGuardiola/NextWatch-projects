@@ -37,6 +37,18 @@ class Comment extends Model
             ->oldest();
     }
 
+    public function allRepliesFlat(): \Illuminate\Support\Collection
+    {
+        $flat = collect();
+
+        foreach ($this->replies as $reply) {
+            $flat->push($reply);
+            $flat = $flat->merge($reply->allRepliesFlat());
+        }
+
+        return $flat;
+    }
+
     public function parent()
     {
         return $this->belongsTo(Comment::class, 'reply_id')

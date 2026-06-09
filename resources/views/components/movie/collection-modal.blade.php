@@ -7,7 +7,7 @@
 
 <a href="{{ route('collection.detail',$tmdb_collection_id) }}" loading="lazy" class="shrink-0 cursor-pointer relative block group" data-card>
 
-    <div class="relative rounded-2xl w-[500px] shrink-0 aspect-[16/9] overflow-hidden border border-white/10
+    <div class="relative rounded-2xl w-[240px] sm:w-[340px] lg:w-[500px] shrink-0 aspect-[16/9] overflow-hidden border border-white/10
         transition duration-500 group-hover:opacity-0">
 
         @isset($poster)
@@ -22,7 +22,7 @@
 
         @isset($name)
             <div class="absolute bottom-0 p-4">
-                <h3 class="text-white font-semibold text-lg">{{ $name }}</h3>
+                <h3 class="text-white font-semibold text-sm sm:text-base lg:text-lg">{{ $name }}</h3>
             </div>
         @endisset
 
@@ -30,7 +30,8 @@
 
     {{-- HOVER PANEL --}}
     <div class="absolute top-0 left-0 z-20
-                w-[500px] h-[281px]
+                w-[240px] sm:w-[340px] lg:w-[500px]
+                aspect-[16/9]
                 rounded-2xl overflow-hidden
                 border border-white/10
                 opacity-0 invisible pointer-events-none
@@ -38,32 +39,29 @@
                 group-hover:opacity-100 group-hover:visible
                 group-hover:pointer-events-auto" data-panel>
 
-        {{-- Poster full --}}
         @isset($poster)
         <img src="{{ $poster }}" class="w-full h-full object-cover object-center" alt="{{ $name }}">
         @endisset
 
-        {{-- Overlay gradient --}}
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
-        {{-- Teks --}}
-        <div class="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-1
+        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 flex flex-col gap-1
                 translate-y-[calc(0.75rem+3*1.2rem)] group-hover:translate-y-0
                 transition-all duration-500 ease-out">
 
         @isset($name)
-        <h3 class="text-white font-semibold text-lg leading-snug">{{ $name }}</h3>
+        <h3 class="text-white font-semibold text-sm sm:text-base lg:text-lg leading-snug">{{ $name }}</h3>
         @endisset
 
         @isset($overview)
-        <p class="text-xs text-white/70 leading-relaxed line-clamp-3
+        <p class="text-xs text-white/70 leading-relaxed line-clamp-2 sm:line-clamp-3
                 opacity-0 group-hover:opacity-100
                 transition-opacity duration-300 delay-200">
             {{ $overview }}
         </p>
         @endisset
 
-    </div>
+        </div>
 
     </div>
 
@@ -75,7 +73,11 @@ document.querySelectorAll('[data-card]').forEach(card => {
         const panel = card.querySelector('[data-panel]');
         if (!panel) return;
         const rect = card.getBoundingClientRect();
-        const panelWidth = 500;
+
+        let panelWidth;
+        if (window.innerWidth >= 1024) panelWidth = 500;
+        else if (window.innerWidth >= 640) panelWidth = 340;
+        else panelWidth = 240;
 
         if (rect.right + panelWidth > window.innerWidth) {
             panel.style.left = 'auto';

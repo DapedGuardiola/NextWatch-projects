@@ -11,7 +11,8 @@
 
         @media (max-width: 768px) {
             #youtube-player iframe {
-                height: 250px !important;
+                height: 220px !important;
+                border-radius: 12px;
             }
         }
     </style>
@@ -21,8 +22,7 @@
         <section class="relative overflow-hidden" id="hero-section">
 
             <!-- BACKGROUND -->
-            <div
-                class="absolute inset-0 h-[1100px] bg-cover bg-center blur-2xl scale-110"
+            <div class="absolute inset-0 h-[1100px] bg-cover bg-center blur-2xl scale-110"
                 style="background-image:url('https://image.tmdb.org/t/p/original/{{ $movie->backdrop_path ?? $movie->poster_path }}')">
             </div>
 
@@ -30,112 +30,221 @@
             <div class="absolute inset-0 bg-gradient-to-br from-[#020817]/95 via-[#020817]/75 to-cyan-950/30"></div>
 
             <!-- SMOOTH GRADIENT -->
-            <div class="absolute bottom-0 left-0 w-full h-[420px]
-            bg-gradient-to-b from-transparent via-[#020817]/70 to-[#020817]">
-            </div>
+            <div class="absolute bottom-0 left-0 w-full h-[420px] bg-gradient-to-b from-transparent via-[#020817]/70 to-[#020817]"></div>
 
             <!-- GLOW -->
             <div class="absolute -top-32 -right-32 w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-3xl"></div>
 
-            <div class="relative z-10 max-w-[90%] mx-auto px-6 py-14">
+            <div class="relative z-10 max-w-[90%] mx-auto px-4 md:px-6 py-8 md:py-14">
 
-                <!-- DEFAULT LAYOUT: poster + content side by side -->
-                <div id="default-layout" class="grid grid-cols-2 lg:grid-cols-[380px_1fr] gap-10 items-center transition-all duration-700">
+                {{-- MOBILE LAYOUT --}}
+                <div class="flex flex-col gap-6 pt-8 md:hidden">
+
+                    {{-- 1. YouTube Player --}}
+                    @if($movie->trailer_key)
+                    <div id="youtube-player-mobile" class="w-full rounded-2xl overflow-hidden"></div>
+                    @else
+                    <div class="flex items-center justify-center h-[220px] rounded-2xl border border-white/10 bg-white/5">
+                        <p class="text-gray-400 text-sm">Trailer tidak tersedia</p>
+                    </div>
+                    @endif
+
+                    {{-- 2. Poster + Meta --}}
+                    <div class="flex gap-4 items-start">
+                        <div class="w-28 flex-shrink-0">
+                            <img src="https://image.tmdb.org/t/p/w500/{{ $movie->poster_path }}"
+                                alt="{{ $movie->title }}"
+                                class="w-full rounded-2xl shadow-xl border border-white/10 object-cover aspect-[4/6]">
+                        </div>
+                        <div class="flex-1 flex flex-col gap-2 pt-1">
+                            <h1 class="text-2xl font-black leading-tight tracking-tight">{{ $movie->title }}</h1>
+                            {{-- Meta badges --}}
+                            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                                <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-yellow-500/10 border border-yellow-400/20 text-yellow-300">
+                                    <span class="font-black">IMDb</span>
+                                    <span class="text-white font-semibold">{{ $movie->rating }}</span>
+                                </div>
+                                <div class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-200">
+                                    {{ \Carbon\Carbon::parse($movie->release_date)->format('Y') }}
+                                </div>
+                                <div class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-200">
+                                    {{ $movie->runtime }} min
+                                </div>
+                                <a href="{{ route('dashboard.discover') }}?language={{ urlencode($movie->original_language) }}"
+                                    class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 uppercase text-gray-200
+                                    hover:bg-cyan-500/20 hover:border-cyan-400/40 transition duration-300">
+                                    {{ $movie->original_language }}
+                                </a>
+                            </div>
+                            {{-- Genres --}}
+                            <div class="flex flex-wrap gap-1.5">
+                                @foreach($genreNames as $genre)
+                                <a href="{{ route('dashboard.discover') }}?genre={{ urlencode(is_object($genre) ? $genre->name : $genre) }}"
+                                    class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/20
+                                    text-cyan-200 text-[11px] hover:bg-cyan-500/30 transition duration-300 inline-block">
+                                    {{ is_object($genre) ? $genre->name : $genre }}
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 3. Director + Cast --}}
+                    <div class="space-y-3">
+                        <div class="flex gap-3 text-sm">
+                            <span class="text-gray-500 min-w-[80px]">Director</span>
+                            @foreach($movie->directors as $director)
+                            <span class="text-white font-medium">{{ $director->name ?? 'Unknown' }}</span>
+                            @endforeach
+                        </div>
+                        <div>
+                            <span class="text-gray-500 text-sm">Starring</span>
+                            <div class="grid grid-cols-3 gap-3 mt-3">
+                                @foreach($movie->actors as $actor)
+                                <x-movie.small.small-actor-card
+                                    :actor_id="$actor->tmdb_actor_id"
+                                    :image_url="$actor->image_url"
+                                    :name="$actor->name" />
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 4. Tagline + Overview --}}
+                    <div>
+                        @isset($movie->tagline)
+                        <p class="text-cyan-300 text-base italic tracking-wide">{{ $movie->tagline }}</p>
+                        @endisset
+                        <p class="text-gray-300 text-sm leading-relaxed mt-2">{{ $movie->overview }}</p>
+                    </div>
+
+                    {{-- 5. Action Buttons (horizontal) --}}
+                    <div class="flex items-center gap-3">
+
+                        {{-- Watchlist --}}
+                        @if($isInWatchlist)
+                        <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
+                                bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                <span>Watchlist</span>
+                            </button>
+                        </form>
+                        @else
+                        <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
+                                bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
+                                text-black transition shadow-lg hover:shadow-cyan-500/50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Watchlist</span>
+                            </button>
+                        </form>
+                        @endif
+
+                        {{-- Favorite --}}
+                        @if($isFavorite)
+                        <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
+                                bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                                <span>Favorited</span>
+                            </button>
+                        </form>
+                        @else
+                        <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
+                                bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
+                                text-white transition hover:shadow-lg hover:shadow-purple-500/20">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                                <span>Favorite</span>
+                            </button>
+                        </form>
+                        @endif
+
+                        {{-- Share --}}
+                        <button onclick="copyShareLink()"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
+                            bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40
+                            text-gray-100 transition hover:text-cyan-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                                <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"/><line x1="8.7" y1="13.3" x2="15.3" y2="17.7"/>
+                            </svg>
+                            <span>Share</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                {{-- DESKTOP LAYOUT --}}
+                <div class="hidden md:grid grid-cols-2 lg:grid-cols-[380px_1fr] gap-10 items-center transition-all duration-700" id="default-layout">
 
                     <!-- POSTER -->
                     <div id="poster-col" class="group relative w-[325px] transition-all duration-700">
                         <div class="absolute inset-0 bg-cyan-400/20 blur-3xl rounded-[32px] scale-90"></div>
-                        <img
-                            src="https://image.tmdb.org/t/p/w500/{{ $movie->poster_path }}"
+                        <img src="https://image.tmdb.org/t/p/w500/{{ $movie->poster_path }}"
                             alt="{{ $movie->title }}"
-                            class="relative z-10 w-full rounded-[32px]
-                    shadow-[0_20px_80px_rgba(0,0,0,0.8)]
-                    border border-white/10 object-cover
-                    transition duration-500 group-hover:scale-[1.03]
-                    aspect-[4/6]">
+                            class="relative z-10 w-full rounded-[32px] shadow-[0_20px_80px_rgba(0,0,0,0.8)]
+                            border border-white/10 object-cover transition duration-500 group-hover:scale-[1.03] aspect-[4/6]">
                     </div>
 
                     <!-- CONTENT -->
                     <div id="trailer-layout" class="opacity-100 scale-100 transform transition-all duration-700 ease-out flex-col gap-10" wire:ignore>
-
-                        <!-- TRAILER -->
                         @if($movie->trailer_key)
                         <div id="youtube-player" class="w-full rounded-2xl overflow-hidden"></div>
                         @else
-                        {{-- Tidak ada trailer --}}
-                        <div class="flex items-center justify-center h-[300px] rounded-2xl
-                    border border-white/10 bg-white/5">
+                        <div class="flex items-center justify-center h-[300px] rounded-2xl border border-white/10 bg-white/5">
                             <p class="text-gray-400">Trailer tidak tersedia</p>
                         </div>
                         @endif
                     </div>
                 </div>
-                <div id="content-col" class="flex flex-col justify-between transition-all duration-700">
+
+                <div id="content-col" class="hidden md:flex flex-col justify-between transition-all duration-700">
                     <div class="mt-10">
-                        <!-- TITLE -->
-                        <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight">
-                            {{ $movie->title }}
-                        </h1>
+                        <h1 class="text-5xl lg:text-7xl font-black leading-none tracking-tight">{{ $movie->title }}</h1>
                     </div>
                     <div class="grid grid-cols-[max-content_1fr_max-content] gap-4">
                         <div>
-                            <!-- TOP META -->
                             <div class="flex flex-wrap items-center gap-3 mt-8 text-sm">
-
-                                <!-- IMDb -->
-                                <div class="flex items-center gap-2 px-4 py-2 rounded-xl
-                                    bg-yellow-500/10 border border-yellow-400/20 text-yellow-300">
-
-                                    <span class="font-black tracking-wide">
-                                        IMDb
-                                    </span>
-
-                                    <span class="text-white font-semibold">
-                                        {{ $movie->rating }}
-                                    </span>
-
+                                <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500/10 border border-yellow-400/20 text-yellow-300">
+                                    <span class="font-black tracking-wide">IMDb</span>
+                                    <span class="text-white font-semibold">{{ $movie->rating }}</span>
                                 </div>
-
-                                <!-- Year -->
                                 <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200">
                                     {{ \Carbon\Carbon::parse($movie->release_date)->format('Y') }}
                                 </div>
-
-                                <!-- Runtime -->
                                 <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200">
                                     {{ $movie->runtime }} min
                                 </div>
-
-                                <!-- Language -->
                                 <a href="{{ route('dashboard.discover') }}?language={{ urlencode($movie->original_language) }}"
                                     class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 uppercase text-gray-200
                                     hover:bg-cyan-500/20 hover:border-cyan-400/40 hover:text-cyan-100 transition duration-300 inline-block">
                                     {{ $movie->original_language }}
                                 </a>
-
                             </div>
-
-                            <!-- CAST INFO -->
                             <div class="mt-8 space-y-4 max-w-3xl">
-
-                                <!-- Director -->
                                 <div class="flex gap-3">
-                                    <span class="text-gray-500 min-w-[90px]">
-                                        Director
-                                    </span>
+                                    <span class="text-gray-500 min-w-[90px]">Director</span>
                                     @foreach($movie->directors as $director)
-                                    <span class="text-white font-medium">
-                                        {{ $director->name ?? 'Unknown Director' }}
-                                    </span>
+                                    <span class="text-white font-medium">{{ $director->name ?? 'Unknown Director' }}</span>
                                     @endforeach
                                 </div>
-
-                                <!-- Starring -->
                                 <div class="flex gap-3">
-
-                                    <span class="text-gray-500 min-w-[90px]">
-                                        Starring
-
+                                    <span class="text-gray-500 min-w-[90px]">Starring
                                         <div class="grid grid-cols-3 mt-4 ml-4 gap-10 overflow-hidden">
                                             @foreach($movie->actors as $actor)
                                             <x-movie.small.small-actor-card
@@ -144,233 +253,108 @@
                                                 :name="$actor->name" />
                                             @endforeach
                                         </div>
+                                    </span>
                                 </div>
-
                             </div>
-
                         </div>
                         <div>
-                            <!-- OVERVIEW -->
                             <div class="mt-10 max-w-3xl mx-auto">
-                                <!-- TAGLINE -->
-                                <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">
-                                    {{ $movie->tagline }}
-                                </p>
-                                <p class="text-gray-300 text-lg leading-relaxed mt-2">
-                                    {{ $movie->overview }}
-                                </p>
-                                <!-- GENRES -->
+                                <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">{{ $movie->tagline }}</p>
+                                <p class="text-gray-300 text-lg leading-relaxed mt-2">{{ $movie->overview }}</p>
                                 <div class="mt-2">
-
                                     <div class="flex flex-wrap gap-4">
-
                                         @foreach($genreNames as $genre)
-
                                         <a href="{{ route('dashboard.discover') }}?genre={{ urlencode(is_object($genre) ? $genre->name : $genre) }}"
-                                            class="px-4 py-2 rounded-full 
-                                            bg-cyan-500/10 border border-cyan-400/20
-                                            backdrop-blur-xl
-                                            hover:bg-cyan-500/30
-                                            hover:border-cyan-400/40
-                                            hover:shadow-lg hover:shadow-cyan-500/20
-                                            text-cyan-200 hover:text-cyan-100 text-sm
-                                            transition duration-300 cursor-pointer
-                                            inline-block">
-
+                                            class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/20 backdrop-blur-xl
+                                            hover:bg-cyan-500/30 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-cyan-500/20
+                                            text-cyan-200 hover:text-cyan-100 text-sm transition duration-300 cursor-pointer inline-block">
                                             {{ is_object($genre) ? $genre->name : $genre }}
-
                                         </a>
-
                                         @endforeach
-
                                     </div>
-
                                 </div>
                             </div>
-
-
                         </div>
                         <div class="flex flex-col justify-between py-10">
-
-                            <!-- WATCHLIST -->
-                            <div>@if($isInWatchlist)
-
+                            {{-- Watchlist --}}
+                            <div>
+                                @if($isInWatchlist)
                                 <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-red-500/20 hover:bg-red-500/30
-                                    border border-red-400/30
-                                    text-red-300 transition-all duration-300
-                                    flex items-center justify-center gap-2">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2">
-
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M6 18L18 6M6 6l12 12" />
-
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
+                                        bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition-all duration-300
+                                        flex items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-
                                     </button>
-
                                 </form>
-
                                 @else
-
                                 <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
-
                                     @csrf
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
-                                    text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
-                                    overflow-hidden flex items-center justify-center gap-2">
-
+                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
+                                        bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
+                                        text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
+                                        overflow-hidden flex items-center justify-center gap-2">
                                         <span class="relative z-10 flex items-center gap-2">
-
-                                            <svg class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M12 4v16m8-8H4" />
-
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                             </svg>
                                         </span>
-
                                     </button>
-
                                 </form>
-
                                 @endif
                             </div>
-
+                            {{-- Favorite --}}
                             <div>
-                                <!-- ACTION BUTTONS -->
-
-                                <!-- FAVORITE -->
                                 @if($isFavorite)
-
                                 <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-red-500/20 hover:bg-red-500/30
-                                    border border-red-400/30
-                                    text-red-300 transition-all duration-300
-                                    flex items-center justify-center gap-2">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-5 h-5"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24">
-
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
+                                        bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 transition-all duration-300
+                                        flex items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-
                                         </svg>
-
                                     </button>
-
                                 </form>
-
                                 @else
-
                                 <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
-
                                     @csrf
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
-                                    text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
-                                    flex items-center justify-center gap-2">
-
+                                    <button type="submit" class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
+                                        bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
+                                        text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
+                                        flex items-center justify-center gap-2">
                                         <span class="relative z-10 flex items-center gap-2">
-
-                                            <svg class="w-5 h-5"
-                                                fill="currentColor"
-                                                viewBox="0 0 24 24">
-
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-
                                             </svg>
-
                                         </span>
-
                                     </button>
-
                                 </form>
-
                                 @endif
-
                             </div>
-
+                            {{-- Share --}}
                             <div>
-                                <!-- SHARE -->
                                 <button onclick="copyShareLink()"
                                     class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                bg-white/5 hover:bg-white/10
-                                border border-white/10 hover:border-cyan-400/40
-                                text-gray-100 transition-all duration-300
-                                hover:text-cyan-200 hover:shadow-lg hover:shadow-cyan-500/20
-                                flex items-center justify-center gap-2">
-
+                                    bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40
+                                    text-gray-100 transition-all duration-300 hover:text-cyan-200
+                                    hover:shadow-lg hover:shadow-cyan-500/20 flex items-center justify-center gap-2">
                                     <span class="relative z-10 flex items-center gap-2">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-5 h-5"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2.4"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round">
-
-                                            <circle cx="18" cy="5" r="3"></circle>
-                                            <circle cx="6" cy="12" r="3"></circle>
-                                            <circle cx="18" cy="19" r="3"></circle>
-
-                                            <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"></line>
-                                            <line x1="8.7" y1="13.3" x2="15.3" y2="17.7"></line>
-
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                                            <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"/><line x1="8.7" y1="13.3" x2="15.3" y2="17.7"/>
                                         </svg>
                                     </span>
-
                                 </button>
-
                             </div>
                         </div>
-
-
-
-
-
                     </div>
-
                 </div>
 
             </div>
-
         </section>
 
         <!-- CONTENT SECTION -->
@@ -393,18 +377,18 @@
                             <div class="flex justify-between items-start mb-5">
 
                                 <div>
-                                    <h2 class="text-3xl font-bold tracking-tight">Discussion</h2>
-                                    <p class="text-gray-400 text-sm mt-1">Join the conversation with other viewers</p>
+                                    <h2 class="text-xl md:text-3xl font-bold tracking-tight">Discussion</h2>
+                                    <p class="text-gray-400 text-[10px] md:text-sm mt-1">Join the conversation with other viewers</p>
                                 </div>
 
-                                <div class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300">
+                                <div class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs md:text-sm text-gray-300 justify-items-center">
                                     {{ isset($comments) ? count($comments) : 0 }} comments
                                 </div>
 
                             </div>
 
                             <!-- COMMENTS LIST -->
-                            <div class="space-y-8">
+                            <div class="space-y-3">
 
                                 @if(isset($comments) && count($comments))
 
@@ -417,14 +401,11 @@
 
                                         {{-- AVATAR + GARIS VERTIKAL --}}
                                         <div class="flex flex-col items-center flex-shrink-0">
-                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
-                                                            text-black font-bold flex items-center justify-center
+                                            <div class="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600
+                                                            text-black font-bold flex items-center justify-center text-xs md:text-sm
                                                             shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                                                 {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
                                             </div>
-                                            @if($comment->replies->isNotEmpty())
-                                            <div class="w-px flex-1 mt-2 bg-white/10"></div>
-                                            @endif
                                         </div>
 
                                         <div class="flex-1 min-w-0">
@@ -432,10 +413,10 @@
                                             {{-- HEADER --}}
                                             <div class="flex items-center justify-between gap-2">
                                                 <div class="flex items-center gap-3 flex-wrap">
-                                                    <h3 class="font-semibold text-sm text-white">
+                                                    <h3 class="font-semibold text-xs md:text-sm text-white">
                                                         {{ $comment->user->name ?? 'Unknown User' }}
                                                     </h3>
-                                                    <span class="text-sm text-gray-500">
+                                                    <span class="text-xs md:text-sm text-gray-500">
                                                         {{ $comment->created_at->diffForHumans() }}
                                                         @if($comment->updated_at->gt($comment->created_at->addSecond()))
                                                         <span class="italic">(edited)</span>
@@ -462,7 +443,7 @@
                                                                     shadow-xl z-50 overflow-hidden">
                                                         <button
                                                             @click="open = false; toggleEdit({{ $comment->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-300
+                                                            class="w-full text-left px-4 py-2 text-xs md:text-sm text-gray-300
                                                                     hover:bg-white/10 hover:text-yellow-300 transition flex items-center gap-2">
                                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -473,7 +454,7 @@
                                                         </button>
                                                         <button
                                                             @click="open = false; deleteComment({{ $comment->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-300
+                                                            class="w-full text-left px-4 py-2 text-xs md:text-sm text-gray-300
                                                                     hover:bg-white/10 hover:text-red-400 transition flex items-center gap-2">
                                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -490,7 +471,7 @@
 
                                             {{-- TEKS KOMENTAR --}}
                                             <div id="comment-text-{{ $comment->id }}">
-                                                <p class="mt-2 text-gray-200 text-[16px] leading-relaxed break-words">
+                                                <p class="mt-0 text-gray-200 text-xs md:text-sm leading-relaxed break-words">
                                                     {{ $comment->content }}
                                                 </p>
                                             </div>
@@ -507,17 +488,17 @@
                                                         rows="2"
                                                         class="w-full resize-none bg-white/5 border border-white/10 rounded-lg
                                                                 focus:border-cyan-400 outline-none text-gray-200
-                                                                p-3 text-base transition">{{ $comment->content }}</textarea>
+                                                                p-3 text-xs md:text-base transition">{{ $comment->content }}</textarea>
                                                     <div class="flex gap-2 mt-2">
                                                         <button type="submit"
                                                             class="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                                                                        text-black text-sm font-semibold transition">
+                                                                        text-black text-xs md:text-sm font-semibold transition">
                                                             Save
                                                         </button>
                                                         <button type="button"
                                                             onclick="toggleEdit({{ $comment->id }})"
                                                             class="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20
-                                                                        text-gray-300 text-sm transition">
+                                                                        text-gray-300 text-xs md:text-sm transition">
                                                             Cancel
                                                         </button>
                                                     </div>
@@ -535,7 +516,7 @@
                                             @endauth
 
                                             {{-- ACTIONS --}}
-                                            <div class="flex gap-6 mt-3 text-sm text-gray-500 items-center">
+                                            <div class="flex gap-6 mt-1 text-xs md:text-sm text-gray-500 items-center">
                                             
                                                 {{-- LIKE BUTTON --}}
                                                 @auth
@@ -601,25 +582,42 @@
                                                 placeholder="Reply to {{ $comment->user->name ?? '' }}…"
                                                 class="flex-1 resize-none bg-transparent border-b border-white/10
                                                         focus:border-cyan-400 outline-none text-gray-200
-                                                        placeholder-gray-500 pb-2 text-sm transition"></textarea>
+                                                        placeholder-gray-500 pb-2 text-xs md:text-sm transition"></textarea>
                                             <button type="submit"
                                                 class="self-end px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400
-                                                            text-black text-sm font-semibold transition">
+                                                            text-black text-xs md:text-sm font-semibold transition">
                                                 Reply
                                             </button>
                                         </form>
                                     </div>
                                     @endauth
 
-                                    {{-- NESTED REPLY TREE --}}
+                                    {{-- REPLY --}}
                                     @if($comment->replies->isNotEmpty())
-                                    <div class="ml-14 mt-4 space-y-3">
-                                        @foreach($comment->replies as $reply)
-                                        <x-movie.comment-reply
-                                            :reply="$reply"
-                                            :movie="$movie"
-                                            :depth="0" />
-                                        @endforeach
+                                    <div class="mt-3 ml-10 md:ml-14">
+                                        {{-- TOGGLE BUTTON --}}
+                                        <button
+                                            onclick="toggleReplies({{ $comment->id }})"
+                                            id="toggle-replies-btn-{{ $comment->id }}"
+                                            class="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 transition mb-3">
+                                            <svg id="toggle-replies-icon-{{ $comment->id }}"
+                                                class="w-3.5 h-3.5 transition-transform duration-200"
+                                                style="transform: rotate(-90deg)"
+                                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                            <span id="toggle-replies-label-{{ $comment->id }}">
+                                                @php $totalReplies = $comment->allRepliesFlat()->count(); @endphp
+                                                Show {{ $totalReplies }} {{ Str::plural('reply', $totalReplies) }}
+                                            </span>
+                                        </button>
+
+                                        {{-- REPLIES LIST --}}
+                                        <div id="replies-list-{{ $comment->id }}" class="hidden space-y-3">
+                                            @foreach($comment->allRepliesFlat() as $reply)
+                                                <x-movie.comment-reply :reply="$reply" :movie="$movie" />
+                                            @endforeach
+                                        </div>
                                     </div>
                                     @endif
 
@@ -644,9 +642,9 @@
                                 @csrf
                                 <input type="hidden" name="movie_id" value="{{ $movie->tmdb_movie_id }}">
 
-                                <div class="flex gap-4 mb-5 mt-5">
+                                <div class="flex gap-4 mt-5">
 
-                                    <div class="w-10 h-10 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center flex-shrink-0">
+                                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-full text-xs md:text-sm bg-cyan-500 text-black font-bold flex items-center justify-center flex-shrink-0">
                                         {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                     </div>
 
@@ -655,11 +653,11 @@
                                             name="content"
                                             rows="2"
                                             placeholder="Add a comment..."
-                                            class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-gray-200 placeholder-gray-500 resize-none pb-2"></textarea>
+                                            class="w-full bg-transparent border-b border-white/10 focus:border-cyan-400 outline-none text-xs md:text-base text-gray-200 placeholder-gray-500 resize-none pb-2"></textarea>
 
                                         <div class="flex justify-end mt-3">
                                             <button type="submit"
-                                                class="px-5 py-2 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition">
+                                                class="px-5 py-2 rounded-lg bg-cyan-500 text-black text-xs md:text-base font-semibold hover:bg-cyan-400 transition">
                                                 Comment
                                             </button>
                                         </div>
@@ -668,7 +666,7 @@
                                 </div>
                             </form>
                             @else
-                            <div class="mb-10 flex items-center gap-3 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
+                            <div class="mb-10 flex items-center gap-3 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-xs md:text-sm text-gray-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -690,13 +688,13 @@
 
                     <div class="flex justify-between items-center mb-6">
 
-                        <h2 class="text-3xl font-bold">
+                        <h2 class="text-xl sm:text-3xl font-bold">
                             Similar Movies
                         </h2>
 
                     </div>
 
-                    <div class="flex gap-3 md:gap-4 py-4 w-full mx-auto overflow-x-auto scrollbar-hide">
+                    <div class="flex gap-8 w-full mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
                         @foreach($similarMovies as $similar)
                             <x-movie.movie-modal
                                 :poster="$similar->poster_url"
@@ -715,93 +713,63 @@
             </div>
 
         </div>
-
     </div>
+
     @if($movie->trailer_key)
-    {{-- YouTube IFrame API --}}
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        let player;
+        let player, playerMobile;
         const trailerKey = "{{ $movie->trailer_key }}";
+        const isMobile = window.innerWidth < 768;
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                width: '100%',
-                height: '500',
-                videoId: trailerKey,
-                playerVars: {
-                    autoplay: 0,
-                    rel: 0,
-                    modestbranding: 1,
-                    controls: 1,
-                },
-                events: {
-                    onReady: onPlayerReady,
-                    onError: onPlayerError
-                }
-            })
-        }
-
-        function onPlayerReady(event) {
-            // Responsive height
-            const container = document.getElementById('youtube-player').querySelector('iframe')
-            if (container) {
-                container.style.width = '100%'
-                container.style.height = '100%'
+            // Desktop player
+            if (document.getElementById('youtube-player')) {
+                player = new YT.Player('youtube-player', {
+                    width: '100%', height: '500',
+                    videoId: trailerKey,
+                    playerVars: { autoplay: 0, rel: 0, modestbranding: 1, controls: 1 },
+                    events: { onError: onPlayerError }
+                });
             }
-            setTimeout(revealTrailerSection, 2000)
+            // Mobile player
+            if (document.getElementById('youtube-player-mobile')) {
+                playerMobile = new YT.Player('youtube-player-mobile', {
+                    width: '100%', height: '220',
+                    videoId: trailerKey,
+                    playerVars: { autoplay: 0, rel: 0, modestbranding: 1, controls: 1 },
+                    events: { onError: onPlayerErrorMobile }
+                });
+            }
         }
-
-        // function revealTrailerSection() {
-        //     const defaultLayout = document.getElementById('default-layout')
-        //     const trailerLayout = document.getElementById('trailer-layout')
-
-        //     if (!defaultLayout || !trailerLayout) {
-        //         return
-        //     }
-
-        //     defaultLayout.classList.add('hidden')
-        //     trailerLayout.classList.remove('hidden')
-        //     trailerLayout.classList.remove('opacity-0', 'scale-95')
-        //     trailerLayout.classList.add('opacity-100', 'scale-100')
-        // }
 
         function onPlayerError(event) {
-            // Error 101/150 = tidak bisa embed
-            console.log('YouTube error code:', event.data)
-            showFallback()
+            showFallback('youtube-player');
         }
 
-        function showFallback() {
-            document.getElementById('youtube-player').innerHTML = `
+        function onPlayerErrorMobile(event) {
+            showFallback('youtube-player-mobile');
+        }
+
+        function showFallback(containerId) {
+            document.getElementById(containerId).innerHTML = `
             <a href="https://www.youtube.com/watch?v=${trailerKey}" target="_blank">
                 <div class="relative group w-full rounded-2xl overflow-hidden cursor-pointer">
-
-                    <img 
-                        src="https://img.youtube.com/vi/${trailerKey}/maxresdefault.jpg"
+                    <img src="https://img.youtube.com/vi/${trailerKey}/maxresdefault.jpg"
                         class="w-full object-cover"
-                        onerror="this.src='https://img.youtube.com/vi/${trailerKey}/hqdefault.jpg'"
-                    >
-
+                        onerror="this.src='https://img.youtube.com/vi/${trailerKey}/hqdefault.jpg'">
                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-4
                         bg-black/50 group-hover:bg-black/30 transition duration-300">
-
-                        <div class="w-20 h-20 rounded-full bg-red-600 flex items-center justify-center
+                        <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center
                             group-hover:scale-110 transition duration-300 shadow-xl">
-                            <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
                         </div>
-
-                        <p class="text-white text-sm bg-black/40 px-4 py-2 rounded-full">
-                            Klik untuk tonton di YouTube
-                        </p>
-
+                        <p class="text-white text-sm bg-black/40 px-4 py-2 rounded-full">Klik untuk tonton di YouTube</p>
                     </div>
-
                 </div>
-            </a>
-        `
+            </a>`;
         }
     </script>
     @endif
@@ -1130,5 +1098,19 @@
                 submitBtn.textContent = 'Kirim Laporan';
             }
         });
+        
+        function toggleReplies(id) {
+            const list  = document.getElementById('replies-list-' + id);
+            const label = document.getElementById('toggle-replies-label-' + id);
+            const icon  = document.getElementById('toggle-replies-icon-' + id);
+            const count = list.querySelectorAll(':scope > *').length;
+
+            const isHidden = list.classList.toggle('hidden');
+
+            icon.style.transform = isHidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+            label.textContent    = isHidden
+                ? `Show ${count} ${count === 1 ? 'reply' : 'replies'}`
+                : `Hide ${count} ${count === 1 ? 'reply' : 'replies'}`;
+        }
     </script>
 </x-app-layout>

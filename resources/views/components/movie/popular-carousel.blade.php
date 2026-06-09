@@ -1,16 +1,16 @@
-<div class="relative rounded-2xl overflow-hidden bg-[#1c1c1e] flex items-center h-[300px] md:h-[380px] lg:h-[450px]">
+<div class="relative rounded-2xl overflow-hidden bg-[#1c1c1e] flex items-center h-[280px] md:h-[380px] lg:h-[450px]">
 
     {{-- Info Panel Kiri --}}
-    <div class="absolute left-4 md:left-6 lg:left-8 z-10 flex flex-col transition-all duration-500" id="infoPanel"
+    <div class="absolute left-2 md:left-6 lg:left-8 z-10 flex flex-col transition-all duration-500 max-w-[140px] md:max-w-[200px] lg:max-w-xs" id="infoPanel"
          style="top: 50%; transform: translateY(-50%);">
-        <h2 class="text-white text-lg md:text-xl lg:text-2xl font-bold mb-2 md:mb-3">All Time Best Movies</h2>
-        <div id="rankList">
+        <h2 class="text-white text-sm md:text-xl lg:text-2xl font-bold mb-1 md:mb-3 leading-tight">All Time Best Movies</h2>
+        <div id="rankList" class="hidden md:block">
             @foreach($movies as $i => $movie)
                 <div class="flex items-center gap-2 text-white text-xs md:text-sm mb-1 md:mb-1.5">
                     <span class="text-yellow-400 font-semibold">{{ $i + 1 }}.</span>
-                    <span>{{ $movie['title'] }}</span>
+                    <span class="truncate max-w-[120px] md:max-w-none">{{ $movie['title'] }}</span>
                     <span>💜</span>
-                    <span class="text-gray-400 text-[10px] md:text-xs">{{ number_format($movie['popularity']) }}</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs shrink-0">{{ number_format($movie['popularity']) }}</span>
                 </div>
             @endforeach
         </div>
@@ -30,8 +30,8 @@
                      data-index="{{ $i }}"
                      class="poster-item shrink-0 rounded-[14px] cursor-pointer transition-all duration-[450ms] ease-[cubic-bezier(.4,0,.2,1)]" href="{{ route('movie.detail',$movie['id']) }}" loading="lazy">
                     <img src="https://image.tmdb.org/t/p/original/{{ $movie['poster_path'] }}" class="w-full h-full rounded-[14px] object-cover" alt="{{ $movie['title'] }}">
-                    <div class="p-2 text-center">
-                        <p class="text-white text-xs font-semibold truncate">{{ $movie['title'] }}</p>
+                    <div class="p-1 md:p-2 text-center">
+                        <p class="text-white text-[10px] md:text-xs font-semibold truncate">{{ $movie['title'] }}</p>
                     </div>
                 </a>
             @endforeach
@@ -63,10 +63,10 @@
 
     const SIZES = {
         sm: {
-            containerWidth: '70%',
-            active:  { w: 140, h: 210, mx: 6,  opacity: 1 },
-            side:    { w: 100, h: 155, mx: 4,  opacity: 0.6 },
-            farSide: { w:  70, h: 110, mx: -4, opacity: 0.35 },
+            containerWidth: '65%',
+            active:  { w: 100, h: 155, mx: 4,  opacity: 1 },
+            side:    { w:  72, h: 112, mx: 3,  opacity: 0.6 },
+            farSide: { w:  48, h:  76, mx: -3, opacity: 0.35 },
         },
         md: {
             containerWidth: '65%',
@@ -118,21 +118,42 @@
             el.style.outline      = dist === 0 ? '2.5px solid #94e2f5' : 'none';
         });
 
+        const isMobile = bp === 'sm';
+
         if (activeSlide > 0) {
-            infoPanel.style.top             = '1.5rem';
-            infoPanel.style.transform       = 'scale(0.78)';
-            infoPanel.style.transformOrigin = 'top left';
-            rankList.style.opacity          = '0';
-            rankList.style.transform        = 'translateY(8px)';
-            rankList.style.pointerEvents    = 'none';
-            prevButton.style.marginLeft     = '0%';
+            if (isMobile) {
+                infoPanel.style.top             = '1rem';
+                infoPanel.style.transform       = 'scale(0.85)';
+                infoPanel.style.transformOrigin = 'top left';
+                rankList.style.opacity          = '0';
+                rankList.style.transform        = 'translateY(8px)';
+                rankList.style.pointerEvents    = 'none';
+            } else {
+                infoPanel.style.top             = '1rem';
+                infoPanel.style.transform       = 'scale(0.78)';
+                infoPanel.style.transformOrigin = 'top left';
+                rankList.style.opacity          = '0';
+                rankList.style.transform        = 'translateY(8px)';
+                rankList.style.pointerEvents    = 'none';
+            }
+            prevButton.style.marginLeft = '0%';
         } else {
-            infoPanel.style.top             = '50%';
-            infoPanel.style.transform       = 'translateY(-50%)';
-            rankList.style.opacity          = '1';
-            rankList.style.transform        = 'translateY(0)';
-            rankList.style.pointerEvents    = '';
-            prevButton.style.marginLeft     = '100%';
+            if (isMobile) {
+                infoPanel.style.top             = '1rem';
+                infoPanel.style.transform       = 'scale(0.85)';
+                infoPanel.style.transformOrigin = 'top left';
+                rankList.style.opacity          = '0';
+                rankList.style.transform        = 'translateY(8px)';
+                rankList.style.pointerEvents    = 'none';
+                prevButton.style.marginLeft     = '0%';
+            } else {
+                infoPanel.style.top             = '50%';
+                infoPanel.style.transform       = 'translateY(-50%)';
+                rankList.style.opacity          = '1';
+                rankList.style.transform        = 'translateY(0)';
+                rankList.style.pointerEvents    = '';
+                prevButton.style.marginLeft     = '100%';
+            }
         }
     }
 

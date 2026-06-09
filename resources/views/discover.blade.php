@@ -22,12 +22,12 @@
             {{-- Glow --}}
 
             {{-- Header content --}}
-            <div class="relative z-10 max-w-[90%] mx-auto px-6 pt-32 pb-4">
-                <h1 class="text-4xl lg:text-5xl font-black leading-none tracking-tight">
+            <div class="relative z-10 max-w-[90%] mx-auto px-6 pt-16 pb-4">
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-black leading-none tracking-tight">
                     Discover
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200">Films</span>
                 </h1>
-                <p class="text-gray-400 mt-2 text-sm">
+                <p class="text-gray-400 mt-2 text-xs sm:text-sm">
                     {{ $movies->count() }} films found based on your filter
                 </p>
             </div>
@@ -36,10 +36,12 @@
         {{-- MOVIE GRID --}}
         <div class="relative z-10 bg-[#020817]">
             <div class="absolute z-1000 -top-[160px] -right-20 w-[350px] h-[350px] bg-cyan-500/15 rounded-full blur-3xl"></div>
-            <div class="max-w-[90%] mx-auto px-6 pt-4 pb-12">
+            <div class="mx-auto px-10 pt-4 pb-12">
 
                 @if($movies->isNotEmpty())
-                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 px-2 w-full mx-auto" id="others-grid">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5
+                gap-3 sm:gap-6 md:gap-8
+                w-full max-w-[95%] sm:max-w-[90%] mx-auto justify-items-center" id="discover-grid">
                     @foreach($movies as $movie)
                         <x-movie.movie-modal
                             :poster="$movie->poster_url"
