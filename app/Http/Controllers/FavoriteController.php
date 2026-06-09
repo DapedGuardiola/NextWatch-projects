@@ -19,7 +19,7 @@ class FavoriteController extends Controller
         ]);
         $logActivityService->favorite(['user_id'=>$user_id,'movie_id'=>$movie]);
         userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie]);
-        return back();
+        return response()->json(['success' => true]); 
     }
 
     public function destroy($movie)
@@ -28,7 +28,7 @@ class FavoriteController extends Controller
             ->where('movie_id', $movie)
             ->delete();
         
-        return back();
+        return response()->json(['success' => true]); 
     }
 
     public function index()

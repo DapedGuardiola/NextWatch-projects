@@ -23,7 +23,7 @@ class WatchlistController extends Controller
         if($interacted){
             Cache::forget("user_movie_interacted_{$user_id}");
         }
-        return back();
+        return response()->json(['success' => true]); 
     }
 
     public function destroy($movie)
@@ -32,7 +32,7 @@ class WatchlistController extends Controller
             ->where('movie_id', $movie)
             ->delete();
 
-        return back();
+        return response()->json(['success' => true]); 
     }
 
     // FUNGSI BARU UNTUK MENAMPILKAN HALAMAN WATCHLIST

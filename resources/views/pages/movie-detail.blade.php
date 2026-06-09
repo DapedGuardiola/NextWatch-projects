@@ -192,136 +192,101 @@
                         </div>
                         <div class="flex flex-col justify-between py-10">
 
-                            <!-- WATCHLIST -->
-                            <div>@if($isInWatchlist)
 
-                                <form action="{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-                                    @method('DELETE')
+                            <div>
+                                <!-- WATCHLIST -->
+                                <div id="watchlist-btn" x-data="{
+    isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
+    loading: false,
+    storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
+    destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
+    toggleWatchlist() {
+        this.loading = true;
+        fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
+            method: this.isWatchlist ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed');
+            this.isWatchlist = !this.isWatchlist;
+            this.loading = false;
+        })
+        .catch(() => this.loading = false)
+    }
+}">
 
                                     <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-red-500/20 hover:bg-red-500/30
-                                    border border-red-400/30
-                                    text-red-300 transition-all duration-300
-                                    flex items-center justify-center gap-2">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2">
-
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M6 18L18 6M6 6l12 12" />
-
+                                        @click="toggleWatchlist()"
+                                        :disabled="loading"
+                                        :class="isWatchlist 
+            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+            : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
+                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
+                                        <!-- Spinner -->
+                                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                                         </svg>
 
+                                        <!-- Icon Plus (add) -->
+                                        <svg x-show="!loading && !isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+
+                                        <!-- Icon X (remove) -->
+                                        <svg x-show="!loading && isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
-
-                                </form>
-
-                                @else
-
-                                <form action="{{ route('watchlist.store', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500
-                                    text-black transition-all duration-300 shadow-lg hover:shadow-cyan-500/50
-                                    overflow-hidden flex items-center justify-center gap-2">
-
-                                        <span class="relative z-10 flex items-center gap-2">
-
-                                            <svg class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M12 4v16m8-8H4" />
-
-                                            </svg>
-                                        </span>
-
-                                    </button>
-
-                                </form>
-
-                                @endif
+                                </div>
                             </div>
 
                             <div>
-                                <!-- ACTION BUTTONS -->
-
                                 <!-- FAVORITE -->
-                                @if($isFavorite)
+                                <div id="favorite-btn" x-data="{
+    isFavorite: {{ $isFavorite ? 'true' : 'false' }},
+    loading: false,
+    destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
+    storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
+    toggleFavorite() {
+        this.loading = true;
+        fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
+            method: this.isFavorite ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed');
+            this.isFavorite = !this.isFavorite;
+            this.loading = false;
+        })
+        .catch(() => this.loading = false)
+    }
+}">
+                                    <button @click="toggleFavorite()" :disabled="loading"
 
-                                <form action="{{ route('favorite.destroy', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-red-500/20 hover:bg-red-500/30
-                                    border border-red-400/30
-                                    text-red-300 transition-all duration-300
-                                    flex items-center justify-center gap-2">
-
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-5 h-5"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24">
-
+                                        :class="isFavorite 
+            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+            : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
+                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
+                                        <svg x-show="!loading" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-
                                         </svg>
 
+                                        <!-- Spinner saat loading -->
+                                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
                                     </button>
-
-                                </form>
-
-                                @else
-
-                                <form action="{{ route('favorite.store', $movie->tmdb_movie_id) }}" method="POST">
-
-                                    @csrf
-
-                                    <button
-                                        type="submit"
-                                        class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base
-                                    bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50
-                                    text-white transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20
-                                    flex items-center justify-center gap-2">
-
-                                        <span class="relative z-10 flex items-center gap-2">
-
-                                            <svg class="w-5 h-5"
-                                                fill="currentColor"
-                                                viewBox="0 0 24 24">
-
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-
-                                            </svg>
-
-                                        </span>
-
-                                    </button>
-
-                                </form>
-
-                                @endif
+                                </div>
 
                             </div>
 
@@ -536,7 +501,7 @@
 
                                             {{-- ACTIONS --}}
                                             <div class="flex gap-6 mt-3 text-sm text-gray-500 items-center">
-                                            
+
                                                 {{-- LIKE BUTTON --}}
                                                 @auth
                                                 <button
@@ -560,7 +525,7 @@
                                                     {{ $comment->likes->count() }}
                                                 </span>
                                                 @endauth
-                                            
+
                                                 {{-- REPLY BUTTON --}}
                                                 @auth
                                                 <button
@@ -569,7 +534,7 @@
                                                     Reply
                                                 </button>
                                                 @endauth
-                                            
+
                                                 {{-- REPORT BUTTON --}}
                                                 @auth
                                                 @if(Auth::id() !== $comment->user_id)
@@ -582,7 +547,7 @@
                                                 </button>
                                                 @endif
                                                 @endauth
-                                            
+
                                             </div>
 
                                         </div>
@@ -698,15 +663,15 @@
 
                     <div class="flex gap-3 md:gap-4 py-4 w-full mx-auto overflow-x-auto scrollbar-hide">
                         @foreach($similarMovies as $similar)
-                            <x-movie.movie-modal
-                                :poster="$similar->poster_url"
-                                :title="$similar->title"
-                                :tmdb_movie_id="$similar->tmdb_movie_id"
-                                :year="$similar->year ?? null"
-                                :rating="$similar->rating ?? null"
-                                :overview="$similar->overview ?? null"
-                                :genres="$similar->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                                :duration="$similar->runtime ?? null" />
+                        <x-movie.movie-modal
+                            :poster="$similar->poster_url"
+                            :title="$similar->title"
+                            :tmdb_movie_id="$similar->tmdb_movie_id"
+                            :year="$similar->year ?? null"
+                            :rating="$similar->rating ?? null"
+                            :overview="$similar->overview ?? null"
+                            :genres="$similar->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                            :duration="$similar->runtime ?? null" />
                         @endforeach
                     </div>
 
@@ -866,9 +831,9 @@
                 card.addEventListener('mouseenter', function() {
                     const panel = card.querySelector('[data-panel]');
                     if (!panel) return;
-                    
+
                     const rect = card.getBoundingClientRect();
-                    
+
                     // Determine panel width based on screen size
                     let panelWidth;
                     if (window.innerWidth >= 1024) {
@@ -878,10 +843,10 @@
                     } else {
                         panelWidth = 360;
                     }
-                    
+
                     // Check if panel would exceed viewport width
                     const panelRightEdge = rect.left + panelWidth;
-                    
+
                     if (panelRightEdge > window.innerWidth) {
                         // Panel akan keluar dari kanan, posisikan ke kiri
                         panel.style.left = 'auto';
@@ -892,15 +857,15 @@
                         panel.style.right = 'auto';
                     }
                 });
-                
+
                 // Repositionkan saat window resize
                 card.addEventListener('mousemove', function() {
                     const panel = card.querySelector('[data-panel]');
                     if (!panel) return;
-                    
+
                     const rect = card.getBoundingClientRect();
                     let panelWidth;
-                    
+
                     if (window.innerWidth >= 1024) {
                         panelWidth = 560;
                     } else if (window.innerWidth >= 768) {
@@ -908,9 +873,9 @@
                     } else {
                         panelWidth = 360;
                     }
-                    
+
                     const panelRightEdge = rect.left + panelWidth;
-                    
+
                     if (panelRightEdge > window.innerWidth) {
                         panel.style.left = 'auto';
                         panel.style.right = '0';
@@ -920,16 +885,16 @@
                     }
                 });
             });
-            
+
             // Handle window resize untuk re-check positioning
             window.addEventListener('resize', function() {
                 document.querySelectorAll('[data-card]').forEach(card => {
                     const panel = card.querySelector('[data-panel]');
                     if (!panel || panel.style.visibility === 'hidden') return;
-                    
+
                     const rect = card.getBoundingClientRect();
                     let panelWidth;
-                    
+
                     if (window.innerWidth >= 1024) {
                         panelWidth = 560;
                     } else if (window.innerWidth >= 768) {
@@ -937,9 +902,9 @@
                     } else {
                         panelWidth = 360;
                     }
-                    
+
                     const panelRightEdge = rect.left + panelWidth;
-                    
+
                     if (panelRightEdge > window.innerWidth) {
                         panel.style.left = 'auto';
                         panel.style.right = '0';
@@ -954,30 +919,30 @@
         document.querySelectorAll('[data-like-btn]').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const commentId = btn.dataset.likeBtn;
-                const isLiked   = btn.dataset.liked === 'true';
-                const countEl   = document.querySelector(`[data-like-count="${commentId}"]`);
-        
+                const isLiked = btn.dataset.liked === 'true';
+                const countEl = document.querySelector(`[data-like-count="${commentId}"]`);
+
                 // Optimistic update
                 const newLiked = !isLiked;
                 btn.dataset.liked = String(newLiked);
                 applyLikeStyle(btn, newLiked);
-        
+
                 try {
-                    const res  = await fetch(`/comments/${commentId}/like`, {
-                        method:  'POST',
+                    const res = await fetch(`/comments/${commentId}/like`, {
+                        method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept':       'application/json',
+                            'Accept': 'application/json',
                             'Content-Type': 'application/json',
                         },
                     });
                     const data = await res.json();
-        
+
                     // Sync dengan server
                     btn.dataset.liked = String(data.liked);
                     applyLikeStyle(btn, data.liked);
                     if (countEl) countEl.textContent = data.like_count;
-        
+
                 } catch (err) {
                     // Rollback jika gagal
                     btn.dataset.liked = String(isLiked);
@@ -986,7 +951,7 @@
                 }
             });
         });
-        
+
         function applyLikeStyle(btn, liked) {
             const svg = btn.querySelector('svg');
             if (liked) {
@@ -999,7 +964,7 @@
                 if (svg) svg.setAttribute('fill', 'none');
             }
         }
-        
+
         const modalHTML = `
         <div id="global-report-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="report-backdrop"></div>
@@ -1073,28 +1038,33 @@
 
         document.getElementById('report-backdrop').addEventListener('click', closeGlobalReportModal);
         document.getElementById('report-cancel').addEventListener('click', closeGlobalReportModal);
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGlobalReportModal(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeGlobalReportModal();
+        });
 
         // Submit
         document.getElementById('report-submit').addEventListener('click', async () => {
             if (!activeCommentId) return;
 
-            const reason  = document.querySelector('#global-report-modal input[name="reason"]:checked')?.value;
-            const note    = document.getElementById('report-note').value;
+            const reason = document.querySelector('#global-report-modal input[name="reason"]:checked')?.value;
+            const note = document.getElementById('report-note').value;
             const submitBtn = document.getElementById('report-submit');
 
-            submitBtn.disabled    = true;
+            submitBtn.disabled = true;
             submitBtn.textContent = 'Mengirim...';
 
             try {
-                const res  = await fetch(`/comments/${activeCommentId}/report`, {
-                    method:  'POST',
+                const res = await fetch(`/comments/${activeCommentId}/report`, {
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept':       'application/json',
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ reason, note }),
+                    body: JSON.stringify({
+                        reason,
+                        note
+                    }),
                 });
                 const data = await res.json();
 
@@ -1126,7 +1096,7 @@
             } catch (err) {
                 alert('Terjadi kesalahan. Silakan coba lagi.');
             } finally {
-                submitBtn.disabled    = false;
+                submitBtn.disabled = false;
                 submitBtn.textContent = 'Kirim Laporan';
             }
         });
