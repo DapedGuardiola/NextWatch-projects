@@ -38,7 +38,7 @@
             <div class="relative z-10 max-w-[90%] mx-auto px-4 md:px-6 py-8 md:py-14">
 
                 {{-- MOBILE LAYOUT --}}
-                <div class="flex flex-col gap-6 pt-8 md:hidden">
+                <div class="flex flex-col gap-6 pt-8 mx-auto md:hidden">
 
                     {{-- 1. YouTube Player --}}
                     @if($movie->trailer_key)
@@ -115,45 +115,45 @@
                         @isset($movie->tagline)
                         <p class="text-cyan-300 text-base italic tracking-wide">{{ $movie->tagline }}</p>
                         @endisset
-                        <p class="text-gray-300 text-sm leading-relaxed mt-2">{{ $movie->overview }}</p>
+                        <p class="text-gray-300 text-sm text-justify leading-relaxed mt-2">{{ $movie->overview }}</p>
                     </div>
 
                     {{-- 5. Action Buttons (horizontal) --}}
-                    <div class="flex items-center gap-3 mx-auto">
+                    <div class="flex items-center justify-center gap-3">
 
                         {{-- Watchlist --}}
                         <div>
                                 <!-- WATCHLIST -->
                                 <div id="watchlist-btn" x-data="{
-    isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
-    loading: false,
-    storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
-    destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
-    toggleWatchlist() {
-        this.loading = true;
-        fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
-            method: this.isWatchlist ? 'DELETE' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Failed');
-            this.isWatchlist = !this.isWatchlist;
-            this.loading = false;
-        })
-        .catch(() => this.loading = false)
-    }
-}">
+                                        isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
+                                        loading: false,
+                                        storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
+                                        destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
+                                        toggleWatchlist() {
+                                            this.loading = true;
+                                            fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
+                                                method: this.isWatchlist ? 'DELETE' : 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({})
+                                            })
+                                            .then(res => {
+                                                if (!res.ok) throw new Error('Failed');
+                                                this.isWatchlist = !this.isWatchlist;
+                                                this.loading = false;
+                                            })
+                                            .catch(() => this.loading = false)
+                                        }
+                                    }">
 
                                     <button
                                         @click="toggleWatchlist()"
                                         :disabled="loading"
                                         :class="isWatchlist 
-            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
-            : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
+                                        ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+                                        : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
                                         class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm transition">
                                         <!-- Spinner -->
                                         <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -162,12 +162,12 @@
                                         </svg>
 
                                         <!-- Icon Plus (add) -->
-                                        <svg x-show="!loading && !isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg x-show="!loading && !isWatchlist" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                         </svg>
 
                                         <!-- Icon X (remove) -->
-                                        <svg x-show="!loading && isWatchlist" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg x-show="!loading && isWatchlist" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                         <span x-text="isWatchlist ? 'Remove' : 'Watchlist'"></span>
@@ -178,40 +178,40 @@
                             <div>
                                 <!-- FAVORITE -->
                                 <div id="favorite-btn" x-data="{
-    isFavorite: {{ $isFavorite ? 'true' : 'false' }},
-    loading: false,
-    destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
-    storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
-    toggleFavorite() {
-        this.loading = true;
-        fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
-            method: this.isFavorite ? 'DELETE' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Failed');
-            this.isFavorite = !this.isFavorite;
-            this.loading = false;
-        })
-        .catch(() => this.loading = false)
-    }
-}">
+                                        isFavorite: {{ $isFavorite ? 'true' : 'false' }},
+                                        loading: false,
+                                        destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
+                                        storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
+                                        toggleFavorite() {
+                                            this.loading = true;
+                                            fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
+                                                method: this.isFavorite ? 'DELETE' : 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({})
+                                            })
+                                            .then(res => {
+                                                if (!res.ok) throw new Error('Failed');
+                                                this.isFavorite = !this.isFavorite;
+                                                this.loading = false;
+                                            })
+                                            .catch(() => this.loading = false)
+                                        }
+                                    }">
                                     <button @click="toggleFavorite()" :disabled="loading"
 
                                         :class="isFavorite 
-            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
-            : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
+                                        ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+                                        : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
                                         class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm transition">
-                                        <svg x-show="!loading" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg x-show="!loading" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                                         </svg>
 
                                         <!-- Spinner saat loading -->
-                                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <svg x-show="loading" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                                         </svg>
@@ -225,7 +225,7 @@
                             class="flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm
                             bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40
                             text-gray-100 transition hover:text-cyan-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                                 <line x1="8.7" y1="10.7" x2="15.3" y2="6.3"/><line x1="8.7" y1="13.3" x2="15.3" y2="17.7"/>
@@ -307,7 +307,7 @@
                         <div>
                             <div class="mt-10 max-w-3xl mx-auto">
                                 <p class="mt-5 text-cyan-300 text-lg italic tracking-wide">{{ $movie->tagline }}</p>
-                                <p class="text-gray-300 text-lg leading-relaxed mt-2">{{ $movie->overview }}</p>
+                                <p class="text-gray-300 text-lg text-justify leading-relaxed mt-2">{{ $movie->overview }}</p>
                                 <div class="mt-2">
                                     <div class="flex flex-wrap gap-4">
                                         @foreach($genreNames as $genre)
@@ -328,35 +328,35 @@
                             <div>
                                 <!-- WATCHLIST -->
                                 <div id="watchlist-btn" x-data="{
-    isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
-    loading: false,
-    storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
-    destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
-    toggleWatchlist() {
-        this.loading = true;
-        fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
-            method: this.isWatchlist ? 'DELETE' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Failed');
-            this.isWatchlist = !this.isWatchlist;
-            this.loading = false;
-        })
-        .catch(() => this.loading = false)
-    }
-}">
+                                    isWatchlist: {{ $isInWatchlist ? 'true' : 'false' }},
+                                    loading: false,
+                                    storeUrl: '{{ route('watchlist.store', $movie->tmdb_movie_id) }}',
+                                    destroyUrl: '{{ route('watchlist.destroy', $movie->tmdb_movie_id) }}',
+                                    toggleWatchlist() {
+                                        this.loading = true;
+                                        fetch(this.isWatchlist ? this.destroyUrl : this.storeUrl, {
+                                            method: this.isWatchlist ? 'DELETE' : 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                            },
+                                            body: JSON.stringify({})
+                                        })
+                                        .then(res => {
+                                            if (!res.ok) throw new Error('Failed');
+                                            this.isWatchlist = !this.isWatchlist;
+                                            this.loading = false;
+                                        })
+                                        .catch(() => this.loading = false)
+                                    }
+                                }">
 
                                     <button
                                         @click="toggleWatchlist()"
                                         :disabled="loading"
                                         :class="isWatchlist 
-            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
-            : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
+                                        ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+                                        : 'bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black shadow-lg hover:shadow-cyan-500/50'"
                                         class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
                                         <!-- Spinner -->
                                         <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -380,33 +380,33 @@
                             <div>
                                 <!-- FAVORITE -->
                                 <div id="favorite-btn" x-data="{
-    isFavorite: {{ $isFavorite ? 'true' : 'false' }},
-    loading: false,
-    destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
-    storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
-    toggleFavorite() {
-        this.loading = true;
-        fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
-            method: this.isFavorite ? 'DELETE' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Failed');
-            this.isFavorite = !this.isFavorite;
-            this.loading = false;
-        })
-        .catch(() => this.loading = false)
-    }
-}">
+                                        isFavorite: {{ $isFavorite ? 'true' : 'false' }},
+                                        loading: false,
+                                        destroyUrl: '{{ route('favorite.destroy', $movie->tmdb_movie_id) }}',
+                                        storeUrl: '{{ route('favorite.store', $movie->tmdb_movie_id) }}',
+                                        toggleFavorite() {
+                                            this.loading = true;
+                                            fetch(this.isFavorite ? this.destroyUrl : this.storeUrl, {
+                                                method: this.isFavorite ? 'DELETE' : 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({})
+                                            })
+                                            .then(res => {
+                                                if (!res.ok) throw new Error('Failed');
+                                                this.isFavorite = !this.isFavorite;
+                                                this.loading = false;
+                                            })
+                                            .catch(() => this.loading = false)
+                                        }
+                                    }">
                                     <button @click="toggleFavorite()" :disabled="loading"
 
                                         :class="isFavorite 
-            ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
-            : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
+                                        ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300' 
+                                        : 'bg-white/10 hover:bg-white/15 border border-white/20 hover:border-purple-400/50 text-white'"
                                         class="group relative px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
                                         <svg x-show="!loading" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -458,7 +458,7 @@
                         <div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-cyan-500/10 blur-3xl rounded-full"></div>
                         <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-purple-500/10 blur-3xl rounded-full"></div>
 
-                        <div class="relative p-8 md:p-10">
+                        <div class="relative p-5 md:p-10">
 
                             <!-- HEADER -->
                             <div class="flex justify-between items-start mb-5">
@@ -716,7 +716,7 @@
 
                                 @else
 
-                                <div class="text-gray-400 text-sm">
+                                <div class="text-gray-400 text-[10px] md:text-sm">
                                     No comments yet. Start the discussion.
                                 </div>
 

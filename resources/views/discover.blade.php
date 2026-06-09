@@ -22,7 +22,7 @@
             {{-- Glow --}}
 
             {{-- Header content --}}
-            <div class="relative z-10 max-w-[90%] mx-auto px-6 pt-16 pb-4">
+            <div class="relative z-10 max-w-full md:max-w-[90%] mx-auto px-6 pt-16 pb-4">
                 <h1 class="text-3xl sm:text-5xl md:text-6xl font-black leading-none tracking-tight">
                     Discover
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200">Films</span>
@@ -36,10 +36,10 @@
         {{-- MOVIE GRID --}}
         <div class="relative z-10 bg-[#020817]">
             <div class="absolute z-1000 -top-[160px] -right-20 w-[350px] h-[350px] bg-cyan-500/15 rounded-full blur-3xl"></div>
-            <div class="mx-auto px-10 pt-4 pb-12">
+            <div class="mx-auto pt-4 pb-12">
 
                 @if($movies->isNotEmpty())
-                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5
+                <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5
                 gap-3 sm:gap-6 md:gap-8
                 w-full max-w-[95%] sm:max-w-[90%] mx-auto justify-items-center" id="discover-grid">
                     @foreach($movies as $movie)
