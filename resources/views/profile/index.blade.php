@@ -259,7 +259,6 @@
         });
     </script>
 
-    {{-- 4. INTEGRASI CHART.JS DENGAN SKALA 100% --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -298,9 +297,7 @@
                             legend: { display: false },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
-                                        return context.raw + '% Match';
-                                    }
+                                    label: function(context) { return context.raw + '% Match'; }
                                 }
                             }
                         }

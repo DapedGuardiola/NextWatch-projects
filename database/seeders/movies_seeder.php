@@ -36,6 +36,7 @@ class movies_seeder extends Seeder
                 'title' => $movie["title"],
                 'overview' => $movie["overview"],
                 'poster_path' => $movie["poster_path"],
+                'backdrop_path' => $movie["backdrop_path"],
                 'popularity' => $movie["popularity"],
                 'release_date' => filled($movie['release_date'] ?? null)? $movie['release_date'] : null ,
                 'runtime' => $movie["runtime"],
@@ -47,6 +48,7 @@ class movies_seeder extends Seeder
                 'tmdb_collection_id' => $movie["collection_id"],
                 'trailer_key' => $movie["trailer_key"],
                 'trailer_size' => $movie["trailer_size"],
+                'adult' => $movie["adult"],
             ];
             if (count($data) === $batchSize) {
                 DB::table("movies")->insert($data);
