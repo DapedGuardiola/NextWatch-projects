@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="-mt-[180px] w-full left-0 right-0 relative z-10 mx-auto">
-        <div>
+        <div class="px-4 sm:px-6 lg:px-0">
             <x-movie.search-bar />
         </div>
 
