@@ -33,32 +33,41 @@
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
         @click.outside="close()"
-        class="absolute top-full mt-2 w-full min-w-[480px] bg-[#1c1c1e] rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50"
+        class="absolute top-full mt-2 w-full bg-[#1c1c1e] rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50"
         x-cloak
     >
-        <div class="flex">
+        {{-- Kolom: flex row di sm+, flex col di mobile --}}
+        <div class="flex flex-col sm:flex-row">
 
             {{-- Kolom Movie --}}
-            <div :class="actors.length > 0 ? 'w-2/3 border-r border-white/10' : 'w-full'" x-show="movies.length > 0" x-cloak>
-                <p class="text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Films</p>
+            <div
+                x-show="movies.length > 0"
+                :class="actors.length > 0
+                    ? 'sm:w-2/3 border-b sm:border-b-0 sm:border-r border-white/10'
+                    : 'w-full'"
+                x-cloak>
+                <p class="text-[10px] sm:text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Films</p>
                 <template x-for="movie in movies" :key="movie.id">
                     <a :href="movie.url" class="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition">
-                        <img :src="movie.poster_url" class="w-8 h-12 object-cover rounded-lg flex-shrink-0" alt="">
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-sm text-white truncate" x-text="movie.title"></p>
-                            <p class="text-xs text-white/40" x-text="'★ ' + movie.rating"></p>
+                        <img :src="movie.poster_url" class="w-6 h-9 sm:w-8 sm:h-12 object-cover rounded-lg flex-shrink-0" alt="">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm text-white truncate" x-text="movie.title"></p>
+                            <p class="text-[10px] sm:text-xs text-white/40" x-text="'★ ' + movie.rating"></p>
                         </div>
                     </a>
                 </template>
             </div>
 
             {{-- Kolom Actor --}}
-            <div :class="movies.length > 0 ? 'w-1/3' : 'w-full'" x-show="actors.length > 0" x-cloak>
-                <p class="text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Actors</p>
+            <div
+                x-show="actors.length > 0"
+                :class="movies.length > 0 ? 'sm:w-1/3' : 'w-full'"
+                x-cloak>
+                <p class="text-[10px] sm:text-xs text-white/40 uppercase tracking-widest px-4 pt-4 pb-2">Actors</p>
                 <template x-for="actor in actors" :key="actor.id">
                     <a :href="actor.url" class="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition">
-                        <img :src="actor.image_url" class="w-8 h-8 object-cover rounded-full flex-shrink-0" alt="">
-                        <p class="text-sm text-white truncate" x-text="actor.name"></p>
+                        <img :src="actor.image_url" class="w-6 h-6 sm:w-8 sm:h-8 object-cover rounded-full flex-shrink-0" alt="">
+                        <p class="text-xs sm:text-sm text-white truncate" x-text="actor.name"></p>
                     </a>
                 </template>
             </div>
@@ -68,7 +77,7 @@
         {{-- Footer --}}
         <div class="px-4 py-3 border-t border-white/10">
             <button @click="goToResults()"
-                class="text-xs text-indigo-400 hover:text-indigo-300 transition">
+                class="text-[10px] sm:text-xs text-indigo-400 hover:text-indigo-300 transition">
                 See all results for "<span x-text="query"></span>" →
             </button>
         </div>
