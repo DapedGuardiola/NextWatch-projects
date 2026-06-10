@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use App\Jobs\ReevalTriger;
 use App\Models\LogActivityModel;
+use App\Models\userMovieInteracted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 class LogActivityService
@@ -67,8 +69,25 @@ class LogActivityService
             'created_at' => now(),
         ]);
         $this->counterReevalTrigger();
-
     }
+
+    public function watchTrailer($movie_id)
+    {
+        $user_id = Auth::user()->id;
+        LogActivityModel::insert([
+            'tmdb_movie_id' => $movie_id,
+            'user_id' => $user_id,
+            'type' => 'watch_trailer',
+            'updated_at'=> now(),
+            'created_at' => now(),
+        ]);
+        $interacted = userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie_id]);
+        if($interacted){
+            Cache::forget("user_movie_interacted_{$user_id}");
+        }
+        $this->counterReevalTrigger();
+    }
+
     public function counterReevalTrigger(){
         $user = Auth::user();
         $userLogIds = LogActivityModel::where(['user_id'=>$user->id,'is_evaluated'=>false])->get()->pluck('id')->toArray();

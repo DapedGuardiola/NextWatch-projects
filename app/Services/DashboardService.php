@@ -177,9 +177,33 @@ class DashboardService
         }
         $cleanCollection = array_filter($collectionsArray);
         $collections = CollectionModel::hydrate($cleanCollection);
-
-
-        return ['topOne' => $topOne, 'forYou' => $forYou, 'topByGenre' => $topByGenre, 'actors' => $actors, 'collections' => $collections, 'others' => $others];
+        $user_genre_id = cache::remember("user_genre_main_{$user_id}", 7600, function () use ($user_id) {
+            return UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
+        });
+        $upcomming_ids = cache::remember("user_upcomming_{$user_id}", 7600, function () use ($user_genre_id) {
+            return Movie::where('status', 'upcoming')
+                ->whereHas('genres', function ($query) use ($user_genre_id) {
+                    $query->whereIn('map_genre_id', $user_genre_id);
+                })
+                ->orderBy('popularity', 'desc')
+                ->take(10)
+                ->get()->pluck('tmdb_movie_id')->toArray();
+        });
+        $upcommingArray = [];
+        foreach ($upcomming_ids as $id) {
+            $upcommingArray[] = Cache::remember("movie_detail_{$id}", now()->addDays(7), function () use ($id) {
+                $movie = Movie::selectRaw('movies.*, YEAR(release_date) as year')
+                    ->where('tmdb_movie_id', $id)->first();
+                return $movie ? $movie->toArray() : null;
+            });
+        }
+        $upcomming = Movie::hydrate($upcommingArray);
+        $upcomming->load([
+            'genres:tmdb_movie_id,map_genre_id',
+            'actors:tmdb_actor_id',
+            'directors:tmdb_director_id'
+        ]);
+        return ['topOne' => $topOne, 'forYou' => $forYou, 'actors' => $actors, 'collections' => $collections, 'others' => $others, 'upcomming' => $upcomming];
     }
 
     public function getWatchlist(int $user_id)
@@ -187,8 +211,8 @@ class DashboardService
         return Movie::whereHas('watchlists', function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
         })
-        ->take(5)
-        ->get();
+            ->take(5)
+            ->get();
     }
 
     // $userGenre = UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();

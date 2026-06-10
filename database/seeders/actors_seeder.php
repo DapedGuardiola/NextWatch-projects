@@ -13,7 +13,7 @@ class actors_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("data/processed/updated2/updated_actors_data.json");
+        $path = base_path("data/processed/final/actors.json");
         $json = file_get_contents($path);
         $actors = json_decode($json, true);
         $batchSize = 500;

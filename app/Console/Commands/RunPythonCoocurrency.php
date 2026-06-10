@@ -26,7 +26,7 @@ class RunPythonCoocurrency extends Command
         return is_string($item) ? json_decode($item, true) : $item;
     })->toArray();
 
-    $pythonPath = 'C:\Python313\python.exe';
+    $pythonPath = 'C:\Users\muham\AppData\Local\Programs\Python\Python313\python.exe';
 
     // 2. Siapkan proses eksekusi Python
     $scriptPath = base_path('\data\scripts\fixed_script\getGenreCoocurrence.py'); // Sesuaikan posisi file python Anda

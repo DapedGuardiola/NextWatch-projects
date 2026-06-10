@@ -28,15 +28,16 @@ class ReevalTriger implements ShouldQueue, ShouldBeUnique
     {
         $activityWeights = [
             'click'         => 0.1,
+            'search'        => 0.1,
             'watch_trailer' => 0.2,
             'watchlist'     => 0.3,
-            'favorite'      => 0.5,
+            'favorite'      => 0.3,
         ];
         $flaskService = new FlaskService();
         $activities = LogActivityModel::whereIn('id', $this->userLogIds)->get();
         $movie_ids = $activities->pluck('tmdb_movie_id')->toArray();
         $totalWeight = $activities->sum(fn($a) => $activityWeights[$a->type] ?? 0);
-        if ($totalWeight < 0.4) return;
+        if ($totalWeight < 0.5) return;
          $movieData = Movie::whereIn('tmdb_movie_id', $movie_ids)->with([
             'genres:tmdb_movie_id,map_genre_id',
         ])->get()
