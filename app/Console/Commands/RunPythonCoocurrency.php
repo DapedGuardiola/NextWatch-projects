@@ -29,7 +29,7 @@ class RunPythonCoocurrency extends Command
     $pythonPath = 'C:\Users\muham\AppData\Local\Programs\Python\Python313\python.exe';
 
     // 2. Siapkan proses eksekusi Python
-    $scriptPath = base_path('\data\scripts\fixed_script\getGenreCoocurrence.py'); // Sesuaikan posisi file python Anda
+    $scriptPath = base_path('\data\scripts\getGenreCoocurrence.py'); // Sesuaikan posisi file python Anda
     $process = new Process([$pythonPath, $scriptPath, '20']); // '20' adalah argumen total_genres
     
     // 3. SEMPROT DATA LANGSUNG KE PYTHON (Menggantikan fungsi query DB di Python)

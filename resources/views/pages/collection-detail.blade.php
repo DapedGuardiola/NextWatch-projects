@@ -48,4 +48,97 @@
 
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle all movie cards with hover panels
+            document.querySelectorAll('[data-card]').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+
+                    const rect = card.getBoundingClientRect();
+
+                    // Determine panel width based on screen size
+                    let panelWidth;
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+
+                    // Check if panel would exceed viewport width
+                    const panelRightEdge = rect.left + panelWidth;
+
+                    if (panelRightEdge > window.innerWidth) {
+                        // Panel akan keluar dari kanan, posisikan ke kiri
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        // Panel bisa normal ke kanan
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+
+                // Repositionkan saat window resize
+                card.addEventListener('mousemove', function() {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel) return;
+
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+
+                    const panelRightEdge = rect.left + panelWidth;
+
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+
+            // Handle window resize untuk re-check positioning
+            window.addEventListener('resize', function() {
+                document.querySelectorAll('[data-card]').forEach(card => {
+                    const panel = card.querySelector('[data-panel]');
+                    if (!panel || panel.style.visibility === 'hidden') return;
+
+                    const rect = card.getBoundingClientRect();
+                    let panelWidth;
+
+                    if (window.innerWidth >= 1024) {
+                        panelWidth = 560;
+                    } else if (window.innerWidth >= 768) {
+                        panelWidth = 460;
+                    } else {
+                        panelWidth = 360;
+                    }
+
+                    const panelRightEdge = rect.left + panelWidth;
+
+                    if (panelRightEdge > window.innerWidth) {
+                        panel.style.left = 'auto';
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                        panel.style.right = 'auto';
+                    }
+                });
+            });
+        });
+    </script>
 </x-app-layout>

@@ -43,8 +43,8 @@ class TopChartedService
     {
         // 1. Ambil semua kandidat + data normalisasi
         $candidates = Movie::select(['tmdb_movie_id'])
-            ->orderByRaw('popularity DESC, rating DESC')
-            ->limit(100)    
+            ->orderByRaw('popularity DESC, rating_count DESC, rating DESC')
+            ->limit(100)
             ->get();
 
         if ($candidates->isEmpty()) {
@@ -78,12 +78,13 @@ class TopChartedService
 
         // 5. Query detail movies
         $movies = Movie::select([
-                'tmdb_movie_id',
-                'title',
-                'poster_path',
-                'popularity',
-                'rating',
-            ])
+            'tmdb_movie_id',
+            'title',
+            'poster_path',
+            'popularity',
+            'rating',
+            'backdrop_path',
+        ])
             ->whereIn('tmdb_movie_id', $topIds)
             ->get();
 
@@ -94,6 +95,7 @@ class TopChartedService
                 'poster_path' => $movie->poster_path,
                 'popularity'  => $movie->popularity,
                 'rating'      => $movie->rating,
+                'backdrop_path' => $movie->backdrop_path,
             ];
         })->toArray();
 
@@ -123,7 +125,7 @@ class TopChartedService
                     foreach ($databaseRecords as $record) {
                         $moviesByGenre[$record->genre_name] = $record->movies_data;
                     }
-                    
+
                     Log::info('EDAS best movies by genre retrieved from database');
                     return $moviesByGenre;
                 }
@@ -139,18 +141,22 @@ class TopChartedService
     {
         $genres = DB::table('genres')->get();
         $moviesByGenre = [];
-
+        $excludeIds = [];
+        $excludeIds = [];
         foreach ($genres as $genre) {
             // 1. Ambil kandidat + data normalisasi
             $candidates = Movie::select([
-                    'movies.tmdb_movie_id',
-                ])
+                'movies.tmdb_movie_id',
+            ])
                 ->with([
                     'genreVector:tmdb_movie_id,vector',
                 ])
                 ->join('movie_genres', 'movies.tmdb_movie_id', '=', 'movie_genres.tmdb_movie_id')
                 ->where('movie_genres.map_genre_id', '=', $genre->map_id)
-                ->orderByRaw('rating DESC')
+                ->when(!empty($excludeIds), function ($query) use ($excludeIds) {
+                    $query->whereNotIn('movies.tmdb_movie_id', $excludeIds);
+                })
+                ->orderByRaw('popularity DESC, rating_count DESC, rating DESC')
                 ->limit(30)
                 ->get();
 
@@ -179,10 +185,10 @@ class TopChartedService
             if (empty($rankedIds)) {
                 continue;
             }
-
             // 4. Ambil top N sesuai urutan ranked
             $topIds = array_slice($rankedIds, 0, 10);
-
+            $existed_id[] = $topIds;
+            $excludeIds = array_merge(...$existed_id);
             // 5. Query detail movies
             $movies = Movie::select([
                 'tmdb_movie_id',
@@ -195,9 +201,9 @@ class TopChartedService
                 'poster_path',
                 'popularity',
             ])
-            ->with(['genres.genre'])
-            ->whereIn('tmdb_movie_id', $topIds)
-            ->get();
+                ->with(['genres.genre'])
+                ->whereIn('tmdb_movie_id', $topIds)
+                ->get();
 
             $moviesByGenre[$genre->name] = $movies->map(function ($movie) {
                 return [
@@ -213,7 +219,7 @@ class TopChartedService
                     'genres'       => $movie->genres->pluck('genre.name')->filter()->values()->toArray(),
                 ];
             })->toArray();
-            
+
             // Simpan ke database untuk genre ini
             try {
                 TopChartedByGenre::updateOrCreate(

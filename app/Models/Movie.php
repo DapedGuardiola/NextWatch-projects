@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
     'tagline',
     'rating',
     'rating_count',
-    'original_language'
+    'original_language',
+    'backdrop_path',
 ])]
 class Movie extends Model
 {
@@ -33,6 +34,12 @@ class Movie extends Model
     {
         return Attribute::make(
             get: fn() => 'https://image.tmdb.org/t/p/original/' . $this->poster_path
+        );
+    }
+    protected function backgroundUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => 'https://image.tmdb.org/t/p/original/' . $this->backdrop_path
         );
     }
 

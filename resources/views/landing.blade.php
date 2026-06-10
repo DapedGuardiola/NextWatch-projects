@@ -3,18 +3,39 @@
 
     <div class="w-screen md:h-screen relative">
         <img src="https://image.tmdb.org/t/p/original/{{ $popularMovie['poster_path'] }}"
-            class="w-full h-full object-cover object-center" alt="hero">
+            class="block sm:hidden w-full h-full object-cover"
+            alt="hero">
+
+        <!-- Tablet & Desktop -->
+        <img src="https://image.tmdb.org/t/p/original/{{ $popularMovie['backdrop_path'] }}"
+            class="hidden sm:block w-full h-full object-cover object-center"
+            alt="hero">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
 
         <div class="absolute bottom-[200px] left-6 sm:left-10 right-6 sm:right-10">
-            <h1 class="text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                {{ $popularMovie['title'] }}
-            </h1>
+            <div class="flex sm:gap-[300px]">
+                <div class="max-w-[80%] sm:max-w-[80%]">
+
+                    <h1 class="text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight line-clamp-2 sm:line-clamp-0">
+                        {{ $popularMovie['title'] }}
+                    </h1>
+                </div>
+
+            </div>
+            <a href="{{ route('movie.detail', $popularMovie['id'])}}"
+                class="sm:hidden my-auto -mt-[34px] inline-block absolute right-0 mt-6 px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
+                Detail
+            </a>
+            <a href="{{ route('movie.detail', $popularMovie['id'])}}"
+                class="hidden sm:block -mt-[50px] absolute right-10 my-auto mt-6 inline-block px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
+                See Detail
+            </a>
         </div>
+
     </div>
 
     <div class="-mt-[180px] w-full left-0 right-0 relative z-10 mx-auto">
-        <div>
+        <div class="px-4 mt-0 sm:mt-6 sm:px-6 lg:px-0">
             <x-movie.search-bar />
         </div>
 
@@ -24,7 +45,7 @@
                     <p class="text-xl sm:text-3xl text-white font-bold">Top on {{ $genre }}</p>
                 </h2>
             </div>
-            <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+            <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
                 @foreach($movies as $index => $movie)
                     <x-movie.topmovies-modal
                         :poster="'https://image.tmdb.org/t/p/original/' . $movie['poster_path']"
@@ -171,8 +192,8 @@
                         </button>
                     </div>
                     <div class="w-full block mb-6">
-                                <img src="{{ asset('images/brand/logo3.png') }}" alt="NextWatch" class="hidden md:block h-10 w-auto mx-auto">
-                            </div>
+                        <img src="{{ asset('images/brand/logo3.png') }}" alt="NextWatch" class="hidden md:block h-10 w-auto mx-auto">
+                    </div>
                     {{-- TAB --}}
                     <div class="flex gap-1 bg-white/5 rounded-xl p-1 mb-6">
                         <button
@@ -306,7 +327,7 @@
                                 class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold">
                                 Login
                             </button>
-                            
+
                         </form>
                     </div>
 

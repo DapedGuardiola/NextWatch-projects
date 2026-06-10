@@ -4,28 +4,49 @@
     </x-slot>
     <div class="w-screen md:h-screen relative">
         <img src="{{ $topOne->poster_url }}"
-            class="w-full h-full object-cover object-center" alt="hero">
+            class="block sm:hidden w-full h-full object-cover"
+            alt="hero">
+
+        <!-- Tablet & Desktop -->
+        <img src="{{ $topOne->background_url }}"
+            class="hidden sm:block w-full h-full object-cover object-center"
+            alt="hero">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
 
         <div class="absolute bottom-[200px] left-6 sm:left-10 right-6 sm:right-10">
-            <h1 class="text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                {{ $topOne->title }}
-            </h1>
+            <div class="flex sm:gap-[300px]">
+                <div class="max-w-[80%] sm:max-w-[80%]">
+
+                    <h1 class="sm:py-1 text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight line-clamp-2 sm:line-clamp-0">
+                        {{ $topOne->title }}
+                    </h1>
+                </div>
+                
+            </div>
+            <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
+                class="sm:hidden my-auto -mt-[34px] inline-block absolute right-0 mt-6 px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
+                Detail
+            </a>
+            <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
+                    class="hidden sm:block -mt-[55px] absolute right-10 my-auto mt-6 inline-block px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
+                    See Detail
+                </a>
         </div>
+
     </div>
-    <div class="-mt-[180px] w-full left-0 right-0 relative z-10 mx-auto">
-        <div class="px-4 sm:px-6 lg:px-0">
+    <div class="-mt-[180px] sm:-mt-[200px] w-full left-0 right-0 relative z-10 mx-auto">
+        <div class="px-4 mt-0 sm:mt-6 sm:px-6 lg:px-0">
             <x-movie.search-bar />
         </div>
 
         @if(auth()->check() && auth()->user()->is_personalized && auth()->user()->persona_ready && isset($forYou) && $forYou->count() > 0)
-        <div class="mx-4 sm:mx-10 my-6 sm:my-10">
+        <div class="mx-4 sm:mx-10 my-6 sm:-mt-6 sm:my-10">
             <h1>
                 <p class="text-xl sm:text-3xl text-white font-bold">For You</p>
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top movies on your preference</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
             @foreach($forYou as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -46,7 +67,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top Collections by your preference</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
             @foreach($collections as $collection)
             <x-movie.collection-modal
                 :poster="$collection->backdrop_url"
@@ -62,7 +83,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Suggested actors for you</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($actors as $actor)
             <x-movie.actor-card
                 :actor_id="$actor->tmdb_actor_id"
@@ -79,7 +100,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Movies you want to watch later</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($watchlist as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -109,7 +130,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">We think you'll love these – coming soon</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($upcomming as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -122,7 +143,7 @@
                 :duration="$movie->runtime ?? null" />
             @endforeach
         </div>
-        
+
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
                 <p class="text-xl sm:text-3xl text-white font-bold">Others Movie</p>
