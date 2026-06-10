@@ -94,7 +94,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/favorite/{movie}', [FavoriteController::class, 'destroy'])->name('favorite.destroy');
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
 
-    
+    Route::post('/trailer-watch/{movie}', [LogActivityService::class, 'watchTrailer'])->name('watch-trailer.store');    
+
     Route::get('/movie/detail/{id}', [DetailController::class, 'index'])->name('movie.detail');
     Route::get('/collection/{id}', [CollectionController::class, 'show'])->name('collection.detail');
     Route::get('/actor/{id}', [DashboardController::class, 'getActorMovie'])->name('actor.detail');

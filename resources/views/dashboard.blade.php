@@ -39,7 +39,7 @@
             @endforeach
         </div>
         @endif
-        
+
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
                 <p class="text-xl sm:text-3xl text-white font-bold">Suggested Collection</p>
@@ -58,23 +58,19 @@
 
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
-                <p class="text-xl sm:text-3xl text-white font-bold">Top On Its Genre</p>
-                <p class="text-xs sm:text-sm text-gray-400 mt-1">One the best movie in each genre</p>
+                <p class="text-xl sm:text-3xl text-white font-bold">Actors</p>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">Suggested actors for you</p>
             </h1>
         </div>
         <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
-            @foreach($topByGenre as $movie)
-            <x-movie.movie-modal
-                :poster="$movie->poster_url"
-                :title="$movie->title"
-                :tmdb_movie_id="$movie->tmdb_movie_id"
-                :year="$movie->year ?? null"
-                :rating="$movie->rating ?? null"
-                :overview="$movie->overview ?? null"
-                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                :duration="$movie->runtime ?? null" />
+            @foreach($actors as $actor)
+            <x-movie.actor-card
+                :actor_id="$actor->tmdb_actor_id"
+                :image_url="$actor->image_url"
+                :name="$actor->name" />
             @endforeach
         </div>
+
 
         @if(isset($watchlist) && $watchlist->isNotEmpty())
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
@@ -97,7 +93,7 @@
             @endforeach
             <a href="{{ route('watchlist.index') }}" class="flex flex-col items-center justify-center">
                 <button
-                class="flex z-10 bg-white/15 hover:bg-white/25 text-white border-0
+                    class="flex z-10 bg-white/15 hover:bg-white/25 text-white border-0
                     w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center
                     text-base md:text-lg cursor-pointer transition">&#8250;</button>
                 <p class="text-sm text-white font-bold justify-content justify-center items-center flex mt-2">
@@ -109,18 +105,24 @@
 
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
-                <p class="text-xl sm:text-3xl text-white font-bold">Actors</p>
-                <p class="text-xs sm:text-sm text-gray-400 mt-1">Suggested actors for you</p>
+                <p class="text-xl sm:text-3xl text-white font-bold">Upcomming Movie</p>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">We think you'll love these – coming soon</p>
             </h1>
         </div>
         <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
-            @foreach($actors as $actor)
-            <x-movie.actor-card
-                :actor_id="$actor->tmdb_actor_id"
-                :image_url="$actor->image_url"
-                :name="$actor->name"/>
+            @foreach($upcomming as $movie)
+            <x-movie.movie-modal
+                :poster="$movie->poster_url"
+                :title="$movie->title"
+                :tmdb_movie_id="$movie->tmdb_movie_id"
+                :year="$movie->year ?? null"
+                :rating="$movie->rating ?? null"
+                :overview="$movie->overview ?? null"
+                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                :duration="$movie->runtime ?? null" />
             @endforeach
         </div>
+        
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
                 <p class="text-xl sm:text-3xl text-white font-bold">Others Movie</p>
@@ -148,94 +150,95 @@
         </div>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-            // Handle all movie cards with hover panels
-            document.querySelectorAll('[data-card]').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    const panel = card.querySelector('[data-panel]');
-                    if (!panel) return;
-                    
-                    const rect = card.getBoundingClientRect();
-                    
-                    // Determine panel width based on screen size
-                    let panelWidth;
-                    if (window.innerWidth >= 1024) {
-                        panelWidth = 560;
-                    } else if (window.innerWidth >= 768) {
-                        panelWidth = 460;
-                    } else {
-                        panelWidth = 360;
-                    }
-                    
-                    // Check if panel would exceed viewport width
-                    const panelRightEdge = rect.left + panelWidth;
-                    
-                    if (panelRightEdge > window.innerWidth) {
-                        // Panel akan keluar dari kanan, posisikan ke kiri
-                        panel.style.left = 'auto';
-                        panel.style.right = '0';
-                    } else {
-                        // Panel bisa normal ke kanan
-                        panel.style.left = '0';
-                        panel.style.right = 'auto';
-                    }
-                });
-                
-                // Repositionkan saat window resize
-                card.addEventListener('mousemove', function() {
-                    const panel = card.querySelector('[data-panel]');
-                    if (!panel) return;
-                    
-                    const rect = card.getBoundingClientRect();
-                    let panelWidth;
-                    
-                    if (window.innerWidth >= 1024) {
-                        panelWidth = 560;
-                    } else if (window.innerWidth >= 768) {
-                        panelWidth = 460;
-                    } else {
-                        panelWidth = 360;
-                    }
-                    
-                    const panelRightEdge = rect.left + panelWidth;
-                    
-                    if (panelRightEdge > window.innerWidth) {
-                        panel.style.left = 'auto';
-                        panel.style.right = '0';
-                    } else {
-                        panel.style.left = '0';
-                        panel.style.right = 'auto';
-                    }
-                });
-            });
-            
-            // Handle window resize untuk re-check positioning
-            window.addEventListener('resize', function() {
+                // Handle all movie cards with hover panels
                 document.querySelectorAll('[data-card]').forEach(card => {
-                    const panel = card.querySelector('[data-panel]');
-                    if (!panel || panel.style.visibility === 'hidden') return;
-                    
-                    const rect = card.getBoundingClientRect();
-                    let panelWidth;
-                    
-                    if (window.innerWidth >= 1024) {
-                        panelWidth = 560;
-                    } else if (window.innerWidth >= 768) {
-                        panelWidth = 460;
-                    } else {
-                        panelWidth = 360;
-                    }
-                    
-                    const panelRightEdge = rect.left + panelWidth;
-                    
-                    if (panelRightEdge > window.innerWidth) {
-                        panel.style.left = 'auto';
-                        panel.style.right = '0';
-                    } else {
-                        panel.style.left = '0';
-                        panel.style.right = 'auto';
-                    }
+                    card.addEventListener('mouseenter', function() {
+                        const panel = card.querySelector('[data-panel]');
+                        if (!panel) return;
+
+                        const rect = card.getBoundingClientRect();
+
+                        // Determine panel width based on screen size
+                        let panelWidth;
+                        if (window.innerWidth >= 1024) {
+                            panelWidth = 560;
+                        } else if (window.innerWidth >= 768) {
+                            panelWidth = 460;
+                        } else {
+                            panelWidth = 360;
+                        }
+
+                        // Check if panel would exceed viewport width
+                        const panelRightEdge = rect.left + panelWidth;
+
+                        if (panelRightEdge > window.innerWidth) {
+                            // Panel akan keluar dari kanan, posisikan ke kiri
+                            panel.style.left = 'auto';
+                            panel.style.right = '0';
+                        } else {
+                            // Panel bisa normal ke kanan
+                            panel.style.left = '0';
+                            panel.style.right = 'auto';
+                        }
+                    });
+
+                    // Repositionkan saat window resize
+                    card.addEventListener('mousemove', function() {
+                        const panel = card.querySelector('[data-panel]');
+                        if (!panel) return;
+
+                        const rect = card.getBoundingClientRect();
+                        let panelWidth;
+
+                        if (window.innerWidth >= 1024) {
+                            panelWidth = 560;
+                        } else if (window.innerWidth >= 768) {
+                            panelWidth = 460;
+                        } else {
+                            panelWidth = 360;
+                        }
+
+                        const panelRightEdge = rect.left + panelWidth;
+
+                        if (panelRightEdge > window.innerWidth) {
+                            panel.style.left = 'auto';
+                            panel.style.right = '0';
+                        } else {
+                            panel.style.left = '0';
+                            panel.style.right = 'auto';
+                        }
+                    });
+                });
+
+                // Handle window resize untuk re-check positioning
+                window.addEventListener('resize', function() {
+                    document.querySelectorAll('[data-card]').forEach(card => {
+                        const panel = card.querySelector('[data-panel]');
+                        if (!panel || panel.style.visibility === 'hidden') return;
+
+                        const rect = card.getBoundingClientRect();
+                        let panelWidth;
+
+                        if (window.innerWidth >= 1024) {
+                            panelWidth = 560;
+                        } else if (window.innerWidth >= 768) {
+                            panelWidth = 460;
+                        } else {
+                            panelWidth = 360;
+                        }
+
+                        const panelRightEdge = rect.left + panelWidth;
+
+                        if (panelRightEdge > window.innerWidth) {
+                            panel.style.left = 'auto';
+                            panel.style.right = '0';
+                        } else {
+                            panel.style.left = '0';
+                            panel.style.right = 'auto';
+                        }
+                    });
                 });
             });
-        });
         </script>
-    </div> </x-app-layout>
+    </div>
+</x-app-layout>

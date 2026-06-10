@@ -13,31 +13,31 @@ class movies_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("data/processed/updated2/movies_final.json");
+        $path = base_path("data/processed/final/movies.json");
         $json = file_get_contents($path);
-        $movies = json_decode($json,true);
+        $movies = json_decode($json, true);
         $batchSize = 500;
         $data = [];
-        
-        foreach($movies as $movie){
-            $releaseDate = !empty($movie['release_date'])
+
+        foreach ($movies as $movie) {
+            $releaseDate = filled($movie['release_date'] ?? null)
                 ? \Carbon\Carbon::parse($movie['release_date'])
                 : null;
 
             $status = (
-                $releaseDate &&
+                !$releaseDate ||
                 $releaseDate->isAfter(today())
             )
                 ? 'upcoming'
                 : 'released';
-                
+
             $data[] = [
                 'tmdb_movie_id' => $movie["tmdb_movie_id"],
                 'title' => $movie["title"],
                 'overview' => $movie["overview"],
                 'poster_path' => $movie["poster_path"],
                 'popularity' => $movie["popularity"],
-                'release_date' => $movie["release_date"],
+                'release_date' => filled($movie['release_date'] ?? null)? $movie['release_date'] : null ,
                 'runtime' => $movie["runtime"],
                 'status' => $status,
                 'tagline' => $movie["tagline"],
@@ -47,13 +47,13 @@ class movies_seeder extends Seeder
                 'tmdb_collection_id' => $movie["collection_id"],
                 'trailer_key' => $movie["trailer_key"],
                 'trailer_size' => $movie["trailer_size"],
-                ];
-            if(count($data) === $batchSize){
+            ];
+            if (count($data) === $batchSize) {
                 DB::table("movies")->insert($data);
                 $data = [];
             }
         }
-        if(!empty($data)){
+        if (!empty($data)) {
             DB::table("movies")->insert($data);
         }
     }

@@ -12,7 +12,7 @@ class normalizeMovieSeeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path('data/processed/updated2/fixed_normalize_movie.json');
+        $path = base_path('data/processed/final/fixed_normalize_movie.json');
         $json = file_get_contents($path);
         $movies = json_decode($json, true);
 
