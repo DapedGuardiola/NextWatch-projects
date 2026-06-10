@@ -29,6 +29,7 @@ class OriginalLanguageHelper
             'pa' => 'Punjabi',
             'si' => 'Sinhala',
             'ne' => 'Nepali',
+            'kn' => 'Kannada',
 
             // Eropa Barat
             'fr' => 'French',
@@ -48,6 +49,8 @@ class OriginalLanguageHelper
             'cy' => 'Welsh',
             'af' => 'Afrikaans',
             'no' => 'Norwegian',
+            'ga' => 'Irish',
+            'la' => 'Latin',
 
             // Eropa Timur & Tengah
             'ru' => 'Russian',
@@ -69,6 +72,7 @@ class OriginalLanguageHelper
             'mk' => 'Macedonian',
             'sq' => 'Albanian',
             'el' => 'Greek',
+            'sh' => 'Serbo-Croatian',
 
             // Timur Tengah & Afrika
             'ar' => 'Arabic',

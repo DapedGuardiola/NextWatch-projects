@@ -788,7 +788,7 @@
 
                     </div>
 
-                    <div class="flex gap-8 w-full mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+                    <div class="flex gap-4 md:gap-8 w-full mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
                         @foreach($similarMovies as $similar)
                         <x-movie.movie-modal
                             :poster="$similar->poster_url"

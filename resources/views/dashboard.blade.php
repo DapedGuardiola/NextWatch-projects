@@ -46,7 +46,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top movies on your preference</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
             @foreach($forYou as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -67,7 +67,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top Collections by your preference</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
             @foreach($collections as $collection)
             <x-movie.collection-modal
                 :poster="$collection->backdrop_url"
@@ -83,7 +83,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Suggested actors for you</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($actors as $actor)
             <x-movie.actor-card
                 :actor_id="$actor->tmdb_actor_id"
@@ -100,7 +100,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Movies you want to watch later</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($watchlist as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
@@ -130,7 +130,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">We think you'll love these – coming soon</p>
             </h1>
         </div>
-        <div class="flex gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
+        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
             @foreach($upcomming as $movie)
             <x-movie.movie-modal
                 :poster="$movie->poster_url"
