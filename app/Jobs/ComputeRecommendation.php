@@ -38,6 +38,10 @@ class ComputeRecommendation implements ShouldQueue
         $interacted = Cache::remember("user_movie_interacted_{$this->userId}", 7600, function () use ($user_id) {
             return userMovieInteracted::where('user_id', $user_id)->get()->pluck('tmdb_movie_id')->toArray();
         });
+
+        $incoming_ids = Cache::rememberForever("upcoming_movie_ids", function () {
+            return Movie::where('status', 'upcoming')->get()->pluck('tmdb_movie_id')->toArray();
+        });
         $movies = Movie::whereHas('genres', function ($query) use ($userGenreIds, $userGenres) {
             $query->whereIn('map_genre_id', $userGenreIds);
         })->with([
@@ -61,8 +65,9 @@ class ComputeRecommendation implements ShouldQueue
                 'normalizedData' => $movie->normalizedData,
             ];
         })->toArray();
-        $movies = array_values(array_filter($movies, function ($movie) use ($interacted) {
-            return !in_array($movie['movie_id'], $interacted);
+        $movies = array_values(array_filter($movies, function ($movie) use ($interacted,$incoming_ids) {
+            return !in_array($movie['movie_id'], $interacted)
+                && !in_array($movie['movie_id'], $incoming_ids);
         }));
         if ($userGenres && $movies) {
             $recommendation_ids = $flaskService->computeRecommendation($userGenres, $userTastes, $movies);

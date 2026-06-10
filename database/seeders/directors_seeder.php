@@ -13,7 +13,7 @@ class directors_seeder extends Seeder
      */
     public function run(): void
     {
-        $path = base_path("data/processed/updated2/director_final.json");
+        $path = base_path("data/processed/final/directors.json");
         $json = file_get_contents($path);
         $directors = json_decode($json, true);
         $batchSize = 500;
