@@ -10,7 +10,7 @@
         <div class="relative min-h-screen bg-gradient-to-b from-transparent via-[#020817]/40 via-25% via-[#020817]/80 via-50% to-[#020817] to-100% pt-12">
 
             {{-- Info Koleksi --}}
-            <div class="px-4 sm:px-10 lg:px-20 max-w-5xl mb-6 sm:mb-10">
+            <div class="px-4 sm:px-10 lg:px-20 w-full mb-6 sm:mb-10">
                 <div class="font-bold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
                     {{ $collection->name }}
                 </div>
