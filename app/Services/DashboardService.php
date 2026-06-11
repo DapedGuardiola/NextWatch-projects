@@ -104,10 +104,19 @@ class DashboardService
     {
         class_exists(\App\Models\Movie::class);
         $user_id = $this->user_id;
-        $recommended_ids = Cache::remember("user_rec_movie_{$user_id}", now()->addDays(7), function () use ($user_id) {
-            return UserRecommendation::where('user_id', $user_id)
-                ->pluck('tmdb_movie_id')->toArray();
+        // Di Controller, sebelum Cache::remember
+        Log::info('READING KEY: ' . "user_rec_movie_{$user_id}");
+        $cacheData = Cache::remember("user_rec_movie_{$user_id}", now()->addDays(7), function () use ($user_id) {
+            Log::info('CACHE MISS - HIT DB for user: ' . $user_id);
+            return [
+                'ids' => UserRecommendation::where('user_id', $user_id)->pluck('tmdb_movie_id')->toArray(),
+                'cached_at' => now()->toDateTimeString(),
+            ];
         });
+
+        $recommended_ids = $cacheData['ids'];
+        Log::info('GOT IDS count: ' . count($recommended_ids) . ' cached_at: ' . $cacheData['cached_at']);
+
         $finalMoviesArray = [];
         foreach ($recommended_ids as $id) {
             $finalMoviesArray[] = Cache::remember("movie_detail_{$id}", now()->addDays(7), function () use ($id) {
@@ -138,7 +147,7 @@ class DashboardService
             })
             ->values()
             ->unique('tmdb_movie_id');
-        $actor_ids = cache::remember("user_rec_actor_{$user_id}", 7600, function () use ($finalMovies) {
+        $actor_ids = Cache::remember("user_rec_actor_{$user_id}", 7600, function () use ($finalMovies) {
             return $finalMovies->flatMap(function ($movie) {
                 return $movie->actors ? $movie->actors->pluck('tmdb_actor_id') : [];
             })
@@ -151,7 +160,7 @@ class DashboardService
 
         $actorsArray = [];
         foreach ($actor_ids as $id) {
-            $actorsArray[] = cache::remember("actor_detail_{$id}", 7600, function () use ($id) {
+            $actorsArray[] = Cache::remember("actor_detail_{$id}", 7600, function () use ($id) {
                 $actor = Actor::where('tmdb_actor_id', $id)->first();
                 return $actor ? $actor->toArray() : null;
             });
@@ -161,7 +170,7 @@ class DashboardService
         // Kita ubah array murni tadi kembali menjadi Objek Model Movie asli Laravel
         $actors = Actor::hydrate($cleanActorArrays);
 
-        $collection_ids = cache::remember("user_rec_collection_{$user_id}", 7600, function () use ($finalMovies) {
+        $collection_ids = Cache::remember("user_rec_collection_{$user_id}", 7600, function () use ($finalMovies) {
             return $finalMovies
                 ->whereNotNull('tmdb_collection_id')
                 ->unique('tmdb_collection_id')
@@ -170,17 +179,17 @@ class DashboardService
         });
         $collectionsArray = [];
         foreach ($collection_ids as $id) {
-            $collectionsArray[] = cache::remember("collection_detail_{$id}", 7600, function () use ($id) {
+            $collectionsArray[] = Cache::remember("collection_detail_{$id}", 7600, function () use ($id) {
                 $collection =  CollectionModel::where('tmdb_collection_id', $id)->first();
                 return $collection ? $collection->toArray() : null;
             });
         }
         $cleanCollection = array_filter($collectionsArray);
         $collections = CollectionModel::hydrate($cleanCollection);
-        $user_genre_id = cache::remember("user_genre_main_{$user_id}", 7600, function () use ($user_id) {
+        $user_genre_id = Cache::remember("user_genre_main_{$user_id}", 7600, function () use ($user_id) {
             return UserGenre::where('user_id', $user_id)->get()->pluck('genre_id')->toArray();
         });
-        $upcomming_ids = cache::remember("user_upcomming_{$user_id}", 7600, function () use ($user_genre_id) {
+        $upcomming_ids = Cache::remember("user_upcomming_{$user_id}", 7600, function () use ($user_genre_id) {
             return Movie::where('status', 'upcoming')
                 ->whereHas('genres', function ($query) use ($user_genre_id) {
                     $query->whereIn('map_genre_id', $user_genre_id);
