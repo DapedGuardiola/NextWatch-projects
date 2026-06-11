@@ -71,9 +71,9 @@
                                     {{ $movie->runtime }} min
                                 </div>
                                 <a href="{{ route('dashboard.discover') }}?language={{ urlencode($movie->original_language) }}"
-                                    class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 uppercase text-gray-200
+                                    class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-200
                                     hover:bg-cyan-500/20 hover:border-cyan-400/40 transition duration-300">
-                                    {{ $movie->original_language }}
+                                    {{ $movie->language_name }}
                                 </a>
                             </div>
                             {{-- Genres --}}
@@ -281,9 +281,9 @@
                                     {{ $movie->runtime }} min
                                 </div>
                                 <a href="{{ route('dashboard.discover') }}?language={{ urlencode($movie->original_language) }}"
-                                    class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 uppercase text-gray-200
+                                    class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200
                                     hover:bg-cyan-500/20 hover:border-cyan-400/40 hover:text-cyan-100 transition duration-300 inline-block">
-                                    {{ $movie->original_language }}
+                                    {{ $movie->language_name }}
                                 </a>
                             </div>
                             <div class="mt-8 space-y-4 max-w-3xl">
