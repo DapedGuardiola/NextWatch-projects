@@ -804,18 +804,28 @@
 
                     </div>
 
-                    <div class="flex gap-4 md:gap-8 w-full mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
-                        @foreach($similarMovies as $similar)
-                        <x-movie.movie-modal
-                            :poster="$similar->poster_url"
-                            :title="$similar->title"
-                            :tmdb_movie_id="$similar->tmdb_movie_id"
-                            :year="$similar->year ?? null"
-                            :rating="$similar->rating ?? null"
-                            :overview="$similar->overview ?? null"
-                            :genres="$similar->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                            :duration="$similar->runtime ?? null" />
-                        @endforeach
+                    <div class="max-w-full mx-auto relative">
+                        <button id="similarPrev" onclick="scrollByItems(document.getElementById('similarScroll'), -1)"
+                            class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <div id="similarScroll" class="flex gap-4 md:gap-8 overflow-hidden overflow-x-auto scrollbar-hide scroll-smooth">
+                            @foreach($similarMovies as $similar)
+                            <x-movie.movie-modal
+                                :poster="$similar->poster_url"
+                                :title="$similar->title"
+                                :tmdb_movie_id="$similar->tmdb_movie_id"
+                                :year="$similar->year ?? null"
+                                :rating="$similar->rating ?? null"
+                                :overview="$similar->overview ?? null"
+                                :genres="$similar->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                                :duration="$similar->runtime ?? null" />
+                            @endforeach
+                        </div>
+                        <button id="similarNext" onclick="scrollByItems(document.getElementById('similarScroll'), 1)"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
                     </div>
 
                 </section>
@@ -1260,5 +1270,45 @@
                 `Show ${count} ${count === 1 ? 'reply' : 'replies'}` :
                 `Hide ${count} ${count === 1 ? 'reply' : 'replies'}`;
         }
+
+        // Scroll Arrows Logic
+        function scrollByItems(container, direction, count = 2) {
+            const item = container.querySelector(':scope > *');
+            if (!item) return;
+            const gap = parseFloat(getComputedStyle(container).gap) || 0;
+            const scrollAmount = (item.offsetWidth + gap) * count;
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        function initScrollArrows(scrollId, prevId, nextId) {
+            const container = document.getElementById(scrollId);
+            const prev = document.getElementById(prevId);
+            const next = document.getElementById(nextId);
+            if (!container || !prev || !next) return;
+
+            function update() {
+                // Sembunyikan semua arrow di mobile
+                if (window.innerWidth < 640) {
+                    prev.classList.add('hidden');
+                    prev.classList.remove('flex');
+                    next.classList.add('hidden');
+                    next.classList.remove('flex');
+                    return;
+                }
+
+                const { scrollLeft, scrollWidth, clientWidth } = container;
+                prev.classList.toggle('hidden', scrollLeft <= 0);
+                prev.classList.toggle('flex', scrollLeft > 0);
+                const atEnd = scrollLeft + clientWidth >= scrollWidth - 1;
+                next.classList.toggle('hidden', atEnd);
+                next.classList.toggle('flex', !atEnd);
+            }
+
+            container.addEventListener('scroll', update);
+            window.addEventListener('resize', update);
+            window.addEventListener('load', update);
+        }
+
+        initScrollArrows('similarScroll', 'similarPrev', 'similarNext');
     </script>
 </x-app-layout>
