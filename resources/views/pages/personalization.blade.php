@@ -7,6 +7,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/brand/logo2.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/brand/logo2.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/brand/logo2.png') }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         [x-cloak] { display: none !important; }
@@ -147,9 +151,9 @@
         .search-item:hover, .search-item:active { background: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body class="bg-[#070709] text-white h-screen overflow-hidden">
+<body class="bg-[#070709] text-white h-screen overflow-hidden mx-auto my-auto">
 
-<div x-data="onboarding()" class="relative h-full overflow-hidden">
+<div x-data="onboarding()" class="relative h-full overflow-hidden mx-auto my-auto">
 
     {{-- PROGRESS LINE --}}
     <div class="fixed top-0 left-0 right-0 h-px bg-white/[0.06] z-50">
@@ -173,7 +177,7 @@
         @csrf
 
         {{-- ========== STEP 1: INTRO ========== --}}
-        <div class="step-section px-6 pt-16 pb-16 sm:px-12 sm:pt-20 sm:pb-12"
+        <div class="step-section mx-auto my-auto"
              :class="step !== 1 ? (step > 1 ? 'prev' : 'hidden') : ''">
             <div class="w-full max-w-[480px] text-center">
 
@@ -221,7 +225,7 @@
         </div>
 
         {{-- ========== STEP 2: GENRE ========== --}}
-        <div class="step-section px-5 pt-16 pb-20 sm:px-12 sm:pt-20 sm:pb-12"
+        <div class="step-section mx-auto my-auto"
              :class="step !== 2 ? (step > 2 ? 'prev' : 'hidden') : ''">
             <div class="w-full max-w-[680px] text-center flex flex-col h-full justify-center">
 
@@ -277,7 +281,7 @@
         </div>
 
         {{-- ========== STEP 3: FILM ========== --}}
-        <div class="step-section px-5 pt-16 pb-20 sm:px-12 sm:pt-20 sm:pb-12"
+        <div class="step-section mx-auto my-auto"
              :class="step !== 3 ? (step > 3 ? 'prev' : 'hidden') : ''">
             <div class="w-full max-w-[640px] text-center">
 
