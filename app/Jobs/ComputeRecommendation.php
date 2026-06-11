@@ -65,7 +65,7 @@ class ComputeRecommendation implements ShouldQueue
                 'normalizedData' => $movie->normalizedData,
             ];
         })->toArray();
-        $movies = array_values(array_filter($movies, function ($movie) use ($interacted,$incoming_ids) {
+        $movies = array_values(array_filter($movies, function ($movie) use ($interacted, $incoming_ids) {
             return !in_array($movie['movie_id'], $interacted)
                 && !in_array($movie['movie_id'], $incoming_ids);
         }));
@@ -87,10 +87,11 @@ class ComputeRecommendation implements ShouldQueue
                     UserRecommendation::where('user_id', $this->userId)->delete();
                     UserRecommendation::insert($data);
                 });
+
+                Cache::forget("user_rec_movie_{$this->userId}");
+                Cache::put("user_rec_movie_{$this->userId}", $recommendation_ids->toArray(), 7600);
             }
 
-            // 1. Simpan array ID rekomendasi film milik user
-            Cache::put("user_rec_movie_{$this->userId}", $recommendation_ids->toArray(), 7600);
 
             // Ambil detail film dari DB (Pastikan sertakan 'tmdb_collection_id' jika ada di tabel movies)
             $movies = Movie::selectRaw('movies.*, YEAR(release_date) as year')
