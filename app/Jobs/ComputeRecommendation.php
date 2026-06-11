@@ -15,6 +15,7 @@ use App\Models\Actor;
 use App\Models\CollectionModel;
 use App\Models\userMovieInteracted;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ComputeRecommendation implements ShouldQueue
 {
@@ -87,9 +88,14 @@ class ComputeRecommendation implements ShouldQueue
                     UserRecommendation::where('user_id', $this->userId)->delete();
                     UserRecommendation::insert($data);
                 });
-
+                $cacheData = [
+                    'ids' => $recommendation_ids->toArray(),
+                    'cached_at' => now()->toDateTimeString(),
+                ];
+                Log::info('FORGET KEY: ' . "user_rec_movie_{$this->userId}");
                 Cache::forget("user_rec_movie_{$this->userId}");
-                Cache::put("user_rec_movie_{$this->userId}", $recommendation_ids->toArray(), 7600);
+                Cache::put("user_rec_movie_{$this->userId}", $cacheData, 7600);
+                Log::info('CACHE SET: ' . "user_rec_movie_{$this->userId}" . ' count: ' . count($recommendation_ids) . ' at: ' . $cacheData['cached_at']);
             }
 
 
