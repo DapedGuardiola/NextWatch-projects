@@ -14,23 +14,25 @@
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent from-10% via-[#020817]/75 via-20% to-[#020817] to-100%"></div>
 
         <div class="absolute bottom-[200px] left-6 sm:left-10 right-6 sm:right-10">
-            <div class="flex sm:gap-[300px]">
-                <div class="max-w-[80%] sm:max-w-[80%]">
-
+            <div class="flex justify-between items-end sm:items-center">
+                <div class="max-w-[70%] sm:max-w-[80%]">
                     <h1 class="sm:py-1 text-white text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight line-clamp-2 sm:line-clamp-0">
                         {{ $topOne->title }}
                     </h1>
                 </div>
-                
-            </div>
-            <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
-                class="sm:hidden my-auto -mt-[34px] inline-block absolute right-0 mt-6 px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
-                Detail
-            </a>
-            <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
-                    class="hidden sm:block -mt-[55px] absolute right-10 my-auto mt-6 inline-block px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 hover:text-grey font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
+
+                {{-- Mobile --}}
+                <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
+                    class="sm:hidden inline-block px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 font-regular transition duration-300 shadow-lg">
+                    Detail
+                </a>
+
+                {{-- Desktop --}}
+                <a href="{{ route('movie.detail', $topOne->tmdb_movie_id) }}"
+                    class="hidden sm:inline-block px-6 py-2 text-sm rounded-xl bg-black/30 text-white hover:bg-black/50 font-regular sm:rounded-3xl sm:text-xl transition duration-300 shadow-lg">
                     See Detail
                 </a>
+            </div>
         </div>
 
     </div>
