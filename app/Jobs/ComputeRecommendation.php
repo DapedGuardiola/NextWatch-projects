@@ -13,6 +13,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\Actor;
 use App\Models\CollectionModel;
+use App\Models\userActors;
+use App\Models\userCollections;
 use App\Models\userMovieInteracted;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -43,7 +45,7 @@ class ComputeRecommendation implements ShouldQueue
         $incoming_ids = Cache::rememberForever("upcoming_movie_ids", function () {
             return Movie::where('status', 'upcoming')->get()->pluck('tmdb_movie_id')->toArray();
         });
-        $movies = Movie::whereHas('genres', function ($query) use ($userGenreIds, $userGenres) {
+        $movies = Movie::select('tmdb_movie_id', 'release_date')->whereHas('genres', function ($query) use ($userGenreIds, $userGenres) {
             $query->whereIn('map_genre_id', $userGenreIds);
         })->with([
             'genres:tmdb_movie_id,map_genre_id',
@@ -62,6 +64,7 @@ class ComputeRecommendation implements ShouldQueue
                     )
                     : null
                 ),
+                'actor_ids' => $movie->actors->pluck('tmdb_actor_id')->toArray(),
                 'director_ids' => $movie->directors->pluck('tmdb_director_id')->toArray(),
                 'normalizedData' => $movie->normalizedData,
             ];
@@ -88,8 +91,6 @@ class ComputeRecommendation implements ShouldQueue
                     UserRecommendation::where('user_id', $this->userId)->delete();
                     UserRecommendation::insert($data);
                 });
-                Cache::forget("user_rec_collection_{$this->userId}");
-                Cache::forget("user_rec_actor_{$this->userId}");
             }
 
 
@@ -106,14 +107,33 @@ class ComputeRecommendation implements ShouldQueue
             ]);
             $topActors = $movies->flatMap(function ($movie) {
                 return $movie->actors ? $movie->actors->pluck('tmdb_actor_id') : [];
-            })->countBy()->sortDesc()->take(12)->keys()->toArray();
-            Cache::put("user_rec_actor_{$this->userId}", $topActors, 7600);
+            })->countBy()->sortDesc()->take(12)->keys();
+
+            $dataActor = $topActors->map(fn($i) => [
+                'user_id'       => $this->userId,
+                'tmdb_actor_id' => $i,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ])->toArray();
+            DB::transaction(function () use ($dataActor) {
+                userActors::where('user_id', $this->userId)->delete();
+                userActors::insert($dataActor);
+            });
             // 4. Hitung Top Koleksi
             $topCollections = $movies->whereNotNull('tmdb_collection_id')
                 ->unique('tmdb_collection_id')
                 ->take(7)
-                ->pluck('tmdb_collection_id')->toArray();
-            Cache::put("user_rec_collection_{$this->userId}", $topCollections, 7600);
+                ->pluck('tmdb_collection_id');
+            $dataCollections = $topCollections->map(fn($i) => [
+                'user_id'       => $this->userId,
+                'tmdb_collection_id' => $i,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ])->toArray();
+            DB::transaction(function () use ($dataCollections) {
+                userCollections::where('user_id', $this->userId)->delete();
+                userCollections::insert($dataCollections);
+            });
 
             // Update Persona Status
             // --- OPTIMASI CACHING DETAIL AKTOR (ANTI N+1 QUERY) ---
