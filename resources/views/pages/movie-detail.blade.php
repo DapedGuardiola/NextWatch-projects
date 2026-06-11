@@ -50,11 +50,19 @@
                     @endif
 
                     {{-- 2. Poster + Meta --}}
-                    <div class="flex gap-4 items-start">
+                    <div class="flex gap-4 items-center">
                         <div class="w-28 flex-shrink-0">
                             <img src="https://image.tmdb.org/t/p/w500/{{ $movie->poster_path }}"
                                 alt="{{ $movie->title }}"
                                 class="w-full rounded-2xl shadow-xl border border-white/10 object-cover aspect-[4/6]">
+                                
+                                {{-- Mobile --}}
+                            @if($movie->tmdb_collection_id && isset($movie->tmdb_collection_id))
+                                <a href="{{ route('collection.detail', $movie->tmdb_collection_id) }}"
+                                    class="sm:hidden w-full mt-2 text-center inline-block px-4 py-[1.5px] text-sm rounded-2xl bg-white border border-cyan-400/20 text-semibold text-cyan-700 hover:bg-cyan-400/10 hover:text-cyan-300 sm:rounded-3xl sm:text-lg transition duration-300 shadow-lg">
+                                    Collection
+                                </a>
+                                @endif
                         </div>
                         <div class="flex-1 flex flex-col gap-2 pt-1">
                             <h1 class="text-2xl font-black leading-tight tracking-tight">{{ $movie->title }}</h1>
@@ -85,6 +93,7 @@
                                     {{ is_object($genre) ? $genre->name : $genre }}
                                 </a>
                                 @endforeach
+
                             </div>
                         </div>
                     </div>
@@ -321,6 +330,13 @@
                                             {{ is_object($genre) ? $genre->name : $genre }}
                                         </a>
                                         @endforeach
+                                        @if($movie->tmdb_collection_id && isset($movie->tmdb_collection_id))
+                                        {{-- Desktop --}}
+                                        <a href="{{ route('collection.detail', $movie->tmdb_collection_id) }}"
+                                            class="hidden sm:inline-block px-4 py-1 text-sm rounded-xl bg-white border border-cyan-400/20 text-semibold text-cyan-700 hover:bg-cyan-400/10 hover:text-cyan-300 sm:rounded-3xl sm:text-lg transition duration-300 shadow-lg">
+                                            Go To Collection
+                                        </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
