@@ -48,18 +48,48 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top movies on your preference</p>
             </h1>
         </div>
-        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
-            @foreach($forYou as $movie)
-            <x-movie.movie-modal
-                :poster="$movie->poster_url"
-                :title="$movie->title"
-                :tmdb_movie_id="$movie->tmdb_movie_id"
-                :year="$movie->year ?? null"
-                :rating="$movie->rating ?? null"
-                :overview="$movie->overview ?? null"
-                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                :duration="$movie->runtime ?? null" />
-            @endforeach
+        <div class="max-w-[90%] mx-auto relative">
+            {{-- Arrow Left --}}
+            <button
+                id="ContPrev"
+                onclick="scrollByItems(document.getElementById('ScrollContainer'), -1)"
+                class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10
+                    w-10 h-10 items-center justify-center
+                    rounded-full bg-black/60 border border-white/10
+                    text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            {{-- Scroll Container --}}
+            <div id="ScrollContainer"
+                class="flex gap-4 md:gap-8 overflow-hidden overflow-x-auto scrollbar-hide scroll-smooth">
+                @foreach($forYou as $movie)
+                    <x-movie.movie-modal
+                        :poster="$movie->poster_url"
+                        :title="$movie->title"
+                        :tmdb_movie_id="$movie->tmdb_movie_id"
+                        :year="$movie->year ?? null"
+                        :rating="$movie->rating ?? null"
+                        :overview="$movie->overview ?? null"
+                        :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                        :duration="$movie->runtime ?? null" />
+                @endforeach
+            </div>
+
+            {{-- Arrow Right --}}
+            <button
+                id="ContNext"
+                onclick="scrollByItems(document.getElementById('ScrollContainer'), 1)"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10
+                    w-10 h-10 flex items-center justify-center
+                    rounded-full bg-black/60 border border-white/10
+                    text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
         </div>
         @endif
 
@@ -69,14 +99,25 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Top Collections by your preference</p>
             </h1>
         </div>
-        <div class="flex gap-4 md:gap-8 max-w-[90%] mx-auto overflow-hidden overflow-x-auto scrollbar-hide">
-            @foreach($collections as $collection)
-            <x-movie.collection-modal
-                :poster="$collection->backdrop_url"
-                :name="$collection->name"
-                :tmdb_collection_id="$collection->tmdb_collection_id"
-                :overview="$collection->overview ?? null" />
-            @endforeach
+
+        <div class="max-w-[90%] mx-auto relative">
+            <button id="collectionPrev" onclick="scrollByItems(document.getElementById('collectionScroll'), -1)"
+                class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div id="collectionScroll" class="flex gap-4 md:gap-8 overflow-hidden overflow-x-auto scrollbar-hide scroll-smooth">
+                @foreach($collections as $collection)
+                <x-movie.collection-modal
+                    :poster="$collection->backdrop_url"
+                    :name="$collection->name"
+                    :tmdb_collection_id="$collection->tmdb_collection_id"
+                    :overview="$collection->overview ?? null" />
+                @endforeach
+            </div>
+            <button id="collectionNext" onclick="scrollByItems(document.getElementById('collectionScroll'), 1)"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
         </div>
 
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
@@ -85,15 +126,25 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">Suggested actors for you</p>
             </h1>
         </div>
-        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
-            @foreach($actors as $actor)
-            <x-movie.actor-card
-                :actor_id="$actor->tmdb_actor_id"
-                :image_url="$actor->image_url"
-                :name="$actor->name" />
-            @endforeach
-        </div>
 
+        <div class="max-w-[90%] mx-auto relative">
+            <button id="actorPrev" onclick="scrollByItems(document.getElementById('actorScroll'), -1)"
+                class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div id="actorScroll" class="flex gap-4 md:gap-8 overflow-hidden overflow-x-auto scrollbar-hide scroll-smooth">
+                @foreach($actors as $actor)
+                <x-movie.actor-card
+                    :actor_id="$actor->tmdb_actor_id"
+                    :image_url="$actor->image_url"
+                    :name="$actor->name" />
+                @endforeach
+            </div>
+            <button id="actorNext" onclick="scrollByItems(document.getElementById('actorScroll'), 1)"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+        </div>
 
         @if(isset($watchlist) && $watchlist->isNotEmpty())
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
@@ -128,22 +179,33 @@
 
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
             <h1>
-                <p class="text-xl sm:text-3xl text-white font-bold">Upcomming Movie</p>
+                <p class="text-xl sm:text-3xl text-white font-bold">Upcoming Movie</p>
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">We think you'll love these – coming soon</p>
             </h1>
         </div>
-        <div class="flex gap-4 md:gap-8 max-w-[90%] overflow-hidden mx-auto overflow-x-auto scrollbar-hide">
-            @foreach($upcomming as $movie)
-            <x-movie.movie-modal
-                :poster="$movie->poster_url"
-                :title="$movie->title"
-                :tmdb_movie_id="$movie->tmdb_movie_id"
-                :year="$movie->year ?? null"
-                :rating="$movie->rating ?? null"
-                :overview="$movie->overview ?? null"
-                :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
-                :duration="$movie->runtime ?? null" />
-            @endforeach
+
+        <div class="max-w-[90%] mx-auto relative">
+            <button id="upcomingPrev" onclick="scrollByItems(document.getElementById('upcomingScroll'), -1)"
+                class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div id="upcomingScroll" class="flex gap-4 md:gap-8 overflow-hidden overflow-x-auto scrollbar-hide scroll-smooth">
+                @foreach($upcomming as $movie)
+                <x-movie.movie-modal
+                    :poster="$movie->poster_url"
+                    :title="$movie->title"
+                    :tmdb_movie_id="$movie->tmdb_movie_id"
+                    :year="$movie->year ?? null"
+                    :rating="$movie->rating ?? null"
+                    :overview="$movie->overview ?? null"
+                    :genres="$movie->genres->pluck('genre.name')->filter()->toArray() ?? []"
+                    :duration="$movie->runtime ?? null" />
+                @endforeach
+            </div>
+            <button id="upcomingNext" onclick="scrollByItems(document.getElementById('upcomingScroll'), 1)"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
         </div>
 
         <div class="mx-4 sm:mx-10 my-6 sm:my-10">
@@ -262,6 +324,49 @@
                     });
                 });
             });
+
+            // Scroll Arrows Logic
+            function scrollByItems(container, direction, count = 2) {
+                const item = container.querySelector(':scope > *');
+                if (!item) return;
+                const gap = parseFloat(getComputedStyle(container).gap) || 0;
+                const scrollAmount = (item.offsetWidth + gap) * count;
+                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
+
+            function initScrollArrows(scrollId, prevId, nextId) {
+                const container = document.getElementById(scrollId);
+                const prev = document.getElementById(prevId);
+                const next = document.getElementById(nextId);
+                if (!container || !prev || !next) return;
+
+                function update() {
+                    // Sembunyikan semua arrow di mobile
+                    if (window.innerWidth < 640) {
+                        prev.classList.add('hidden');
+                        prev.classList.remove('flex');
+                        next.classList.add('hidden');
+                        next.classList.remove('flex');
+                        return;
+                    }
+
+                    const { scrollLeft, scrollWidth, clientWidth } = container;
+                    prev.classList.toggle('hidden', scrollLeft <= 0);
+                    prev.classList.toggle('flex', scrollLeft > 0);
+                    const atEnd = scrollLeft + clientWidth >= scrollWidth - 1;
+                    next.classList.toggle('hidden', atEnd);
+                    next.classList.toggle('flex', !atEnd);
+                }
+
+                container.addEventListener('scroll', update);
+                window.addEventListener('resize', update);
+                window.addEventListener('load', update);
+            }
+
+            initScrollArrows('ScrollContainer',  'ContPrev',       'ContNext');
+            initScrollArrows('collectionScroll', 'collectionPrev', 'collectionNext');
+            initScrollArrows('actorScroll',      'actorPrev',      'actorNext');
+            initScrollArrows('upcomingScroll',   'upcomingPrev',   'upcomingNext');
         </script>
     </div>
 </x-app-layout>
