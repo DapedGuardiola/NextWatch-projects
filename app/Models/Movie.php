@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Helpers\OriginalLanguageHelper;
 
 #[Fillable([
     'tmdb_movie_id',
@@ -91,6 +92,13 @@ class Movie extends Model
             'tmdb_actor_id',
             'tmdb_movie_id',
             'tmdb_actor_id'
+        );
+    }
+
+    protected function languageName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => OriginalLanguageHelper::getName($this->original_language)
         );
     }
     
