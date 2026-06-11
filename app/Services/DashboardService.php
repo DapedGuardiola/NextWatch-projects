@@ -105,18 +105,8 @@ class DashboardService
         class_exists(\App\Models\Movie::class);
         $user_id = $this->user_id;
         // Di Controller, sebelum Cache::remember
-        Log::info('READING KEY: ' . "user_rec_movie_{$user_id}");
-        $cacheData = Cache::remember("user_rec_movie_{$user_id}", now()->addDays(7), function () use ($user_id) {
-            Log::info('CACHE MISS - HIT DB for user: ' . $user_id);
-            return [
-                'ids' => UserRecommendation::where('user_id', $user_id)->pluck('tmdb_movie_id')->toArray(),
-                'cached_at' => now()->toDateTimeString(),
-            ];
-        });
-
-        $recommended_ids = $cacheData['ids'];
-        Log::info('GOT IDS count: ' . count($recommended_ids) . ' cached_at: ' . $cacheData['cached_at']);
-
+       $recommended_ids = UserRecommendation::where('user_id', $user_id)->pluck('tmdb_movie_id')->toArray();
+                
         $finalMoviesArray = [];
         foreach ($recommended_ids as $id) {
             $finalMoviesArray[] = Cache::remember("movie_detail_{$id}", now()->addDays(7), function () use ($id) {

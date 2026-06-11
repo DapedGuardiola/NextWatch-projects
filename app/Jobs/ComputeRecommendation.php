@@ -88,14 +88,6 @@ class ComputeRecommendation implements ShouldQueue
                     UserRecommendation::where('user_id', $this->userId)->delete();
                     UserRecommendation::insert($data);
                 });
-                $cacheData = [
-                    'ids' => $recommendation_ids->toArray(),
-                    'cached_at' => now()->toDateTimeString(),
-                ];
-                Log::info('FORGET KEY: ' . "user_rec_movie_{$this->userId}");
-                Cache::forget("user_rec_movie_{$this->userId}");
-                Cache::put("user_rec_movie_{$this->userId}", $cacheData, 7600);
-                Log::info('CACHE SET: ' . "user_rec_movie_{$this->userId}" . ' count: ' . count($recommendation_ids) . ' at: ' . $cacheData['cached_at']);
             }
 
 
