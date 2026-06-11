@@ -10,43 +10,19 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         [x-cloak] { display: none !important; }
-        html, body { height: 100%; overflow: hidden; background: #070709; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #fff;
-        }
-
-        .font-syne { font-family: 'Plus Jakarta Sans', sans-serif; }
-
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
 
-        /* Progress line */
-        .progress-line {
-            height: 1px;
-            background: rgba(255,255,255,0.06);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-        }
         .progress-fill {
             height: 100%;
             background: #fff;
             transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        /* Ambient bg blobs */
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-        }
-
-        /* Step section */
         .step-section {
             position: absolute;
             inset: 0;
@@ -54,7 +30,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 80px 48px 48px;
             transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .step-section.hidden {
@@ -68,7 +43,6 @@
             pointer-events: none;
         }
 
-        /* Step indicator */
         .step-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
@@ -81,19 +55,24 @@
             background: #fff;
         }
 
-        /* Genre pill */
         .genre-pill {
-            padding: 10px 20px;
+            padding: 8px 14px;
             border-radius: 99px;
             border: 1px solid rgba(255,255,255,0.1);
             background: rgba(255,255,255,0.04);
             color: rgba(255,255,255,0.55);
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
             white-space: nowrap;
+        }
+        @media (min-width: 640px) {
+            .genre-pill {
+                padding: 9px 18px;
+                font-size: 13px;
+            }
         }
         .genre-pill.disabled {
             opacity: 0.2;
@@ -112,7 +91,6 @@
             font-weight: 600;
         }
 
-        /* Movie card */
         .movie-chip {
             position: relative;
             cursor: pointer;
@@ -124,14 +102,7 @@
             from { transform: scale(0.85); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
-        .movie-chip-img {
-            width: 64px;
-            height: 96px;
-            object-fit: cover;
-            border-radius: 10px;
-            display: block;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
+
         .movie-chip-remove {
             position: absolute;
             top: -5px; right: -5px;
@@ -148,8 +119,11 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
         .movie-chip:hover .movie-chip-remove { opacity: 1; }
+        /* Always show remove on touch devices */
+        @media (hover: none) {
+            .movie-chip-remove { opacity: 1; }
+        }
 
-        /* Search dropdown */
         .search-dropdown {
             position: absolute;
             top: calc(100% + 8px);
@@ -170,170 +144,104 @@
             cursor: pointer;
             transition: background 0.15s ease;
         }
-        .search-item:hover { background: rgba(255,255,255,0.05); }
-        .search-item img {
-            width: 32px; height: 48px;
-            object-fit: cover;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            padding: 14px 36px;
-            background: #fff;
-            color: #070709;
-            border: none;
-            border-radius: 99px;
-            font-family: 'Syne', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            letter-spacing: 0.01em;
-        }
-        .btn-primary:hover {
-            background: rgba(255,255,255,0.9);
-            transform: translateY(-1px);
-        }
-        .btn-primary:disabled {
-            background: rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.3);
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-ghost {
-            padding: 14px 24px;
-            background: transparent;
-            color: rgba(255,255,255,0.35);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 99px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-ghost:hover {
-            color: rgba(255,255,255,0.7);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        /* Search input */
-        .search-input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px;
-            padding: 14px 16px 14px 44px;
-            font-size: 14px;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            transition: border-color 0.2s ease, background 0.2s ease;
-            outline: none;
-        }
-        .search-input::placeholder { color: rgba(255,255,255,0.25); }
-        .search-input:focus {
-            border-color: rgba(255,255,255,0.25);
-            background: rgba(255,255,255,0.07);
-        }
-
-        /* Divider line in step 1 */
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.4);
-        }
-        .feature-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.25);
-            flex-shrink: 0;
-        }
+        .search-item:hover, .search-item:active { background: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body>
+<body class="bg-[#070709] text-white h-screen overflow-hidden">
 
-<div x-data="onboarding()" class="relative h-screen overflow-hidden">
+<div x-data="onboarding()" class="relative h-full overflow-hidden">
 
-    {{-- PROGRESS --}}
-    <div class="progress-line">
+    {{-- PROGRESS LINE --}}
+    <div class="fixed top-0 left-0 right-0 h-px bg-white/[0.06] z-50">
         <div class="progress-fill" :style="'width:' + ((step / 3) * 100) + '%'"></div>
     </div>
 
-    {{-- AMBIENT BACKGROUND --}}
-    <div class="blob" style="width:600px;height:600px;top:-200px;left:-100px;background:rgba(88,80,236,0.08)"></div>
-    <div class="blob" style="width:500px;height:500px;bottom:-150px;right:-100px;background:rgba(236,80,120,0.06)"></div>
-    <div class="blob" style="width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.02)"></div>
+    {{-- AMBIENT BLOBS --}}
+    <div class="absolute -top-48 -left-24 w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] rounded-full pointer-events-none"
+         style="background:rgba(88,80,236,0.08);filter:blur(120px)"></div>
+    <div class="absolute -bottom-36 -right-24 w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] rounded-full pointer-events-none"
+         style="background:rgba(236,80,120,0.06);filter:blur(120px)"></div>
 
     {{-- STEP DOTS --}}
-    <div style="position:fixed;bottom:36px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100;">
+    <div class="fixed bottom-6 sm:bottom-9 left-1/2 -translate-x-1/2 flex gap-2 z-50">
         <template x-for="i in 3" :key="i">
             <div class="step-dot" :class="step >= i ? 'active' : ''"></div>
         </template>
     </div>
 
-    <form method="POST" action="{{ route('personalization.store') }}" style="height:100%">
+    <form method="POST" action="{{ route('personalization.store') }}" class="h-full">
         @csrf
 
         {{-- ========== STEP 1: INTRO ========== --}}
-        <div class="step-section" :class="step !== 1 ? (step > 1 ? 'prev' : 'hidden') : ''">
-            <div style="max-width:560px;width:100%;text-align:center;">
+        <div class="step-section px-6 pt-16 pb-16 sm:px-12 sm:pt-20 sm:pb-12"
+             :class="step !== 1 ? (step > 1 ? 'prev' : 'hidden') : ''">
+            <div class="w-full max-w-[480px] text-center">
 
                 {{-- Logo mark --}}
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 32px;">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-[14px] bg-white/[0.07] border border-white/10
+                            flex items-center justify-center mx-auto mb-7 sm:mb-8">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="rgba(255,255,255,0.7)" stroke-width="1.5" class="sm:w-[22px] sm:h-[22px]">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                 </div>
 
-                <h1 class="font-syne" style="font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:16px;">
+                <h1 class="text-[1.75rem] sm:text-[2.5rem] md:text-[2.8rem] font-extrabold leading-[1.1] tracking-[-0.03em] mb-4">
                     Temukan film yang
-                    <span style="color:rgba(255,255,255,0.35)">benar-benar untukmu</span>
+                    <span class="text-white/35">benar-benar untukmu</span>
                 </h1>
 
-                <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.7;max-width:380px;margin:0 auto 28px;">
+                <p class="text-[13px] sm:text-sm text-white/40 leading-relaxed max-w-[320px] sm:max-w-[380px] mx-auto mb-7 sm:mb-8">
                     Data yang anda berikan akan membantu sistem kami menemukan rekomendasi yang tepat untuk anda.
                 </p>
 
-                {{-- Features --}}
-                <div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto 32px;text-align:left;">
+                {{-- Feature list --}}
+                <div class="flex flex-col gap-2 max-w-[260px] sm:max-w-[280px] mx-auto mb-8 text-left">
                     @foreach(['Pilih genre favoritmu', 'Pilih film yang kamu suka', 'Rekomendasi langsung aktif'] as $idx => $f)
-                    <div class="feature-item">
-                        <div class="feature-dot"></div>
+                    <div class="flex items-center gap-[10px] text-[13px] text-white/40">
+                        <div class="w-[5px] h-[5px] rounded-full bg-white/25 flex-shrink-0"></div>
                         <span>{{ $f }}</span>
-                        <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.2)">{{ $idx + 1 }}/3</span>
+                        <span class="ml-auto text-[11px] text-white/20">{{ $idx + 1 }}/3</span>
                     </div>
                     @endforeach
                 </div>
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <button type="button" class="btn-primary" @click="step = 2">
+                <div class="flex items-center justify-center gap-3">
+                    <button type="button"
+                            class="px-8 py-3.5 sm:px-9 bg-white text-[#070709] rounded-full text-[14px] sm:text-[15px]
+                                   font-bold cursor-pointer transition-all hover:bg-white/90 active:scale-95"
+                            @click="step = 2">
                         Mulai →
                     </button>
-                    <span style="font-size:12px;color:rgba(255,255,255,0.2)">kurang dari 1 menit</span>
+                    <span class="text-[11px] text-white/20 hidden sm:inline">kurang dari 1 menit</span>
                 </div>
+                <p class="mt-3 text-[11px] text-white/20 sm:hidden">kurang dari 1 menit</p>
 
             </div>
         </div>
 
         {{-- ========== STEP 2: GENRE ========== --}}
-        <div class="step-section" :class="step !== 2 ? (step > 2 ? 'prev' : 'hidden') : ''">
-            <div style="max-width:720px;width:100%;text-align:center;">
+        <div class="step-section px-5 pt-16 pb-20 sm:px-12 sm:pt-20 sm:pb-12"
+             :class="step !== 2 ? (step > 2 ? 'prev' : 'hidden') : ''">
+            <div class="w-full max-w-[680px] text-center flex flex-col h-full justify-center">
 
-                <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;">Langkah 1 dari 2</p>
+                <p class="text-[10px] sm:text-[11px] tracking-[0.12em] uppercase text-white/25 mb-3 sm:mb-4">
+                    Langkah 1 dari 2
+                </p>
 
-                <h2 class="font-syne" style="font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:8px;">
+                <h2 class="text-[2rem] sm:text-[2.5rem] md:text-[3rem] font-extrabold tracking-[-0.03em] mb-2">
                     Genre favorit
                 </h2>
-                <p style="font-size:14px;color:rgba(255,255,255,0.35);margin-bottom:32px;">
+                <p class="text-[13px] sm:text-sm text-white/35 mb-6 sm:mb-8">
                     Pilih 4 genre favoritmu
-                    <span x-show="selectedGenres.length > 0" x-text="' · ' + selectedGenres.length + '/4'" style="color:rgba(255,255,255,0.6)" x-cloak></span>
+                    <span x-show="selectedGenres.length > 0"
+                          x-text="' · ' + selectedGenres.length + '/4'"
+                          class="text-white/60" x-cloak></span>
                 </p>
 
                 {{-- Genre pills --}}
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:40px;">
+                <div class="flex flex-wrap justify-center gap-2 mb-8 sm:mb-10
+                            max-h-[calc(100vh-340px)] sm:max-h-none overflow-y-auto px-1">
                     @foreach($genres as $genre)
                     <button type="button"
                         class="genre-pill"
@@ -348,11 +256,19 @@
                     @endforeach
                 </div>
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
-                    <button type="button" class="btn-ghost" @click="step = 1">← Kembali</button>
-                    <button type="button" class="btn-primary"
-                        :disabled="selectedGenres.length !== 4"
-                        @click="nextToMovies()">
+                <div class="flex items-center justify-center gap-2.5">
+                    <button type="button"
+                            class="px-5 py-3.5 bg-transparent text-white/35 border border-white/10 rounded-full
+                                   text-[13px] sm:text-sm font-medium transition-all hover:text-white/70
+                                   hover:border-white/20 active:scale-95"
+                            @click="step = 1">← Kembali</button>
+                    <button type="button"
+                            class="px-7 py-3.5 sm:px-9 bg-white text-[#070709] rounded-full text-[14px] sm:text-[15px]
+                                   font-bold cursor-pointer transition-all hover:bg-white/90 active:scale-95
+                                   disabled:bg-white/15 disabled:text-white/30 disabled:cursor-not-allowed
+                                   disabled:transform-none"
+                            :disabled="selectedGenres.length !== 4"
+                            @click="nextToMovies()">
                         Lanjut →
                     </button>
                 </div>
@@ -361,53 +277,70 @@
         </div>
 
         {{-- ========== STEP 3: FILM ========== --}}
-        <div class="step-section" :class="step !== 3 ? (step > 3 ? 'prev' : 'hidden') : ''">
-            <div style="max-width:680px;width:100%;text-align:center;">
+        <div class="step-section px-5 pt-16 pb-20 sm:px-12 sm:pt-20 sm:pb-12"
+             :class="step !== 3 ? (step > 3 ? 'prev' : 'hidden') : ''">
+            <div class="w-full max-w-[640px] text-center">
 
-                <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;">Langkah 2 dari 2</p>
+                <p class="text-[10px] sm:text-[11px] tracking-[0.12em] uppercase text-white/25 mb-3 sm:mb-4">
+                    Langkah 2 dari 2
+                </p>
 
-                <h2 class="font-syne" style="font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:8px;">
+                <h2 class="text-[2rem] sm:text-[2.5rem] md:text-[3rem] font-extrabold tracking-[-0.03em] mb-2">
                     Film favorit
                 </h2>
-                <p style="font-size:14px;color:rgba(255,255,255,0.35);margin-bottom:24px;">
+                <p class="text-[13px] sm:text-sm text-white/35 mb-5 sm:mb-6">
                     Pilih 3 film favoritmu
-                    <span x-show="selectedMovies.length > 0" x-text="' · ' + selectedMovies.length + '/3'" style="color:rgba(255,255,255,0.6)" x-cloak></span>
+                    <span x-show="selectedMovies.length > 0"
+                          x-text="' · ' + selectedMovies.length + '/3'"
+                          class="text-white/60" x-cloak></span>
                 </p>
 
                 {{-- Search --}}
-                <div style="position:relative;width:100%;max-width:440px;margin:0 auto 24px;">
-                    <svg style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:rgba(255,255,255,0.25);pointer-events:none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                <div class="relative w-full max-w-[440px] mx-auto mb-5 sm:mb-6">
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
                     </svg>
-                    <input type="text" class="search-input"
+                    <input type="text"
+                        class="w-full bg-white/[0.05] border border-white/10 rounded-2xl
+                               py-3.5 pl-11 pr-4 text-[13px] sm:text-sm text-white
+                               placeholder:text-white/25 outline-none
+                               focus:border-white/25 focus:bg-white/[0.07]
+                               disabled:opacity-30 disabled:cursor-not-allowed
+                               transition-all duration-200"
                         x-model="search"
                         @input.debounce.250ms="fetchSearch()"
                         @keydown.escape="searchResults = []"
                         :disabled="selectedMovies.length >= 3"
-                        :placeholder="selectedMovies.length >= 3 ? 'Sudah memilih 3 film ✓' : 'Cari film...'"
-                        :class="selectedMovies.length >= 3 ? 'opacity-30 cursor-not-allowed' : ''">
+                        :placeholder="selectedMovies.length >= 3 ? 'Sudah memilih 3 film ✓' : 'Cari film...'">
 
                     {{-- Dropdown --}}
-                    <div class="search-dropdown" x-show="search.length > 1 && searchResults.length > 0" @click.outside="searchResults = []" x-cloak>
+                    <div class="search-dropdown" x-show="search.length > 1 && searchResults.length > 0"
+                         @click.outside="searchResults = []" x-cloak>
                         <template x-for="movie in searchResults" :key="movie.id">
                             <div class="search-item" @mousedown.prevent @click.stop="selectMovie(movie)">
-                                <img :src="movie.poster_url" :alt="movie.title">
-                                <div style="text-align:left;min-width:0;flex:1">
-                                    <p style="font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="movie.title"></p>
-                                    <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px">⭐ <span x-text="movie.rating"></span></p>
+                                <img :src="movie.poster_url" :alt="movie.title"
+                                     class="w-8 h-12 object-cover rounded-[6px] flex-shrink-0">
+                                <div class="text-left min-w-0 flex-1">
+                                    <p class="text-[13px] font-medium text-white truncate" x-text="movie.title"></p>
+                                    <p class="text-[11px] text-white/30 mt-0.5">⭐ <span x-text="movie.rating"></span></p>
                                 </div>
-                                <span style="font-size:11px;color:rgba(255,255,255,0.25);flex-shrink:0">Pilih</span>
+                                <span class="text-[11px] text-white/25 flex-shrink-0">Pilih</span>
                             </div>
                         </template>
                     </div>
                 </div>
 
-                {{-- Selected movies - rendered dari Alpine state --}}
-                <div style="min-height:112px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:28px;max-height:140px;overflow-y:auto;padding:8px 8px 4px;">
+                {{-- Selected movies --}}
+                <div class="flex flex-wrap justify-center gap-2.5 mb-6 sm:mb-7
+                            min-h-[104px] max-h-[120px] sm:max-h-[140px] overflow-y-auto px-2 py-1">
 
                     <template x-for="movie in selectedMoviesData" :key="movie.id">
                         <div class="movie-chip" @click="removeMovie(movie.id)">
-                            <img class="movie-chip-img" :src="movie.poster_url" :alt="movie.title">
+                            <img :src="movie.poster_url" :alt="movie.title"
+                                 class="w-14 h-20 sm:w-16 sm:h-24 object-cover rounded-[10px] block
+                                        border border-white/[0.08]">
                             <div class="movie-chip-remove">✕</div>
                             <input type="hidden" name="movie_ids[]" :value="movie.id">
                         </div>
@@ -415,17 +348,27 @@
 
                     {{-- Empty state --}}
                     <div x-show="selectedMoviesData.length === 0" x-cloak
-                        style="width:100%;display:flex;align-items:center;justify-content:center;height:96px;border:1px dashed rgba(255,255,255,0.08);border-radius:16px;gap:8px;">
-                        <svg style="width:16px;height:16px;color:rgba(255,255,255,0.15)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         class="w-full flex items-center justify-center h-24 gap-2
+                                border border-dashed border-white/[0.08] rounded-2xl">
+                        <svg class="w-4 h-4 text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        <span style="font-size:13px;color:rgba(255,255,255,0.2)">Film yang kamu pilih akan muncul di sini</span>
+                        <span class="text-[12px] sm:text-[13px] text-white/20">Film pilihanmu muncul di sini</span>
                     </div>
                 </div>
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
-                    <button type="button" class="btn-ghost" @click="step = 2">← Kembali</button>
-                    <button type="submit" class="btn-primary" :disabled="selectedMovies.length !== 3">Selesai</button>
+                <div class="flex items-center justify-center gap-2.5">
+                    <button type="button"
+                            class="px-5 py-3.5 bg-transparent text-white/35 border border-white/10 rounded-full
+                                   text-[13px] sm:text-sm font-medium transition-all hover:text-white/70
+                                   hover:border-white/20 active:scale-95"
+                            @click="step = 2">← Kembali</button>
+                    <button type="submit"
+                            class="px-7 py-3.5 sm:px-9 bg-white text-[#070709] rounded-full text-[14px] sm:text-[15px]
+                                   font-bold cursor-pointer transition-all hover:bg-white/90 active:scale-95
+                                   disabled:bg-white/15 disabled:text-white/30 disabled:cursor-not-allowed
+                                   disabled:transform-none"
+                            :disabled="selectedMovies.length !== 3">Selesai</button>
                 </div>
 
             </div>
@@ -441,8 +384,8 @@ function onboarding() {
         search: '',
         searchResults: [],
         selectedGenres: [],
-        selectedMovies: [],       // array of ids (string)
-        selectedMoviesData: [],   // array of {id, title, poster_url, rating}
+        selectedMovies: [],
+        selectedMoviesData: [],
 
         async fetchSearch() {
             if (this.search.length < 2) { this.searchResults = []; return; }
@@ -456,7 +399,7 @@ function onboarding() {
         selectMovie(movie) {
             const id = String(movie.id);
             if (this.selectedMovies.includes(id)) return;
-            if (this.selectedMovies.length >= 3) return; // max 3
+            if (this.selectedMovies.length >= 3) return;
             this.selectedMovies.push(id);
             this.selectedMoviesData.push({
                 id: id,
@@ -481,17 +424,11 @@ function onboarding() {
         toggleGenre(id) {
             const i = this.selectedGenres.indexOf(id);
             if (i === -1) {
-                if (this.selectedGenres.length >= 4) return; // max 4
+                if (this.selectedGenres.length >= 4) return;
                 this.selectedGenres.push(id);
             } else {
                 this.selectedGenres.splice(i, 1);
             }
-        },
-
-        toggleMovie(id) {
-            const s = String(id);
-            const i = this.selectedMovies.indexOf(s);
-            i === -1 ? this.selectedMovies.push(s) : this.selectedMovies.splice(i, 1);
         },
 
         nextToMovies() {
