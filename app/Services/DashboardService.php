@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\userActors;
 use Illuminate\Support\Facades\Cache;
 use App\Models\CollectionModel;
 use App\Models\Movie;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Collection\distinct;
 use App\Models\User;
 use App\Models\UserGenre;
 use App\Models\Actor;
+use App\Models\userCollections;
 use App\Models\Watchlist;
 use App\Models\UserRecommendation;
 
@@ -137,16 +139,7 @@ class DashboardService
             })
             ->values()
             ->unique('tmdb_movie_id');
-        $actor_ids = Cache::remember("user_rec_actor_{$user_id}", 7600, function () use ($finalMovies) {
-            return $finalMovies->flatMap(function ($movie) {
-                return $movie->actors ? $movie->actors->pluck('tmdb_actor_id') : [];
-            })
-                ->countBy()
-                ->sortDesc()
-                ->take(12)
-                ->keys()
-                ->toArray();
-        });
+        $actor_ids = userActors::where('user_id',$user_id)->pluck('tmdb_actor_id')->toArray(); 
 
         $actorsArray = [];
         foreach ($actor_ids as $id) {
@@ -160,13 +153,8 @@ class DashboardService
         // Kita ubah array murni tadi kembali menjadi Objek Model Movie asli Laravel
         $actors = Actor::hydrate($cleanActorArrays);
 
-        $collection_ids = Cache::remember("user_rec_collection_{$user_id}", 7600, function () use ($finalMovies) {
-            return $finalMovies
-                ->whereNotNull('tmdb_collection_id')
-                ->unique('tmdb_collection_id')
-                ->take(7)
-                ->pluck('tmdb_collection_id')->toArray();
-        });
+        $collection_ids = userCollections::where('user_id',$user_id)->pluck('tmdb_collection_id')->toArray(); 
+
         $collectionsArray = [];
         foreach ($collection_ids as $id) {
             $collectionsArray[] = Cache::remember("collection_detail_{$id}", 7600, function () use ($id) {
