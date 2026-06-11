@@ -144,7 +144,7 @@
                     @if($userTaste || $userGenres->count() > 0)
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                             
-                            {{-- Grafik Genre --}}
+                           {{-- Grafik Genre --}}
                             <div class="bg-black/30 rounded-2xl p-5 border border-white/5 flex flex-col h-full">
                                 <h3 class="text-sm md:text-base font-semibold text-gray-300 mb-4 flex items-center gap-2">
                                     <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -152,7 +152,7 @@
                                 </h3>
                                 <div class="flex-grow flex items-center justify-center w-full">
                                     <canvas id="genreChart" style="max-height: 220px; width: 100%;"></canvas>
-                                end
+                                </div> {{-- Teks 'end' tadi sudah diganti kembali menjadi penutup div yang benar --}}
                                 <button @click="openGenre = true" class="mt-4 w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-medium transition text-gray-300">
                                     Lihat Detail Genre
                                 </button>
@@ -291,7 +291,7 @@
                             label: 'Affinity Score (%)',
                             data: {!! json_encode(array_slice($genreWeights ?? [], 0, 5)) !!},
                             backgroundColor: 'rgba(6, 182, 212, 0.4)',
-                            borderColor: 'rgba(6, 182, 212, 1)',
+                            borderColor: 'rgba(6, 182, 212, 1)',    
                             borderWidth: 1,
                             borderRadius: 4
                         }]
