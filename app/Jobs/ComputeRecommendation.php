@@ -38,10 +38,7 @@ class ComputeRecommendation implements ShouldQueue
         $userGenreIds = $userGenres->pluck('genre_id');
         $userTastes = UserTaste::where('user_id', $this->userId)->first()->toArray();
         $user_id = $this->userId;
-        $interacted = Cache::remember("user_movie_interacted_{$this->userId}", 7600, function () use ($user_id) {
-            return userMovieInteracted::where('user_id', $user_id)->get()->pluck('tmdb_movie_id')->toArray();
-        });
-
+        $interacted = userMovieInteracted::where('user_id', $user_id)->get()->pluck('tmdb_movie_id')->toArray();
         $incoming_ids = Cache::rememberForever("upcoming_movie_ids", function () {
             return Movie::where('status', 'upcoming')->get()->pluck('tmdb_movie_id')->toArray();
         });
