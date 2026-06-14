@@ -76,10 +76,11 @@ class FlaskService
         return $response->json('ranked_id');
     }
 
-    public function getBestMoviesByGenre(array $movies): array
+    public function getBestMoviesByGenre(array $movies, string $genreName = ''): array
     {
         $response = Http::post("{$this->baseUrl}/edas/bestbygenre", [
-            'movies' => $movies,
+            'movies'     => $movies,
+            'genre_name' => $genreName,   // tambahan
         ]);
 
         if ($response->failed()) {
