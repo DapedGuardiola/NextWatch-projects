@@ -24,6 +24,8 @@ class LogActivityService
 
     public function favorite(array $data)
     {
+        $user_id = Auth::user()->id;
+        $movie_id = $data['movie_id'];
         LogActivityModel::insert([
             'tmdb_movie_id' => $data['movie_id'],
             'user_id' => $data['user_id'],
@@ -31,18 +33,22 @@ class LogActivityService
             'updated_at'=> now(),
             'created_at' => now(),
         ]);
+        userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie_id]);
         $this->counterReevalTrigger();
     }
 
     public function watchlist(array $data)
     {
+        $user_id = Auth::user()->id;
+        $movie_id = $data['movie_id'];
         LogActivityModel::insert([
-            'tmdb_movie_id' => $data['movie_id'],
+            'tmdb_movie_id' => $movie_id,
             'user_id' => $data['user_id'],
             'type' => 'watchlist',
             'updated_at'=> now(),
             'created_at' => now(),
         ]);
+        userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie_id]);
         $this->counterReevalTrigger();
     }
 
@@ -81,10 +87,6 @@ class LogActivityService
             'updated_at'=> now(),
             'created_at' => now(),
         ]);
-        $interacted = userMovieInteracted::firstOrCreate(['user_id'=>$user_id, 'tmdb_movie_id'=>$movie_id]);
-        if($interacted){
-            Cache::forget("user_movie_interacted_{$user_id}");
-        }
         $this->counterReevalTrigger();
     }
 
