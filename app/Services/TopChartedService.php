@@ -42,7 +42,7 @@ class TopChartedService
     private function computeAllTimeBestFromFlask()
     {
         // 1. Ambil semua kandidat + data normalisasi
-        $candidates = Movie::select(['tmdb_movie_id'])
+        $candidates = Movie::select(['tmdb_movie_id', 'popularity', 'rating', 'rating_count'])
             ->orderByRaw('popularity DESC, rating_count DESC, rating DESC')
             ->limit(100)
             ->get();
@@ -146,7 +146,7 @@ class TopChartedService
         foreach ($genres as $genre) {
             // 1. Ambil kandidat + data normalisasi
             $candidates = Movie::select([
-                'movies.tmdb_movie_id',
+                'movies.tmdb_movie_id', 'movies.popularity', 'movies.rating', 'movies.rating_count',
             ])
                 ->with([
                     'genreVector:tmdb_movie_id,vector',
@@ -174,9 +174,9 @@ class TopChartedService
                 ];
             })->toArray();
 
-            // 3. Kirim ke Flask EDAS
+            // 3. Kirim ke Flask EDAS — sertakan genre_name sebagai parameter terpisah
             try {
-                $rankedIds = $this->flaskService->getBestMoviesByGenre($moviesPayload);
+                $rankedIds = $this->flaskService->getBestMoviesByGenre($moviesPayload, $genre->name);
             } catch (\Exception $e) {
                 Log::error('Flask EDAS error: ' . $genre->name, ['error' => $e->getMessage()]);
                 continue;
